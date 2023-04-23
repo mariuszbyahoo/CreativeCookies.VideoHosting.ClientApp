@@ -3,6 +3,7 @@ import FilmsList from "./components/FilmsList";
 import FilmUpload from "./components/FilmUpload";
 import { Home } from "./components/Home";
 import Player from "./components/Player";
+import SignInLandingComponent from "./components/Account/SignInLandingComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -98,6 +99,20 @@ const AppRoutes = [
         }}
       >
         <FilmUpload />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "signin-oidc",
+    requireAuth: false,
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <SignInLandingComponent />
       </ErrorBoundary>
     ),
   },
