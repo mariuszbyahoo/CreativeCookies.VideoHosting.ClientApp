@@ -10,6 +10,7 @@ import { Navbar } from "reactstrap";
 import { Link } from "react-router-dom";
 import "./NavMenu.css";
 import LoginComponent from "./Account/Login";
+import RegisterComponent from "./Account/Register";
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -62,9 +63,12 @@ export class NavMenu extends Component {
                   Film upload
                 </NavLink>
               </NavItem>
-              {/* HACK: warunkowo wyświetl komponent linków logoania i rejestrowania, albo adres email użytkownika - ten link będzie prowadził do strony z zarządzaniem konta. */}
+              {/* HACK: warunkowo wyświetl komponent linków logowania i rejestrowania, albo adres email użytkownika - ten link będzie prowadził do strony z zarządzaniem konta. */}
               <NavItem>
-                <LoginComponent />
+                <LoginComponent className="text-dark  nav-link" />
+              </NavItem>
+              <NavItem>
+                <RegisterComponent className="text-dark  nav-link" />
               </NavItem>
             </ul>
           </Collapse>
