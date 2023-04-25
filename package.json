@@ -12,6 +12,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.2.0",
+    "crypto-js": "^4.1.1",
     "js-base64": "^3.7.5",
     "merge": "^2.1.1",
     "plyr-react": "^5.1.2",

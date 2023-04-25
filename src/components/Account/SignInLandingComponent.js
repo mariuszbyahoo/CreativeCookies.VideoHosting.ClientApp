@@ -1,18 +1,51 @@
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import CryptoJS from "crypto-js";
 
 const SignInLandingComponent = (props) => {
-  const params = useParams();
-  // useParams returns no changes?!
-  debugger;
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const code = searchParams.get("code");
+  const returnedState = CryptoJS.AES.decrypt(
+    searchParams.get("state"),
+    process.env.REACT_APP_AES_KEY
+  ).toString(CryptoJS.enc.Utf8);
+  console.log(
+    "returned state: ",
+    CryptoJS.AES.decrypt(
+      searchParams.get("state"),
+      process.env.REACT_APP_AES_KEY
+    ).toString(CryptoJS.enc.Utf8)
+  );
+  console.log(
+    "stored state: ",
+    CryptoJS.AES.decrypt(
+      localStorage.getItem("state"),
+      process.env.REACT_APP_AES_KEY
+    ).toString(CryptoJS.enc.Utf8)
+  );
+  // Check if the returned state matches the stored state
+  if (
+    CryptoJS.AES.decrypt(
+      searchParams.get("state"),
+      process.env.REACT_APP_AES_KEY
+    ).toString(CryptoJS.enc.Utf8) ===
+    CryptoJS.AES.decrypt(
+      localStorage.getItem("state"),
+      process.env.REACT_APP_AES_KEY
+    ).toString(CryptoJS.enc.Utf8)
+  ) {
+    // Perform other actions specified in RFC6749
+    console.log("State values match");
+  } else {
+    console.error("State values do not match");
+    // HACK TODO: Add error response https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+  }
+
   return (
     <>
       <h4>This is SignIn landing component</h4>
-      {/* Get the code and state from url and then compare state with the stored value + perform other actions specified in RFC6749 */}
-      {Object.entries(params).map((v, i) => (
-        <h5>
-          Value: {v}, Index: {i}
-        </h5>
-      ))}
+      <h5>Code: {code}</h5>
+      <h5>State: {returnedState}</h5>
     </>
   );
 };
