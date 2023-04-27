@@ -1,51 +1,49 @@
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import CryptoJS from "crypto-js";
+
+function getCookie(name) {
+  const nameWithEquals = name + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const cookieArray = decodedCookie.split(";");
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i];
+    while (cookie.charAt(0) === " ") {
+      cookie = cookie.substring(1);
+    }
+    if (cookie.indexOf(nameWithEquals) === 0) {
+      return cookie.substring(nameWithEquals.length, cookie.length);
+    }
+  }
+  return "";
+}
 
 const SignInLandingComponent = (props) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const code = searchParams.get("code");
-  const returnedState = CryptoJS.AES.decrypt(
-    searchParams.get("state"),
-    process.env.REACT_APP_AES_KEY
-  ).toString(CryptoJS.enc.Utf8);
-  console.log(
-    "returned state: ",
-    CryptoJS.AES.decrypt(
-      searchParams.get("state"),
-      process.env.REACT_APP_AES_KEY
-    ).toString(CryptoJS.enc.Utf8)
+  const [stateFromParams, setStateFromParams] = useState(
+    decodeURIComponent(searchParams.get("state"))
   );
-  console.log(
-    "stored state: ",
-    CryptoJS.AES.decrypt(
-      localStorage.getItem("state"),
-      process.env.REACT_APP_AES_KEY
-    ).toString(CryptoJS.enc.Utf8)
+  const [stateFromCookies, setStateFromCookies] = useState(
+    getCookie("oauth2_state")
   );
-  // Check if the returned state matches the stored state
-  if (
-    CryptoJS.AES.decrypt(
-      searchParams.get("state"),
-      process.env.REACT_APP_AES_KEY
-    ).toString(CryptoJS.enc.Utf8) ===
-    CryptoJS.AES.decrypt(
-      localStorage.getItem("state"),
-      process.env.REACT_APP_AES_KEY
-    ).toString(CryptoJS.enc.Utf8)
-  ) {
-    // Perform other actions specified in RFC6749
-    console.log("State values match");
-  } else {
-    console.error("State values do not match");
-    // HACK TODO: Add error response https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+
+  const [code, setCode] = useState(searchParams.get("code"));
+
+  const areTheyEqual = stateFromParams === stateFromCookies;
+
+  if (areTheyEqual) {
+    document.cookie =
+      "oauth2_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // HACK TODO: Perform tokens retrieval.
   }
 
   return (
     <>
       <h4>This is SignIn landing component</h4>
       <h5>Code: {code}</h5>
-      <h5>State: {returnedState}</h5>
+      <h5>State from params: {stateFromParams}</h5>
+      <h5>State from Cookies: {stateFromCookies}</h5>
+      <h5>Are they equal: {areTheyEqual ? <p>Yes</p> : <p>No</p>}</h5>
     </>
   );
 };

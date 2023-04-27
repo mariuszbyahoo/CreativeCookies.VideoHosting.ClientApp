@@ -1,16 +1,22 @@
 import { Link, NavLink } from "react-router-dom";
-import CryptoJS from "crypto-js";
 
-function getRandomNumbers(amount) {
-  const randomNumbers = [];
-  const min = 1;
-  const max = 100;
-
-  for (let i = 0; i < amount; i++) {
-    const randomNumber = Math.floor(Math.random() * (max - min + 1) + min);
-    randomNumbers.push(randomNumber);
+function generateRandomString(length) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  return randomNumbers.join("");
+  return result;
+}
+
+function setCookie(name, value) {
+  const expiresInSeconds = 60;
+  let expires = "";
+  const date = new Date();
+  date.setTime(date.getTime() + expiresInSeconds * 1000);
+  expires = "; expires=" + date.toUTCString();
+  document.cookie = name + "=" + value + expires + "; path=/";
 }
 
 const LoginComponent = (props) => {
@@ -18,19 +24,16 @@ const LoginComponent = (props) => {
   const redirectUri = encodeURIComponent(process.env.REACT_APP_REDIRECT_URI);
   const responseType = "code";
   const scope = encodeURIComponent("test");
-  const initialState = getRandomNumbers(10);
-  const stateEncrypted = encodeURIComponent(
-    CryptoJS.AES.encrypt(initialState, process.env.REACT_APP_AES_KEY)
-  );
+  const state = generateRandomString(32);
+  const encodedState = encodeURIComponent(state);
   const codeChallenge = encodeURIComponent("myCodeChallenge");
   const codeChallengeMethod = "myCodeChallengeMethod";
 
   const handleLoginClick = () => {
-    localStorage.setItem("state", stateEncrypted.toString(CryptoJS.enc.Utf8));
-    console.log("stateEncrypted: ", stateEncrypted.toString(CryptoJS.enc.Utf8));
+    setCookie("oauth2_state", state); // Expires in 60 seconds
   };
 
-  const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&state=${stateEncrypted}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
+  const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&state=${encodedState}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
 
   return (
     <a href={loginUrl} className={props.className} onClick={handleLoginClick}>
