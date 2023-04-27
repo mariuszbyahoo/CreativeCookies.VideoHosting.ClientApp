@@ -37,6 +37,9 @@ const SignInLandingComponent = (props) => {
     // HACK TODO: Perform tokens retrieval.
   }
 
+  // HACK add reaction if cookie will expire itself before the equality test
+  // i.e. component receives a request, but state param from cookie is not present.
+
   return (
     <>
       <h4>This is SignIn landing component</h4>
