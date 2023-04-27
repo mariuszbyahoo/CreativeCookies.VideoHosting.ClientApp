@@ -16,7 +16,7 @@ function setCookie(name, value) {
   const date = new Date();
   date.setTime(date.getTime() + expiresInSeconds * 1000);
   expires = "; expires=" + date.toUTCString();
-  document.cookie = name + "=" + value + expires + "; path=/";
+  document.cookie = name + "=" + value + expires + "; path=/; Secure;";
 }
 
 const LoginComponent = (props) => {
