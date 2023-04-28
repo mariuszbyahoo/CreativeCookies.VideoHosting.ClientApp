@@ -16,7 +16,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    // Perform logout actions, e.g., clearing tokens
+    // Call your API to perform the logout action
+    await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/logout`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Add any necessary authentication headers, e.g., an access token
+      }
+    );
+
+    // Clear any stored tokens and set isAuthenticated to false
     setIsAuthenticated(false);
   };
 

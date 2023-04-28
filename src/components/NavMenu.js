@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import "./NavMenu.css";
 import LoginComponent from "./Account/Login";
 import RegisterComponent from "./Account/Register";
+import LogoutComponent from "./Account/Logout";
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
@@ -69,6 +70,9 @@ export class NavMenu extends Component {
               </NavItem>
               <NavItem>
                 <RegisterComponent className="text-dark  nav-link" />
+              </NavItem>
+              <NavItem>
+                <LogoutComponent className="text-dark  nav-link" />
               </NavItem>
             </ul>
           </Collapse>
