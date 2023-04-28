@@ -4,6 +4,7 @@ import FilmUpload from "./components/FilmUpload";
 import { Home } from "./components/Home";
 import Player from "./components/Player";
 import SignInLandingComponent from "./components/Account/SignInLandingComponent";
+import ProtectedComponent from "./components/Routes/ProtectedComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -47,6 +48,9 @@ function fallbackRender({ error, resetErrorBoundary }) {
     </div>
   );
 }
+
+const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/Login`;
+const isAuthenticated = false; // HACK TODO: Change with real isAuthenticated check
 const AppRoutes = [
   {
     index: true,
@@ -76,7 +80,6 @@ const AppRoutes = [
   },
   {
     path: "/player/:title",
-    requireAuth: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -84,13 +87,17 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <Player />
+        <ProtectedComponent
+          isAuthenticated={isAuthenticated}
+          loginUrl={loginUrl}
+        >
+          <Player />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },
   {
     path: "/films-upload",
-    requireAuth: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -98,13 +105,17 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <FilmUpload />
+        <ProtectedComponent
+          isAuthenticated={isAuthenticated}
+          loginUrl={loginUrl}
+        >
+          <FilmUpload />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },
   {
     path: "signin-oidc",
-    requireAuth: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
