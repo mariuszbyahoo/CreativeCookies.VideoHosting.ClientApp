@@ -1,6 +1,9 @@
 import React from "react";
+import { useAuth } from "../Account/AuthContext";
 
-const ProtectedComponent = ({ isAuthenticated, loginUrl, children }) => {
+const ProtectedComponent = ({ loginUrl, children }) => {
+  const { isAuthenticated } = useAuth();
+
   if (!isAuthenticated) {
     // Redirect to the login page
     window.location.href = loginUrl;

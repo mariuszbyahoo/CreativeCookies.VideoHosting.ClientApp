@@ -1,21 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-
-function getCookie(name) {
-  const nameWithEquals = name + "=";
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const cookieArray = decodedCookie.split(";");
-  for (let i = 0; i < cookieArray.length; i++) {
-    let cookie = cookieArray[i];
-    while (cookie.charAt(0) === " ") {
-      cookie = cookie.substring(1);
-    }
-    if (cookie.indexOf(nameWithEquals) === 0) {
-      return cookie.substring(nameWithEquals.length, cookie.length);
-    }
-  }
-  return "";
-}
+import { getAuthCookie, isStateValid } from "./authHelper";
 
 const SignInLandingComponent = (props) => {
   const location = useLocation();
@@ -23,24 +8,11 @@ const SignInLandingComponent = (props) => {
   const [stateFromParams, setStateFromParams] = useState(
     decodeURIComponent(searchParams.get("state"))
   );
-  const [stateFromCookies, setStateFromCookies] = useState(
-    getCookie("oauth2_state")
-  );
+  const [stateFromCookies, setStateFromCookies] = useState(getAuthCookie());
 
   const [code, setCode] = useState(searchParams.get("code"));
 
-  const areTheyEqual = stateFromParams === stateFromCookies;
-
-  if (areTheyEqual) {
-    document.cookie =
-      "oauth2_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    // HACK TODO: Perform tokens retrieval.
-  } else if (!areTheyEqual && !stateFromCookies) {
-    console.log("State cookie expired!");
-    // add reaction if cookie will expire itself before the equality test
-    // i.e. component receives a request, but state param from cookie is not present.
-  }
-
+  const areTheyEqual = isStateValid(stateFromParams, stateFromCookies);
   return (
     <>
       <h4>This is SignIn landing component</h4>

@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { generateRandomString, setAuthCookie } from "./stateHelper";
+import { generateRandomString, setAuthCookie } from "./authHelper";
 
 const LoginComponent = (props) => {
   const clientId = process.env.REACT_APP_CLIENT_ID;
@@ -12,7 +12,7 @@ const LoginComponent = (props) => {
   const codeChallengeMethod = "myCodeChallengeMethod";
 
   const handleLoginClick = () => {
-    setAuthCookie("oauth2_state", state); // Expires in 5 minutes
+    setAuthCookie(state);
   };
 
   const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&state=${encodedState}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
