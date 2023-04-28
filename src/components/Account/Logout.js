@@ -11,15 +11,11 @@ const LogoutComponent = (props) => {
     event.preventDefault(); // Prevent the default behavior of the anchor tag
 
     try {
-      await logout(); // Wait for the logout function to complete
-
-      // Show the feedback message
-      setMessage("Logged out");
-
-      // Redirect the user to the "films-list" page or any other appropriate location after a short delay
-      setTimeout(() => {
-        navigate("/films-list");
-      }, 2000);
+      debugger;
+      // Redirect the user to the Razor Page Logout
+      // HACK TODO: After finishing of Tokens retrieval flow - clear all
+      // Auth related cookies from the browser.
+      window.location.href = "https://localhost:7034/Identity/Account/Logout";
     } catch (error) {
       // Show an error message if the logout process fails
       setMessage("Error logging out");
