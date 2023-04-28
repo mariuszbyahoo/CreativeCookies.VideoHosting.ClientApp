@@ -35,10 +35,11 @@ const SignInLandingComponent = (props) => {
     document.cookie =
       "oauth2_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     // HACK TODO: Perform tokens retrieval.
+  } else if (!areTheyEqual && !stateFromCookies) {
+    console.log("State cookie expired!");
+    // add reaction if cookie will expire itself before the equality test
+    // i.e. component receives a request, but state param from cookie is not present.
   }
-
-  // HACK add reaction if cookie will expire itself before the equality test
-  // i.e. component receives a request, but state param from cookie is not present.
 
   return (
     <>
