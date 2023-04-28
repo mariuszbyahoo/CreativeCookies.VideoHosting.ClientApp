@@ -10,7 +10,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = async (code) => {
+  const requestAccessToken = async (code) => {
     // Call your API to exchange the code for an access_token
     // Set isAuthenticated to true after a successful login
   };
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     isAuthenticated,
-    login,
+    requestAccessToken,
     logout,
   };
 

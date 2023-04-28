@@ -1,27 +1,27 @@
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 import { getAuthCookie, isStateValid } from "./authHelper";
 
-const SignInLandingComponent = (props) => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const [stateFromParams, setStateFromParams] = useState(
-    decodeURIComponent(searchParams.get("state"))
-  );
+const SignInLandingComponent = () => {
+  const { requestAccessToken } = useAuth();
   const [stateFromCookies, setStateFromCookies] = useState(getAuthCookie());
 
-  const [code, setCode] = useState(searchParams.get("code"));
+  useEffect(() => {
+    // Verify the state parameter and extract the code from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    const state = urlParams.get("state");
 
-  const areTheyEqual = isStateValid(stateFromParams, stateFromCookies);
-  return (
-    <>
-      <h4>This is SignIn landing component</h4>
-      <h5>Code: {code}</h5>
-      <h5>State from params: {stateFromParams}</h5>
-      <h5>State from Cookies: {stateFromCookies}</h5>
-      <h5>Are they equal: {areTheyEqual ? <p>Yes</p> : <p>No</p>}</h5>
-    </>
-  );
+    // Implement the logic to verify the state parameter
+    // If the state is valid, call the requestAccessToken function with the code
+    if (isStateValid(state, stateFromCookies)) {
+      requestAccessToken(code);
+    }
+  }, [requestAccessToken]);
+
+  const content = <h4>Processing Auth...</h4>;
+
+  return <div>{content}</div>;
 };
 
 export default SignInLandingComponent;
