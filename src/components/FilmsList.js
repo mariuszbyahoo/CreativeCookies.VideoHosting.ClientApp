@@ -1,6 +1,5 @@
 "use client";
 
-import { BlobServiceClient } from "@azure/storage-blob";
 import { useCallback, useEffect, useState } from "react";
 import styles from "./FilmsList.module.css";
 import Mosaic from "./Mosaic";

@@ -1,4 +1,3 @@
-import { Link, NavLink } from "react-router-dom";
 import { generateRandomString, setAuthCookie } from "./authHelper";
 
 const LoginComponent = (props) => {
