@@ -14,7 +14,7 @@ const LoginComponent = (props) => {
     setAuthCookie(state);
   };
 
-  const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/authenticate?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&state=${encodedState}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
+  const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&state=${encodedState}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
 
   return (
     <a href={loginUrl} className={props.className} onClick={handleLoginClick}>

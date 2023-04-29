@@ -6,6 +6,8 @@ const SignInLandingComponent = () => {
   const { requestAccessToken } = useAuth();
   const [stateFromCookies, setStateFromCookies] = useState(getAuthCookie());
 
+  // HACK: If error response received: display an error message to the user
+
   useEffect(() => {
     // Verify the state parameter and extract the code from the URL
     const urlParams = new URLSearchParams(window.location.search);
