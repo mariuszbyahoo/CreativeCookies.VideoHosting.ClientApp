@@ -1,5 +1,6 @@
 // AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
+import { generateCodeChallenge } from "./authHelper";
 
 const AuthContext = createContext();
 
@@ -10,9 +11,41 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const requestAccessToken = async (code) => {
-    // Call your API to exchange the code for an access_token
-    // Set isAuthenticated to true after a successful login
+  const requestAccessToken = async (code, codeVerifier) => {
+    const clientId = process.env.REACT_APP_CLIENT_ID;
+    const redirectUri = process.env.REACT_APP_REDIRECT_URI;
+    const grantType = "authorization_code";
+
+    try {
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `grant_type=${grantType}&code=${code}&redirect_uri=${redirectUri}&client_id=${clientId}&code_verifier=${codeVerifier}`,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // Store the access_token and other relevant data
+        // Set isAuthenticated to true after a successful login
+        debugger;
+        setIsAuthenticated(true);
+      } else {
+        // Handle errors, e.g., display an error message
+        console.error("Error requesting access token:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching access token:", error);
+    }
+  };
+
+  const generatePkceData = () => {
+    const { codeVerifier, codeChallenge } = generateCodeChallenge();
+    return { codeVerifier, codeChallenge };
   };
 
   const logout = async () => {
@@ -42,6 +75,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     requestAccessToken,
     logout,
+    generatePkceData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

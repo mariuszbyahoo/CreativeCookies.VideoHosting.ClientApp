@@ -4,7 +4,9 @@ import { getAuthCookie, isStateValid } from "./authHelper";
 
 const SignInLandingComponent = () => {
   const { requestAccessToken } = useAuth();
-  const [stateFromCookies, setStateFromCookies] = useState(getAuthCookie());
+  const [stateFromCookies, setStateFromCookies] = useState(
+    getAuthCookie(process.env.REACT_APP_STATE_COOKIE_NAME)
+  );
   const [error, setError] = useState(null);
   const [errorDescription, setErrorDescription] = useState(null);
 
@@ -19,7 +21,10 @@ const SignInLandingComponent = () => {
       setError(error);
     } else if (isStateValid(state, stateFromCookies)) {
       // If the state is valid, call the requestAccessToken function with the code
-      requestAccessToken(code);
+      const codeVerifier = getAuthCookie(
+        process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME
+      );
+      requestAccessToken(code, codeVerifier);
     }
   }, [requestAccessToken]);
 

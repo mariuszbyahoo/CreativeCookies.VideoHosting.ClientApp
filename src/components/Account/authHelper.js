@@ -1,3 +1,5 @@
+import CryptoJS from "crypto-js";
+
 function generateRandomString(length) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -8,8 +10,18 @@ function generateRandomString(length) {
   return result;
 }
 
-function getAuthCookie() {
-  const nameWithEquals = `${process.env.REACT_APP_STATE_COOKIE_NAME}=`;
+function generateCodeChallenge() {
+  const codeVerifier = generateRandomString(43);
+  const hash = CryptoJS.SHA256(codeVerifier);
+  const base64UrlEncodedHash = CryptoJS.enc.Base64.stringify(hash)
+    .replace("+", "-")
+    .replace("/", "_")
+    .replace(/=+$/, "");
+  return { codeVerifier, codeChallange: base64UrlEncodedHash };
+}
+
+function getAuthCookie(name) {
+  const nameWithEquals = `${name}=`;
   const decodedCookie = decodeURIComponent(document.cookie);
   const cookieArray = decodedCookie.split(";");
   for (let i = 0; i < cookieArray.length; i++) {
@@ -24,17 +36,13 @@ function getAuthCookie() {
   return "";
 }
 
-function setAuthCookie(value) {
+function setAuthCookie(name, value) {
   const expiresInMinutes = 60 * 5;
   let expires = "";
   const date = new Date();
   date.setTime(date.getTime() + expiresInMinutes * 1000);
   expires = "; expires=" + date.toUTCString();
-  document.cookie =
-    `${process.env.REACT_APP_STATE_COOKIE_NAME}=` +
-    value +
-    expires +
-    "; path=/; Secure;";
+  document.cookie = `${name}=` + value + expires + "; path=/; Secure;";
 }
 
 function isStateValid(stateFromParams, stateFromCookies) {
@@ -42,8 +50,6 @@ function isStateValid(stateFromParams, stateFromCookies) {
 
   if (areTheyEqual) {
     document.cookie = `${process.env.REACT_APP_STATE_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    // HACK TODO: disable used authCode from further usage
-    // HACK TODO: Perform tokens retrieval.
   } else if (!areTheyEqual && !stateFromCookies) {
     console.log("State cookie expired!");
     // add reaction if cookie will expire itself before the equality test
@@ -52,4 +58,10 @@ function isStateValid(stateFromParams, stateFromCookies) {
   return areTheyEqual;
 }
 
-export { generateRandomString, setAuthCookie, getAuthCookie, isStateValid };
+export {
+  generateRandomString,
+  setAuthCookie,
+  getAuthCookie,
+  isStateValid,
+  generateCodeChallenge,
+};
