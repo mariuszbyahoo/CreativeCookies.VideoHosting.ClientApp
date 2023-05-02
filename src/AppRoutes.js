@@ -5,6 +5,7 @@ import { Home } from "./components/Home";
 import Player from "./components/Player";
 import SignInLandingComponent from "./components/Account/SignInLandingComponent";
 import ProtectedComponent from "./components/Routes/ProtectedComponent";
+import AuthErrorComponent from "./components/Account/AuthError";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -126,6 +127,10 @@ const AppRoutes = [
         <SignInLandingComponent />
       </ErrorBoundary>
     ),
+  },
+  {
+    path: "auth-error",
+    element: <AuthErrorComponent />,
   },
 ];
 

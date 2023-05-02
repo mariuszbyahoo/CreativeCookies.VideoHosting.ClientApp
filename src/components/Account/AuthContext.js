@@ -52,9 +52,12 @@ export const AuthProvider = ({ children }) => {
       } else {
         // Handle errors, e.g., display an error message
         console.error("Error requesting access token:", response.statusText);
+        // HACK TODO: tutaj występuje błąd za pierwszą próbą logowania.
+        navigate("/auth-error");
       }
     } catch (error) {
       console.error("Error fetching access token:", error);
+      navigate("/auth-error");
     }
   }, []);
 
