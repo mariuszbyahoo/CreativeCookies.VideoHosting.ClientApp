@@ -3,6 +3,7 @@ import styles from "./Player.module.css";
 import "plyr-react/plyr.css";
 import Plyr from "plyr-react";
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "./Account/AuthContext";
 
 const Player = (props) => {
   const [videoUrl, setVideoUrl] = useState("");
@@ -10,6 +11,7 @@ const Player = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
+  const { accessToken } = useAuth();
 
   if (params.title === ":title") navigate("/films-list");
 
@@ -26,9 +28,14 @@ const Player = (props) => {
 
   async function fetchSasToken() {
     const response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/film/${params.title}`
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/film/${params.title}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
     );
-    // HACK TODO: add access token and API's Authorize attribute
     const data = await response.json();
     return data.sasToken;
   }

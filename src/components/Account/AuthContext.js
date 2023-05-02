@@ -98,6 +98,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     isAuthenticated,
     userEmail,
+    accessToken,
     requestAccessToken,
     logout,
     generatePkceData,
