@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useAuth } from "./AuthContext";
-import { generateRandomString, setAuthCookie } from "./authHelper";
+import {
+  deleteCookie,
+  generateRandomString,
+  setAuthCookie,
+} from "./authHelper";
 
 const LoginComponent = (props) => {
   const { generatePkceData } = useAuth();
@@ -15,6 +19,8 @@ const LoginComponent = (props) => {
     const state = generateRandomString(32);
     const encodedState = encodeURIComponent(state);
     const encodedCodeChallenge = encodeURIComponent(codeChallenge);
+    deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
+    deleteCookie(process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME);
 
     setAuthCookie(process.env.REACT_APP_STATE_COOKIE_NAME, state);
     setAuthCookie(
