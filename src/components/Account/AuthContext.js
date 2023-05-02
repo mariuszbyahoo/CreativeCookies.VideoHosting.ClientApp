@@ -26,8 +26,15 @@ export const AuthProvider = ({ children }) => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
     const grantType = "authorization_code";
-
     try {
+      const body = new URLSearchParams({
+        grant_type: grantType,
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+        code_verifier: codeVerifier,
+      });
+
       const response = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
         {
@@ -35,7 +42,7 @@ export const AuthProvider = ({ children }) => {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `grant_type=${grantType}&code=${code}&redirect_uri=${redirectUri}&client_id=${clientId}&code_verifier=${codeVerifier}`,
+          body: body,
         }
       );
 
@@ -50,6 +57,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         navigate("/films-list");
       } else {
+        console.error(response);
+        debugger;
         // Handle errors, e.g., display an error message
         console.error("Error requesting access token:", response.statusText);
         // HACK TODO: tutaj występuje błąd za pierwszą próbą logowania.
