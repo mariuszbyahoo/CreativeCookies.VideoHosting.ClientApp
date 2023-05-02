@@ -11,7 +11,6 @@ const LogoutComponent = (props) => {
     event.preventDefault(); // Prevent the default behavior of the anchor tag
 
     try {
-      debugger;
       // Redirect the user to the Razor Page Logout
       // HACK TODO: After finishing of Tokens retrieval flow - clear all
       // Auth related cookies from the browser.

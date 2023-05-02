@@ -7,6 +7,7 @@ import {
   useCallback,
 } from "react";
 import { deleteCookie, generateCodeChallenge } from "./authHelper";
+import jwtDecode from "jwt-decode";
 
 const AuthContext = createContext();
 
@@ -16,6 +17,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
@@ -37,7 +39,13 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         console.log("returned: ", data);
-        //deleteCookie("codeVerifier");
+        // deleteCookie("codeVerifier");
+        const decodedToken = jwtDecode(data.access_token);
+
+        debugger;
+        const email = decodedToken.email;
+        console.log("UserEmail: ", email);
+        setUserEmail(email);
         // Store the access_token and other relevant data
         // Set isAuthenticated to true after a successful login
         setIsAuthenticated(true);
