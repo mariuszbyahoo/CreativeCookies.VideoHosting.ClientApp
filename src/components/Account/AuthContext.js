@@ -8,6 +8,7 @@ import {
 } from "react";
 import { deleteCookie, generateCodeChallenge } from "./authHelper";
 import jwtDecode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -19,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessToken, setAccessToken] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const navigate = useNavigate();
 
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
@@ -46,6 +48,7 @@ export const AuthProvider = ({ children }) => {
         console.log("UserEmail: ", email);
         setUserEmail(email);
         setIsAuthenticated(true);
+        navigate("/films-list");
       } else {
         // Handle errors, e.g., display an error message
         console.error("Error requesting access token:", response.statusText);
