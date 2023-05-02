@@ -28,6 +28,7 @@ const Player = (props) => {
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/film/${params.title}`
     );
+    // HACK TODO: add access token and API's Authorize attribute
     const data = await response.json();
     return data.sasToken;
   }
@@ -43,7 +44,6 @@ const Player = (props) => {
             src: videoUrl,
             provider: "html5",
             type: "video/mp4",
-            provider: "html5",
           },
         ],
       }}

@@ -17,6 +17,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [accessToken, setAccessToken] = useState("");
   const [userEmail, setUserEmail] = useState("");
 
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
@@ -39,15 +40,11 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         console.log("returned: ", data);
-        // deleteCookie("codeVerifier");
         const decodedToken = jwtDecode(data.access_token);
-
-        debugger;
+        setAccessToken(data.access_token);
         const email = decodedToken.email;
         console.log("UserEmail: ", email);
         setUserEmail(email);
-        // Store the access_token and other relevant data
-        // Set isAuthenticated to true after a successful login
         setIsAuthenticated(true);
       } else {
         // Handle errors, e.g., display an error message
@@ -88,6 +85,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     isAuthenticated,
+    userEmail,
     requestAccessToken,
     logout,
     generatePkceData,

@@ -5,7 +5,7 @@ const ProtectedComponent = ({ loginUrl, children }) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
-    // Redirect to the login page
+    //HACK TODO: Change this to be redirected towards the film, right after obtaining the Access token.
     window.location.href = loginUrl;
     return <div>Redirecting...</div>;
   } else {

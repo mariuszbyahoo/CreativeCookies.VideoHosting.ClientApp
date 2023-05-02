@@ -20,6 +20,7 @@ const uploadBlob = async (file, blobName, isVideo) => {
     ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
     : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
   const response = await fetch(fetchUrl);
+  // HACK TODO: add access token and API's Authorize attribute
   const data = await response.json();
   const sasToken = data.sasToken;
 
@@ -36,7 +37,6 @@ const uploadBlob = async (file, blobName, isVideo) => {
   const blobURL = `https://${account}.blob.core.windows.net/${
     isVideo ? filmContainerName : thumbnailContainerName
   }/${encodeURIComponent(blobName)}?${sasToken}`;
-  debugger;
   const pipeline = newPipeline(new AnonymousCredential());
   const blobClient = new BlockBlobClient(blobURL, pipeline);
 

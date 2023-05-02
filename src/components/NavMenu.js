@@ -22,6 +22,34 @@ const NavMenu = () => {
     setCollapsed(!collapsed);
   };
 
+  const accountNav = () => {
+    if (isAuthenticated && userEmail && userEmail.length > 0) {
+      return (
+        <>
+          <NavItem>
+            <NavLink tag={Link} to="/account" className="text-dark">
+              {userEmail.toLowerCase()}
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <LogoutComponent className="text-dark  nav-link" />
+          </NavItem>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <NavItem>
+            <LoginComponent className="text-dark  nav-link" />
+          </NavItem>
+          <NavItem>
+            <RegisterComponent className="text-dark  nav-link" />
+          </NavItem>
+        </>
+      );
+    }
+  };
+
   return (
     <header>
       <Navbar
@@ -54,16 +82,7 @@ const NavMenu = () => {
                 Film upload
               </NavLink>
             </NavItem>
-            {/* HACK: warunkowo wyświetl komponent linków logowania i rejestrowania, albo adres email użytkownika - ten link będzie prowadził do strony z zarządzaniem konta. */}
-            <NavItem>
-              <LoginComponent className="text-dark  nav-link" />
-            </NavItem>
-            <NavItem>
-              <RegisterComponent className="text-dark  nav-link" />
-            </NavItem>
-            <NavItem>
-              <LogoutComponent className="text-dark  nav-link" />
-            </NavItem>
+            {accountNav()}
           </ul>
         </Collapse>
       </Navbar>
