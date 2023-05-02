@@ -1,6 +1,12 @@
 // AuthContext.js
-import { createContext, useContext, useState, useEffect } from "react";
-import { generateCodeChallenge } from "./authHelper";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { deleteCookie, generateCodeChallenge } from "./authHelper";
 
 const AuthContext = createContext();
 
@@ -11,7 +17,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const requestAccessToken = async (code, codeVerifier) => {
+  const requestAccessToken = useCallback(async (code, codeVerifier) => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
     const grantType = "authorization_code";
@@ -30,9 +36,10 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("returned: ", data);
+        //deleteCookie("codeVerifier");
         // Store the access_token and other relevant data
         // Set isAuthenticated to true after a successful login
-        debugger;
         setIsAuthenticated(true);
       } else {
         // Handle errors, e.g., display an error message
@@ -41,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching access token:", error);
     }
-  };
+  }, []);
 
   const generatePkceData = () => {
     const { codeVerifier, codeChallenge } = generateCodeChallenge();

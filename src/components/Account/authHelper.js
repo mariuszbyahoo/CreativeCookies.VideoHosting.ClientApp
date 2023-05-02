@@ -45,6 +45,10 @@ function setAuthCookie(name, value) {
   document.cookie = `${name}=` + value + expires + "; path=/; Secure;";
 }
 
+function deleteCookie(name) {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
 function isStateValid(stateFromParams, stateFromCookies) {
   const areTheyEqual = stateFromParams === stateFromCookies;
 
@@ -64,4 +68,5 @@ export {
   getAuthCookie,
   isStateValid,
   generateCodeChallenge,
+  deleteCookie,
 };
