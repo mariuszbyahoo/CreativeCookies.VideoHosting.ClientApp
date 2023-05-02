@@ -57,11 +57,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         navigate("/films-list");
       } else {
-        console.error(response);
-        debugger;
         // Handle errors, e.g., display an error message
         console.error("Error requesting access token:", response.statusText);
-        // HACK TODO: tutaj występuje błąd za pierwszą próbą logowania.
         navigate("/auth-error");
       }
     } catch (error) {
