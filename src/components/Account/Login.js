@@ -5,7 +5,6 @@ import { generateRandomString, setAuthCookie } from "./authHelper";
 const LoginComponent = (props) => {
   const { generatePkceData } = useAuth();
   const { codeVerifier, codeChallenge } = generatePkceData();
-
   const clientId = process.env.REACT_APP_CLIENT_ID;
   const redirectUri = encodeURIComponent(process.env.REACT_APP_REDIRECT_URI);
   const responseType = "code";

@@ -13,11 +13,11 @@ function generateRandomString(length) {
 function generateCodeChallenge() {
   const codeVerifier = generateRandomString(43);
   const hash = CryptoJS.SHA256(codeVerifier);
-  const base64UrlEncodedHash = CryptoJS.enc.Base64.stringify(hash)
+  const codeChallenge = CryptoJS.enc.Base64.stringify(hash)
     .replace("+", "-")
     .replace("/", "_")
     .replace(/=+$/, "");
-  return { codeVerifier, codeChallange: base64UrlEncodedHash };
+  return { codeVerifier, codeChallenge };
 }
 
 function getAuthCookie(name) {
@@ -51,7 +51,7 @@ function isStateValid(stateFromParams, stateFromCookies) {
   if (areTheyEqual) {
     document.cookie = `${process.env.REACT_APP_STATE_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   } else if (!areTheyEqual && !stateFromCookies) {
-    console.log("State cookie expired!");
+    console.error("State cookie expired!");
     // add reaction if cookie will expire itself before the equality test
     // i.e. component receives a request, but state param from cookie is not present.
   }
