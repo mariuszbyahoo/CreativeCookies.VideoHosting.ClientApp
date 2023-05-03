@@ -8,8 +8,9 @@ import { useState } from "react";
 import { Base64 } from "js-base64";
 import { Button, Input } from "@mui/material";
 import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
+import { useAuth } from "./Account/AuthContext";
 
-const uploadBlob = async (file, blobName, isVideo) => {
+const uploadBlob = async (file, blobName, isVideo, accessToken) => {
   const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
   const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
   const thumbnailContainerName =
@@ -19,7 +20,12 @@ const uploadBlob = async (file, blobName, isVideo) => {
   const fetchUrl = isVideo
     ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
     : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
-  const response = await fetch(fetchUrl);
+  const response = await fetch(fetchUrl, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
   const data = await response.json();
   const sasToken = data.sasToken;
 
@@ -36,7 +42,6 @@ const uploadBlob = async (file, blobName, isVideo) => {
   const blobURL = `https://${account}.blob.core.windows.net/${
     isVideo ? filmContainerName : thumbnailContainerName
   }/${encodeURIComponent(blobName)}?${sasToken}`;
-  debugger;
   const pipeline = newPipeline(new AnonymousCredential());
   const blobClient = new BlockBlobClient(blobURL, pipeline);
 
@@ -84,6 +89,7 @@ const getVideoDuration = (file) => {
 const FilmUpload = (props) => {
   const [video, setVideo] = useState();
   const [thumbnail, setThumbnail] = useState();
+  const { accessToken } = useAuth();
 
   const videoChangeHandler = (e) => {
     if (e.target.files) {
@@ -117,7 +123,7 @@ const FilmUpload = (props) => {
         0,
         video.name.lastIndexOf(".")
       )}.jpg`;
-      uploadBlob(thumbnail, thumbnailName, false)
+      uploadBlob(thumbnail, thumbnailName, false, accessToken)
         .then((res) => {
           setThumbnail(undefined);
         })
@@ -126,7 +132,7 @@ const FilmUpload = (props) => {
         });
     }
 
-    uploadBlob(video, video.name, true)
+    uploadBlob(video, video.name, true, accessToken)
       .then((res) => {
         setVideo(undefined);
       })

@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./MosaicElement.module.css";
 import { useEffect, useState } from "react";
 import { BlobServiceClient } from "@azure/storage-blob";

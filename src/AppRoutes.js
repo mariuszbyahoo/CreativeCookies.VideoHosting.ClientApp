@@ -3,6 +3,10 @@ import FilmsList from "./components/FilmsList";
 import FilmUpload from "./components/FilmUpload";
 import { Home } from "./components/Home";
 import Player from "./components/Player";
+import SignInLandingComponent from "./components/Account/SignInLandingComponent";
+import ProtectedComponent from "./components/Routes/ProtectedComponent";
+import AuthErrorComponent from "./components/Account/AuthError";
+import { useAuth } from "./components/Account/AuthContext";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -46,6 +50,8 @@ function fallbackRender({ error, resetErrorBoundary }) {
     </div>
   );
 }
+
+const { isAuthenticated } = useAuth;
 const AppRoutes = [
   {
     index: true,
@@ -75,7 +81,6 @@ const AppRoutes = [
   },
   {
     path: "/player/:title",
-    requireAuth: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -83,13 +88,14 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <Player />
+        <ProtectedComponent isAuthenticated={isAuthenticated}>
+          <Player />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },
   {
     path: "/films-upload",
-    requireAuth: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -97,9 +103,28 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <FilmUpload />
+        <ProtectedComponent isAuthenticated={isAuthenticated}>
+          <FilmUpload />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
+  },
+  {
+    path: "signin-oidc",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <SignInLandingComponent />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "auth-error",
+    element: <AuthErrorComponent />,
   },
 ];
 
