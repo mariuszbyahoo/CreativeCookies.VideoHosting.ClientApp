@@ -1,12 +1,14 @@
 import React from "react";
 import { useAuth } from "../Account/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-const ProtectedComponent = ({ loginUrl, children }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedComponent = ({ children }) => {
+  const { isAuthenticated, login } = useAuth();
+  const navigate = useNavigate();
 
   if (!isAuthenticated) {
     //HACK TODO: Change this to be redirected towards the film, right after obtaining the Access token.
-    window.location.href = loginUrl;
+    login();
     return <div>Redirecting...</div>;
   } else {
     return <>{children}</>;

@@ -6,6 +6,7 @@ import Player from "./components/Player";
 import SignInLandingComponent from "./components/Account/SignInLandingComponent";
 import ProtectedComponent from "./components/Routes/ProtectedComponent";
 import AuthErrorComponent from "./components/Account/AuthError";
+import { useAuth } from "./components/Account/AuthContext";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -50,8 +51,7 @@ function fallbackRender({ error, resetErrorBoundary }) {
   );
 }
 
-const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/Login`;
-const isAuthenticated = false; // HACK TODO: Change with real isAuthenticated check
+const { isAuthenticated } = useAuth;
 const AppRoutes = [
   {
     index: true,
@@ -88,10 +88,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent
-          isAuthenticated={isAuthenticated}
-          loginUrl={loginUrl}
-        >
+        <ProtectedComponent isAuthenticated={isAuthenticated}>
           <Player />
         </ProtectedComponent>
       </ErrorBoundary>
@@ -106,10 +103,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent
-          isAuthenticated={isAuthenticated}
-          loginUrl={loginUrl}
-        >
+        <ProtectedComponent isAuthenticated={isAuthenticated}>
           <FilmUpload />
         </ProtectedComponent>
       </ErrorBoundary>
