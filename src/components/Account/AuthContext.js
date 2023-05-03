@@ -35,6 +35,8 @@ export const AuthProvider = ({ children }) => {
         code_verifier: codeVerifier,
       });
 
+      console.log("Body params sent: ", body);
+
       const response = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
         {
@@ -45,6 +47,8 @@ export const AuthProvider = ({ children }) => {
           body: body,
         }
       );
+
+      console.log("api response: ", response);
 
       if (response.ok) {
         const data = await response.json();
@@ -58,7 +62,7 @@ export const AuthProvider = ({ children }) => {
         navigate("/films-list");
       } else {
         // Handle errors, e.g., display an error message
-        console.error("Error requesting access token:", response.statusText);
+        console.error("Error requesting access token: ", response.statusText);
         navigate("/auth-error");
       }
     } catch (error) {
