@@ -14,7 +14,7 @@ const LogoutComponent = (props) => {
       // Redirect the user to the Razor Page Logout
       // HACK TODO: After finishing of Tokens retrieval flow - clear all
       // Auth related cookies from the browser.
-      window.location.href = "https://localhost:7034/Identity/Account/Logout";
+      window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/Logout`;
     } catch (error) {
       // Show an error message if the logout process fails
       setMessage("Error logging out");
@@ -24,7 +24,7 @@ const LogoutComponent = (props) => {
   return (
     <>
       <a
-        href="https://localhost:44495"
+        href={process.env.REACT_APP_HOME_PAGE_URI}
         className={props.className}
         onClick={handleLogout}
       >
