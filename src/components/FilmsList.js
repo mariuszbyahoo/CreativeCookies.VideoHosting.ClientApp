@@ -101,7 +101,7 @@ const FilmsList = () => {
 
   return (
     <div className={styles.container}>
-      <div className="row">
+      {/* <div className="row">
         <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
           <TextField
             label="Filter"
@@ -117,7 +117,7 @@ const FilmsList = () => {
             variant="filled"
           />
         </FormControl>
-      </div>
+      </div> */}
 
       {content}
       {loadBtn}
