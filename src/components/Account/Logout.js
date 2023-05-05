@@ -16,7 +16,7 @@ const LogoutComponent = (props) => {
       // Auth related cookies from the browser.
       window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/Logout`;
     } catch (error) {
-      // Show an error message if the logout process fails
+      // Show an error message if the logout process fails - CICD test
       setMessage("Error logging out");
     }
   };
