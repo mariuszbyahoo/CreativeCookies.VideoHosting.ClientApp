@@ -27,17 +27,22 @@ const Player = (props) => {
   }, []);
 
   async function fetchSasToken() {
-    const response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/film/${params.title}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    const data = await response.json();
-    return data.sasToken;
+    try {
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/film/${params.title}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+      return data.sasToken;
+    } catch (error) {
+      console.log("error happened: ", error);
+      console.log("JSON.stringinfy(error): ", JSON.stringify(error));
+    }
   }
 
   const videoOptions = undefined;
