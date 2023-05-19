@@ -24,12 +24,13 @@ const NavMenu = () => {
 
   const accountNav = () => {
     if (isAuthenticated && userEmail && userEmail.length > 0) {
+      let link = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/Manage`;
       return (
         <>
           <NavItem>
-            <NavLink tag={Link} to="/account" className="text-dark">
+            <a href={link} className="nav-link text-dark">
               {userEmail.toLowerCase()}
-            </NavLink>
+            </a>
           </NavItem>
           <NavItem>
             <LogoutComponent className="text-dark  nav-link" />
