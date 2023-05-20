@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
     const grantType = "authorization_code";
@@ -107,7 +108,6 @@ export const AuthProvider = ({ children }) => {
     const { codeVerifier, codeChallenge } = generatePkceData();
     const state = generateRandomString(32);
     const encodedState = encodeURIComponent(state);
-    const encodedCodeChallenge = encodeURIComponent(codeChallenge);
     deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
     deleteCookie(process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME);
 
@@ -116,7 +116,8 @@ export const AuthProvider = ({ children }) => {
       process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME,
       codeVerifier
     );
-    const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&state=${encodedState}&code_challenge=${encodedCodeChallenge}&code_challenge_method=${codeChallengeMethod}`;
+    const codeChallengeWithPlusesReplaced = codeChallenge.replace(/\+/g, "%2B");
+    const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&state=${encodedState}&code_challenge=${codeChallengeWithPlusesReplaced}&code_challenge_method=${codeChallengeMethod}`;
 
     window.location.href = loginUrl;
   };
