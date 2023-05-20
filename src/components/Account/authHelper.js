@@ -12,7 +12,8 @@ function generateRandomString(length) {
 
 function generateCodeChallenge() {
   const codeVerifier = generateRandomString(43);
-  const hash = CryptoJS.SHA256(codeVerifier);
+  const wordArray = CryptoJS.enc.Utf8.parse(codeVerifier); // new line
+  const hash = CryptoJS.SHA256(wordArray); // use wordArray instead of codeVerifier
   const codeChallenge = CryptoJS.enc.Base64.stringify(hash)
     .replace("+", "-")
     .replace("/", "_")
