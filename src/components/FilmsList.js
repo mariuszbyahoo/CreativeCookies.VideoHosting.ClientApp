@@ -116,9 +116,6 @@ const FilmsList = () => {
             onChange={filterInputChangeHandler}
             variant="filled"
           />
-          {/* <Button variant="outlined" onClick={fetchWithSearchTerm}>
-            Search
-          </Button> */}
         </FormControl>
         <Button
           variant="outlined"
