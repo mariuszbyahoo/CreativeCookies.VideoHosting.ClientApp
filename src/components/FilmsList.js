@@ -109,24 +109,24 @@ const FilmsList = () => {
   return (
     <div className={styles.container}>
       <div className="row">
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+        <FormControl variant="standard">
           <TextField
-            label="Filter"
+            label="Search"
             id="filter-search"
             onChange={filterInputChangeHandler}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
             variant="filled"
           />
-          <Button variant="outlined" onClick={fetchWithSearchTerm}>
+          {/* <Button variant="outlined" onClick={fetchWithSearchTerm}>
             Search
-          </Button>
+          </Button> */}
         </FormControl>
+        <Button
+          variant="outlined"
+          style={{ marginTop: 5 }}
+          onClick={fetchWithSearchTerm}
+        >
+          <Search />
+        </Button>
       </div>
       {content}
       {loadBtn}
