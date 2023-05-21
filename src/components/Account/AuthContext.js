@@ -41,8 +41,6 @@ export const AuthProvider = ({ children }) => {
         code_verifier: codeVerifier,
       });
 
-      console.log("Body params sent: ", body);
-
       const response = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
         {
@@ -54,15 +52,11 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      console.log("api response: ", response);
-
       if (response.ok) {
         const data = await response.json();
-        console.log("returned: ", data);
         const decodedToken = jwtDecode(data.access_token);
         setAccessToken(data.access_token);
         const email = decodedToken.email;
-        console.log("UserEmail: ", email);
         setUserEmail(email);
         setIsAuthenticated(true);
         navigate("/films-list");

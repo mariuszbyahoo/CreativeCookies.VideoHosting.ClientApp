@@ -27,7 +27,6 @@ const fetchBlob = async (blobName, sasToken) => {
 
 const MosaicElement = (props) => {
   const [blobImage, setBlobImage] = useState(undefined);
-  console.log("Props inside of a MosaicElement element: ", props);
 
   useEffect(() => {
     if (

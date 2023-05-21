@@ -23,16 +23,8 @@ const Player = (props) => {
         `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/storageUrl?Id=${params.title}`
       );
       const blobResponseJson = await blobUrlResponse.json();
-      console.log(
-        `blobUrlResponse inside of a Player.js: ${JSON.stringify(
-          blobResponseJson
-        )}`
-      );
       // TILL HERE
       const sasTokenResponse = await fetchSasToken();
-      console.log(
-        `sasTokenResponse inside of a Player.js: ${sasTokenResponse}`
-      );
       setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
       setLoading(false);
     }

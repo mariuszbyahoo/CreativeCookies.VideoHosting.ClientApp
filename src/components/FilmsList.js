@@ -8,7 +8,6 @@ import { Search } from "@mui/icons-material";
 
 const FilmsList = () => {
   const [videoMetadatas, setVideoMetadatas] = useState([]);
-  const [filteredFilmBlobs, setFilteredFilmBlobs] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,8 +15,8 @@ const FilmsList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
 
-  const fetchMoviesHandler = useCallback(async () => {
-    if (!hasMore) return; // Don't fetch if there are no more items
+  const fetchMoviesHandler = async () => {
+    if (!hasMore && pageNumber > 1) return; // Don't fetch if there are no more items and it's not the first page
 
     setLoading(true);
     setError(null);
@@ -25,15 +24,21 @@ const FilmsList = () => {
     fetchSasToken()
       .then((token) => {
         fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/films?search=&pageNumber=${pageNumber}&pageSize=24`
+          `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/films?search=${searchTerm}&pageNumber=${pageNumber}&pageSize=24`
         )
           .then((response) => response.json())
           .then((data) => {
+            console.log(
+              `fetch blobs metadata called with searchTerm: ${searchTerm}`
+            );
             setVideoMetadatas((prevVideoMetadatas) => [
               ...prevVideoMetadatas,
               ...data.films,
             ]);
             setTotalPages(data.totalPages);
+            console.log(
+              `inside of fetchMoviesHandler, data.hasMore: ${data.hasMore}`
+            );
             setHasMore(data.hasMore);
             setPageNumber((prevPage) => prevPage + 1);
             setLoading(false);
@@ -47,11 +52,11 @@ const FilmsList = () => {
         setError(error);
         setLoading(false);
       });
-  }, [hasMore, pageNumber]);
+  };
 
   useEffect(() => {
     fetchMoviesHandler();
-  }, []);
+  }, [pageNumber]);
 
   async function fetchSasToken() {
     const response = await fetch(
@@ -65,15 +70,18 @@ const FilmsList = () => {
     setPageNumber((prevPage) => {
       return prevPage + 1;
     });
-    fetchMoviesHandler();
   };
 
   const filterInputChangeHandler = (e) => {
-    setFilteredFilmBlobs(
-      videoMetadatas.filter((b) =>
-        b.name.toLowerCase().includes(e.target.value.toLowerCase())
-      )
-    ); // Update the filteredFilmBlobs instead
+    setSearchTerm(e.target.value);
+  };
+
+  const fetchWithSearchTerm = async () => {
+    setVideoMetadatas([]);
+    setPageNumber(1);
+    setHasMore(false);
+
+    await fetchMoviesHandler();
   };
 
   let content = <p>Upload a movie to get started!</p>;
@@ -100,23 +108,26 @@ const FilmsList = () => {
 
   return (
     <div className={styles.container}>
-      {/* <div className="row">
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+      <div className="row">
+        <FormControl variant="standard">
           <TextField
-            label="Filter"
+            label="Search"
             id="filter-search"
             onChange={filterInputChangeHandler}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
             variant="filled"
           />
+          {/* <Button variant="outlined" onClick={fetchWithSearchTerm}>
+            Search
+          </Button> */}
         </FormControl>
-      </div> */}
+        <Button
+          variant="outlined"
+          style={{ marginTop: 5 }}
+          onClick={fetchWithSearchTerm}
+        >
+          <Search />
+        </Button>
+      </div>
       {content}
       {loadBtn}
     </div>
