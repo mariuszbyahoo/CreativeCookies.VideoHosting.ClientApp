@@ -27,6 +27,7 @@ const fetchBlob = async (blobName, sasToken) => {
 
 const MosaicElement = (props) => {
   const [blobImage, setBlobImage] = useState(undefined);
+  console.log("Props inside of a MosaicElement element: ", props);
 
   useEffect(() => {
     if (
@@ -52,8 +53,6 @@ const MosaicElement = (props) => {
     }
   }, [props.thumbnail]);
 
-  const filmTitle = props.film.slice(0, props.film.lastIndexOf("."));
-
   const videoDurationToString = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -71,16 +70,17 @@ const MosaicElement = (props) => {
     return timeSpan;
   };
 
+  // HACK TODO: poniżej należy jakoś przekazać blobUrl do komponentu Player, bo na razie to on po prostu sobie wyciągał tytuł filmu i tyle.
   return (
     <div className={styles.boxShadowCard}>
-      <Link to={"/player/" + props.film} className={styles.linkImage}>
+      <Link to={"/player/" + props.videoId} className={styles.linkImage}>
         <div className={styles.imageContainer}>
           <img src={blobImage} alt="thumbnail" className={styles.thumbnail} />
           <div className={styles.badge}>
             {videoDurationToString(props.duration)}
           </div>
         </div>
-        <p className={styles.videoTitle}>{filmTitle}</p>
+        <p className={styles.videoTitle}>{props.film}</p>
       </Link>
     </div>
   );
