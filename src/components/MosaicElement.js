@@ -27,6 +27,7 @@ const fetchBlob = async (blobName, sasToken) => {
 
 const MosaicElement = (props) => {
   const [blobImage, setBlobImage] = useState(undefined);
+  console.log("Props inside of a MosaicElement element: ", props);
 
   useEffect(() => {
     if (
@@ -72,7 +73,7 @@ const MosaicElement = (props) => {
   // HACK TODO: poniżej należy jakoś przekazać blobUrl do komponentu Player, bo na razie to on po prostu sobie wyciągał tytuł filmu i tyle.
   return (
     <div className={styles.boxShadowCard}>
-      <Link to={"/player/" + props.film} className={styles.linkImage}>
+      <Link to={"/player/" + props.videoId} className={styles.linkImage}>
         <div className={styles.imageContainer}>
           <img src={blobImage} alt="thumbnail" className={styles.thumbnail} />
           <div className={styles.badge}>

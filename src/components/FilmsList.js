@@ -54,12 +54,6 @@ const FilmsList = () => {
   }, []);
 
   async function fetchSasToken() {
-    console.log("process.env", process.env);
-    console.log("process.env.NODE_ENV", process.env.NODE_ENV);
-    console.log(
-      "process.env.REACT_APP_API_ADDRESS",
-      process.env.REACT_APP_API_ADDRESS
-    );
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/SAS/filmsList/`
     );
