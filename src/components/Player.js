@@ -16,14 +16,33 @@ const Player = (props) => {
   if (params.title === ":title") navigate("/films-list");
 
   useEffect(() => {
-    setLoading(true);
-    fetchSasToken().then((response) => {
-      let lookup = `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/films/${params.title}?${response}`;
-      setVideoUrl(
-        `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/films/${params.title}?${response}`
+    async function fetchUrlWithSAS() {
+      setLoading(true);
+      // FROM HERE Encapsulate it to another function
+      const blobUrlResponse = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/storageUrl?Id=${params.title}`
       );
+      const blobResponseJson = await blobUrlResponse.json();
+      console.log(
+        `blobUrlResponse inside of a Player.js: ${JSON.stringify(
+          blobResponseJson
+        )}`
+      );
+      // TILL HERE
+      const sasTokenResponse = await fetchSasToken();
+      console.log(
+        `sasTokenResponse inside of a Player.js: ${sasTokenResponse}`
+      );
+      setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
+      //.then((response) => {
+      //   let lookup = `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/films/${params.title}?${response}`;
+      //   setVideoUrl(
+      //     `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/films/${params.title}?${response}`
+      //   );
+      // });
       setLoading(false);
-    });
+    }
+    fetchUrlWithSAS();
   }, []);
 
   async function fetchSasToken() {
