@@ -69,6 +69,7 @@ const MosaicElement = (props) => {
     return timeSpan;
   };
 
+  // HACK TODO: poniżej należy jakoś przekazać blobUrl do komponentu Player, bo na razie to on po prostu sobie wyciągał tytuł filmu i tyle.
   return (
     <div className={styles.boxShadowCard}>
       <Link to={"/player/" + props.film} className={styles.linkImage}>

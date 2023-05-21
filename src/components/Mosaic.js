@@ -4,12 +4,13 @@ import MosaicElement from "./MosaicElement";
 const Mosaic = (props) => {
   return (
     <div className={styles["mosaic-wrapper"]}>
-      {props.filmBlobs.map((blob, index) => (
+      {props.videoMetadatas.map((videoMetadata, index) => (
         <MosaicElement
-          film={blob.name}
-          thumbnail={blob.thumbnailName}
-          duration={blob.length}
-          createdOn={blob.createdOn}
+          film={videoMetadata.name}
+          blobUrl={videoMetadata.blobUrl}
+          thumbnail={videoMetadata.thumbnailName}
+          duration={videoMetadata.length}
+          createdOn={videoMetadata.createdOn}
           key={index}
         />
       ))}

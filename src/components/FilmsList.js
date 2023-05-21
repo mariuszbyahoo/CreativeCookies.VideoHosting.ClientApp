@@ -7,7 +7,7 @@ import { Button, FormControl, InputAdornment, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 
 const FilmsList = () => {
-  const [filmBlobs, setFilmBlobs] = useState([]);
+  const [videoMetadatas, setVideoMetadatas] = useState([]);
   const [filteredFilmBlobs, setFilteredFilmBlobs] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -29,7 +29,10 @@ const FilmsList = () => {
         )
           .then((response) => response.json())
           .then((data) => {
-            setFilmBlobs((prevFilmBlobs) => [...prevFilmBlobs, ...data.films]);
+            setVideoMetadatas((prevVideoMetadatas) => [
+              ...prevVideoMetadatas,
+              ...data.films,
+            ]);
             setTotalPages(data.totalPages);
             setHasMore(data.hasMore);
             setPageNumber((prevPage) => prevPage + 1);
@@ -73,7 +76,7 @@ const FilmsList = () => {
 
   const filterInputChangeHandler = (e) => {
     setFilteredFilmBlobs(
-      filmBlobs.filter((b) =>
+      videoMetadatas.filter((b) =>
         b.name.toLowerCase().includes(e.target.value.toLowerCase())
       )
     ); // Update the filteredFilmBlobs instead
@@ -87,10 +90,12 @@ const FilmsList = () => {
     content = <h4>An error occured, while fetching the API: {error}</h4>;
   }
 
-  if (filmBlobs.length > 0) {
+  if (videoMetadatas.length > 0) {
     // Order by date desc
-    filmBlobs.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
-    content = <Mosaic filmBlobs={filmBlobs} />;
+    videoMetadatas.sort(
+      (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+    );
+    content = <Mosaic videoMetadatas={videoMetadatas} />;
   }
 
   let loadBtn = hasMore && (
@@ -118,7 +123,6 @@ const FilmsList = () => {
           />
         </FormControl>
       </div> */}
-
       {content}
       {loadBtn}
     </div>
