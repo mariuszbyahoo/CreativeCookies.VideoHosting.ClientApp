@@ -52,8 +52,6 @@ const MosaicElement = (props) => {
     }
   }, [props.thumbnail]);
 
-  const filmTitle = props.film.slice(0, props.film.lastIndexOf("."));
-
   const videoDurationToString = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -80,7 +78,7 @@ const MosaicElement = (props) => {
             {videoDurationToString(props.duration)}
           </div>
         </div>
-        <p className={styles.videoTitle}>{filmTitle}</p>
+        <p className={styles.videoTitle}>{props.film}</p>
       </Link>
     </div>
   );
