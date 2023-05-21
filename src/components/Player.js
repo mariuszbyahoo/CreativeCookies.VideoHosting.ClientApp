@@ -34,12 +34,6 @@ const Player = (props) => {
         `sasTokenResponse inside of a Player.js: ${sasTokenResponse}`
       );
       setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
-      //.then((response) => {
-      //   let lookup = `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/films/${params.title}?${response}`;
-      //   setVideoUrl(
-      //     `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/films/${params.title}?${response}`
-      //   );
-      // });
       setLoading(false);
     }
     fetchUrlWithSAS();
