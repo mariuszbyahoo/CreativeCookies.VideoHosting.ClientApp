@@ -2,7 +2,6 @@ import styles from "./Mosaic.module.css";
 import MosaicElement from "./MosaicElement";
 
 const Mosaic = (props) => {
-  console.log("videoMetadatas inside 'Mosaic' element: ", props.videoMetadatas);
   return (
     <div className={styles["mosaic-wrapper"]}>
       {props.videoMetadatas.map((videoMetadata, index) => (
