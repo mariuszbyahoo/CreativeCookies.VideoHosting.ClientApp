@@ -158,6 +158,7 @@ const FilmUpload = (props) => {
         })
         .catch((error) => {
           console.log("Error while uploading thumbnail: ", error);
+          setThumbnail(undefined);
         });
     }
     getVideoDuration(video)
@@ -176,26 +177,35 @@ const FilmUpload = (props) => {
               CreatedOn: new Date(),
               VideoType: "Premium",
             };
-            console.log("metadata: ", metadata);
-            console.log("JSON.stringify(metadata): ", JSON.stringify(metadata));
 
             fetch(`https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(metadata),
             })
-              .then((response) => response.json())
-              .then((data) => console.log(data))
+              .then((response) => {
+                response.json();
+                setTitle("");
+                setDescription("");
+              })
               .catch((error) => {
                 console.log("Error while saving metadata: ", error);
+                setTitle("");
+                setDescription("");
               });
           })
           .catch((error) => {
             console.log("Error while uploading video: ", error);
+            setVideo(undefined);
+            setTitle("");
+            setDescription("");
           });
       })
       .catch((error) => {
         console.log("Error while reading the video's length: ", error);
+        setVideo(undefined);
+        setTitle("");
+        setDescription("");
       });
   };
 
@@ -209,7 +219,8 @@ const FilmUpload = (props) => {
 
   return (
     <div className={styles.container}>
-      <div className="row">
+      <h3 style={{ marginBottom: "5%" }}>Upload a new video</h3>
+      <div className={`row ${styles["row-margin"]}`}>
         <label htmlFor="title-input">Title</label>
         <Input
           id="title-input"
@@ -218,16 +229,7 @@ const FilmUpload = (props) => {
           onChange={titleChangeHandler}
         />
       </div>
-      <div className="row">
-        <label htmlFor="description-input">Description</label>
-        <Input
-          id="description-input"
-          type="text"
-          value={description}
-          onChange={descriptionChangeHandler}
-        />
-      </div>
-      <div className="row">
+      <div className={`row ${styles["row-margin"]}`}>
         <div className="row">
           <div className="col-6">
             <label
@@ -264,10 +266,20 @@ const FilmUpload = (props) => {
             </span>
           </div>
         </div>
+        <div className={`row ${styles["row-margin"]}`}>
+          <label htmlFor="description-input">Description</label>
+          <Input
+            id="description-input"
+            type="text"
+            value={description}
+            onChange={descriptionChangeHandler}
+          />
+        </div>
         <Button
           variant="contained"
           endIcon={<UploadFile />}
           onClick={uploadVideoHandler}
+          style={{ marginTop: "5%" }}
         >
           Upload
         </Button>
