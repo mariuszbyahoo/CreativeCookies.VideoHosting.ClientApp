@@ -110,8 +110,7 @@ export const AuthProvider = ({ children }) => {
       process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME,
       codeVerifier
     );
-    const codeChallengeWithPlusesReplaced = codeChallenge.replace(/\+/g, "%2B");
-    const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&state=${encodedState}&code_challenge=${codeChallengeWithPlusesReplaced}&code_challenge_method=${codeChallengeMethod}`;
+    const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&state=${encodedState}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
 
     window.location.href = loginUrl;
   };
