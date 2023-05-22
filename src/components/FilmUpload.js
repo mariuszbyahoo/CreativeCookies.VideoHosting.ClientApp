@@ -9,6 +9,7 @@ import { Base64 } from "js-base64";
 import { Button, Input } from "@mui/material";
 import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
+import { v4 } from "uuid";
 
 // function to get SAS token
 const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
@@ -147,9 +148,10 @@ const FilmUpload = (props) => {
     if (!video) {
       return;
     }
-    let thumbnailName = "";
+    const guid = v4();
+    const videoBlobName = `${guid}.mp4`;
+    const thumbnailName = `${guid}.jpg`;
     if (thumbnail) {
-      thumbnailName = `${video.name.slice(0, video.name.lastIndexOf("."))}.jpg`;
       uploadBlob(thumbnail, thumbnailName, false, accessToken)
         .then((res) => {
           setThumbnail(undefined);
@@ -160,19 +162,22 @@ const FilmUpload = (props) => {
     }
     getVideoDuration(video)
       .then((videoDuration) => {
-        uploadBlob(video, video.name, true, accessToken)
+        uploadBlob(video, videoBlobName, true, accessToken)
           .then((res) => {
             setVideo(undefined);
 
             const metadata = {
+              Id: guid,
               Name: title,
               Description: description,
               Length: videoDuration.toFixed(0),
               ThumbnailName: thumbnailName,
-              BlobUrl: `${video.name}?${accessToken}`, // HACK TODO: this is just a stamp. It has to be pulled from Azure Blob Storage itself.
+              BlobUrl: `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.REACT_APP_FILMS_CONTAINER_NAME}/${videoBlobName}`, // HACK TODO: this is just a stamp. It has to be pulled from Azure Blob Storage itself.
               CreatedOn: new Date(),
               VideoType: "Premium",
             };
+            console.log("metadata: ", metadata);
+            console.log("JSON.stringify(metadata): ", JSON.stringify(metadata));
 
             fetch(`https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`, {
               method: "POST",
