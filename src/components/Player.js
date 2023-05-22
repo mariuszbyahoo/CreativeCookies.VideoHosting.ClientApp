@@ -34,7 +34,9 @@ const Player = (props) => {
   async function fetchSasToken() {
     try {
       const response = await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/film/${params.title}`,
+        `https://${
+          process.env.REACT_APP_API_ADDRESS
+        }/api/sas/film/${params.title.toUpperCase()}.mp4`,
         {
           method: "GET",
           headers: {

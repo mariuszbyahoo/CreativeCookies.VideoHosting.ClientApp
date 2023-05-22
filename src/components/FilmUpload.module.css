@@ -7,6 +7,10 @@ input[type="file"] {
     display: none;
 }
 
+.row-margin {
+    margin-block: 1%;
+}
+
 .custom-file-upload {
     border: 1px solid #1565c0;
     background-color: transparent;

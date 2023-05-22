@@ -9,14 +9,10 @@ import { Base64 } from "js-base64";
 import { Button, Input } from "@mui/material";
 import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
+import { v4 } from "uuid";
 
-const uploadBlob = async (file, blobName, isVideo, accessToken) => {
-  const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
-  const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
-  const thumbnailContainerName =
-    process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME;
-  const apiAddress = process.env.REACT_APP_API_ADDRESS;
-
+// function to get SAS token
+const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
   const fetchUrl = isVideo
     ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
     : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
@@ -26,18 +22,54 @@ const uploadBlob = async (file, blobName, isVideo, accessToken) => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data = await response.json();
-  const sasToken = data.sasToken;
 
-  const blockSize = 100 * 1024 * 1024; // 100MB
-  const fileSize = file.size;
+  if (!response.ok) {
+    throw new Error("Failed to get SAS token");
+  }
+
+  const data = await response.json();
+  return data.sasToken;
+};
+
+// function to create block IDs
+const createBlockIds = (fileSize, blockSize) => {
   const blockCount = Math.ceil(fileSize / blockSize);
-  const blockIds = Array.from({ length: blockCount }, (_, i) => {
+  return Array.from({ length: blockCount }, (_, i) => {
     const id = ("0000" + i).slice(-5); // Create a 5-character zero-padded string
     const encoder = new TextEncoder();
     const idBytes = encoder.encode(id);
     return Base64.encode(idBytes);
   });
+};
+
+// function to stage blocks
+const stageBlocks = async (blobClient, blockIds, file, blockSize) => {
+  for (let i = 0; i < blockIds.length; i++) {
+    const start = i * blockSize;
+    const end = Math.min(start + blockSize, file.size);
+    const chunk = file.slice(start, end);
+    const chunkSize = end - start;
+    await blobClient.stageBlock(blockIds[i], chunk, chunkSize);
+  }
+};
+
+// Updated uploadBlob function
+const uploadBlob = async (file, blobName, isVideo, accessToken) => {
+  const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
+  const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
+  const thumbnailContainerName =
+    process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME;
+  const apiAddress = process.env.REACT_APP_API_ADDRESS;
+
+  const sasToken = await getSASToken(
+    blobName,
+    isVideo,
+    accessToken,
+    apiAddress
+  );
+
+  const blockSize = 100 * 1024 * 1024; // 100MB
+  const blockIds = createBlockIds(file.size, blockSize);
 
   const blobURL = `https://${account}.blob.core.windows.net/${
     isVideo ? filmContainerName : thumbnailContainerName
@@ -45,13 +77,7 @@ const uploadBlob = async (file, blobName, isVideo, accessToken) => {
   const pipeline = newPipeline(new AnonymousCredential());
   const blobClient = new BlockBlobClient(blobURL, pipeline);
 
-  for (let i = 0; i < blockCount; i++) {
-    const start = i * blockSize;
-    const end = Math.min(start + blockSize, fileSize);
-    const chunk = file.slice(start, end);
-    const chunkSize = end - start;
-    await blobClient.stageBlock(blockIds[i], chunk, chunkSize);
-  }
+  await stageBlocks(blobClient, blockIds, file, blockSize);
 
   await blobClient.commitBlockList(blockIds);
 
@@ -87,9 +113,14 @@ const getVideoDuration = (file) => {
 };
 
 const FilmUpload = (props) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [video, setVideo] = useState();
   const [thumbnail, setThumbnail] = useState();
   const { accessToken } = useAuth();
+
+  const titleChangeHandler = (e) => setTitle(e.target.value);
+  const descriptionChangeHandler = (e) => setDescription(e.target.value);
 
   const videoChangeHandler = (e) => {
     if (e.target.files) {
@@ -117,27 +148,64 @@ const FilmUpload = (props) => {
     if (!video) {
       return;
     }
-
+    const guid = v4();
+    const videoBlobName = `${guid.toUpperCase()}.mp4`;
+    const thumbnailName = `${guid.toUpperCase()}.jpg`;
     if (thumbnail) {
-      let thumbnailName = `${video.name.slice(
-        0,
-        video.name.lastIndexOf(".")
-      )}.jpg`;
       uploadBlob(thumbnail, thumbnailName, false, accessToken)
         .then((res) => {
           setThumbnail(undefined);
         })
         .catch((error) => {
           console.log("Error while uploading thumbnail: ", error);
+          setThumbnail(undefined);
         });
     }
+    getVideoDuration(video)
+      .then((videoDuration) => {
+        uploadBlob(video, videoBlobName, true, accessToken)
+          .then((res) => {
+            setVideo(undefined);
 
-    uploadBlob(video, video.name, true, accessToken)
-      .then((res) => {
-        setVideo(undefined);
+            const metadata = {
+              Id: guid,
+              Name: title,
+              Description: description,
+              Length: videoDuration.toFixed(0),
+              ThumbnailName: thumbnailName,
+              BlobUrl: `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.REACT_APP_FILMS_CONTAINER_NAME}/${videoBlobName}`, // HACK TODO: this is just a stamp. It has to be pulled from Azure Blob Storage itself.
+              CreatedOn: new Date(),
+              VideoType: "Premium",
+            };
+
+            fetch(`https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(metadata),
+            })
+              .then((response) => {
+                response.json();
+                setTitle("");
+                setDescription("");
+              })
+              .catch((error) => {
+                console.log("Error while saving metadata: ", error);
+                setTitle("");
+                setDescription("");
+              });
+          })
+          .catch((error) => {
+            console.log("Error while uploading video: ", error);
+            setVideo(undefined);
+            setTitle("");
+            setDescription("");
+          });
       })
       .catch((error) => {
-        console.log("Error while uploading video: ", error);
+        console.log("Error while reading the video's length: ", error);
+        setVideo(undefined);
+        setTitle("");
+        setDescription("");
       });
   };
 
@@ -151,7 +219,17 @@ const FilmUpload = (props) => {
 
   return (
     <div className={styles.container}>
-      <div className="row">
+      <h3 style={{ marginBottom: "5%" }}>Upload a new video</h3>
+      <div className={`row ${styles["row-margin"]}`}>
+        <label htmlFor="title-input">Title</label>
+        <Input
+          id="title-input"
+          type="text"
+          value={title}
+          onChange={titleChangeHandler}
+        />
+      </div>
+      <div className={`row ${styles["row-margin"]}`}>
         <div className="row">
           <div className="col-6">
             <label
@@ -188,10 +266,20 @@ const FilmUpload = (props) => {
             </span>
           </div>
         </div>
+        <div className={`row ${styles["row-margin"]}`}>
+          <label htmlFor="description-input">Description</label>
+          <Input
+            id="description-input"
+            type="text"
+            value={description}
+            onChange={descriptionChangeHandler}
+          />
+        </div>
         <Button
           variant="contained"
           endIcon={<UploadFile />}
           onClick={uploadVideoHandler}
+          style={{ marginTop: "5%" }}
         >
           Upload
         </Button>
