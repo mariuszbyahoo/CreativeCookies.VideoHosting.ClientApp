@@ -149,8 +149,8 @@ const FilmUpload = (props) => {
       return;
     }
     const guid = v4();
-    const videoBlobName = `${guid}.mp4`;
-    const thumbnailName = `${guid}.jpg`;
+    const videoBlobName = `${guid.toUpperCase()}.mp4`;
+    const thumbnailName = `${guid.toUpperCase()}.jpg`;
     if (thumbnail) {
       uploadBlob(thumbnail, thumbnailName, false, accessToken)
         .then((res) => {
