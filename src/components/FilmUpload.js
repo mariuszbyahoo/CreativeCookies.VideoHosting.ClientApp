@@ -112,9 +112,14 @@ const getVideoDuration = (file) => {
 };
 
 const FilmUpload = (props) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [video, setVideo] = useState();
   const [thumbnail, setThumbnail] = useState();
   const { accessToken } = useAuth();
+
+  const titleChangeHandler = (e) => setTitle(e.target.value);
+  const descriptionChangeHandler = (e) => setDescription(e.target.value);
 
   const videoChangeHandler = (e) => {
     if (e.target.files) {
@@ -142,12 +147,9 @@ const FilmUpload = (props) => {
     if (!video) {
       return;
     }
-
+    let thumbnailName = "";
     if (thumbnail) {
-      let thumbnailName = `${video.name.slice(
-        0,
-        video.name.lastIndexOf(".")
-      )}.jpg`;
+      thumbnailName = `${video.name.slice(0, video.name.lastIndexOf("."))}.jpg`;
       uploadBlob(thumbnail, thumbnailName, false, accessToken)
         .then((res) => {
           setThumbnail(undefined);
@@ -156,13 +158,39 @@ const FilmUpload = (props) => {
           console.log("Error while uploading thumbnail: ", error);
         });
     }
+    getVideoDuration(video)
+      .then((videoDuration) => {
+        uploadBlob(video, video.name, true, accessToken)
+          .then((res) => {
+            setVideo(undefined);
 
-    uploadBlob(video, video.name, true, accessToken)
-      .then((res) => {
-        setVideo(undefined);
+            const metadata = {
+              Name: title,
+              Description: description,
+              Length: videoDuration.toFixed(0),
+              ThumbnailName: thumbnailName,
+              BlobUrl: `${video.name}?${accessToken}`, // HACK TODO: this is just a stamp. It has to be pulled from Azure Blob Storage itself.
+              CreatedOn: new Date(),
+              VideoType: "Premium",
+            };
+
+            fetch(`https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(metadata),
+            })
+              .then((response) => response.json())
+              .then((data) => console.log(data))
+              .catch((error) => {
+                console.log("Error while saving metadata: ", error);
+              });
+          })
+          .catch((error) => {
+            console.log("Error while uploading video: ", error);
+          });
       })
       .catch((error) => {
-        console.log("Error while uploading video: ", error);
+        console.log("Error while reading the video's length: ", error);
       });
   };
 
@@ -176,6 +204,24 @@ const FilmUpload = (props) => {
 
   return (
     <div className={styles.container}>
+      <div className="row">
+        <label htmlFor="title-input">Title</label>
+        <Input
+          id="title-input"
+          type="text"
+          value={title}
+          onChange={titleChangeHandler}
+        />
+      </div>
+      <div className="row">
+        <label htmlFor="description-input">Description</label>
+        <Input
+          id="description-input"
+          type="text"
+          value={description}
+          onChange={descriptionChangeHandler}
+        />
+      </div>
       <div className="row">
         <div className="row">
           <div className="col-6">
