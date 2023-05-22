@@ -10,13 +10,8 @@ import { Button, Input } from "@mui/material";
 import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 
-const uploadBlob = async (file, blobName, isVideo, accessToken) => {
-  const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
-  const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
-  const thumbnailContainerName =
-    process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME;
-  const apiAddress = process.env.REACT_APP_API_ADDRESS;
-
+// function to get SAS token
+const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
   const fetchUrl = isVideo
     ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
     : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
@@ -26,18 +21,54 @@ const uploadBlob = async (file, blobName, isVideo, accessToken) => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data = await response.json();
-  const sasToken = data.sasToken;
 
-  const blockSize = 100 * 1024 * 1024; // 100MB
-  const fileSize = file.size;
+  if (!response.ok) {
+    throw new Error("Failed to get SAS token");
+  }
+
+  const data = await response.json();
+  return data.sasToken;
+};
+
+// function to create block IDs
+const createBlockIds = (fileSize, blockSize) => {
   const blockCount = Math.ceil(fileSize / blockSize);
-  const blockIds = Array.from({ length: blockCount }, (_, i) => {
+  return Array.from({ length: blockCount }, (_, i) => {
     const id = ("0000" + i).slice(-5); // Create a 5-character zero-padded string
     const encoder = new TextEncoder();
     const idBytes = encoder.encode(id);
     return Base64.encode(idBytes);
   });
+};
+
+// function to stage blocks
+const stageBlocks = async (blobClient, blockIds, file, blockSize) => {
+  for (let i = 0; i < blockIds.length; i++) {
+    const start = i * blockSize;
+    const end = Math.min(start + blockSize, file.size);
+    const chunk = file.slice(start, end);
+    const chunkSize = end - start;
+    await blobClient.stageBlock(blockIds[i], chunk, chunkSize);
+  }
+};
+
+// Updated uploadBlob function
+const uploadBlob = async (file, blobName, isVideo, accessToken) => {
+  const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
+  const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
+  const thumbnailContainerName =
+    process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME;
+  const apiAddress = process.env.REACT_APP_API_ADDRESS;
+
+  const sasToken = await getSASToken(
+    blobName,
+    isVideo,
+    accessToken,
+    apiAddress
+  );
+
+  const blockSize = 100 * 1024 * 1024; // 100MB
+  const blockIds = createBlockIds(file.size, blockSize);
 
   const blobURL = `https://${account}.blob.core.windows.net/${
     isVideo ? filmContainerName : thumbnailContainerName
@@ -45,13 +76,7 @@ const uploadBlob = async (file, blobName, isVideo, accessToken) => {
   const pipeline = newPipeline(new AnonymousCredential());
   const blobClient = new BlockBlobClient(blobURL, pipeline);
 
-  for (let i = 0; i < blockCount; i++) {
-    const start = i * blockSize;
-    const end = Math.min(start + blockSize, fileSize);
-    const chunk = file.slice(start, end);
-    const chunkSize = end - start;
-    await blobClient.stageBlock(blockIds[i], chunk, chunkSize);
-  }
+  await stageBlocks(blobClient, blockIds, file, blockSize);
 
   await blobClient.commitBlockList(blockIds);
 
