@@ -10,6 +10,7 @@ import { Button, Input } from "@mui/material";
 import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import { v4 } from "uuid";
+import RichTextEditor from "./SlateTextEditor/RichTextEditor";
 
 // function to get SAS token
 const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
@@ -274,6 +275,9 @@ const FilmUpload = (props) => {
             value={description}
             onChange={descriptionChangeHandler}
           />
+        </div>
+        <div className={`row ${styles["row-margin"]}`}>
+          <RichTextEditor></RichTextEditor>
         </div>
         <Button
           variant="contained"
