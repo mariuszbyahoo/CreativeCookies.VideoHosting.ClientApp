@@ -15,8 +15,8 @@ function generateCodeChallenge() {
   const wordArray = CryptoJS.enc.Utf8.parse(codeVerifier); // new line
   const hash = CryptoJS.SHA256(wordArray); // use wordArray instead of codeVerifier
   const codeChallenge = CryptoJS.enc.Base64.stringify(hash)
-    .replace("+", "-")
-    .replace("/", "_")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
     .replace(/=+$/, "");
   return { codeVerifier, codeChallenge };
 }
@@ -43,7 +43,8 @@ function setAuthCookie(name, value) {
   const date = new Date();
   date.setTime(date.getTime() + expiresInMinutes * 1000);
   expires = "; expires=" + date.toUTCString();
-  document.cookie = `${name}=` + value + expires + "; path=/; Secure;";
+  document.cookie =
+    `${name}=` + encodeURIComponent(value) + expires + "; path=/; Secure;";
 }
 
 function deleteCookie(name) {
