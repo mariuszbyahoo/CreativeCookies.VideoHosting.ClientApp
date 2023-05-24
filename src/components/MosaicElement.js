@@ -72,7 +72,6 @@ const MosaicElement = (props) => {
     return timeSpan;
   };
 
-  // HACK TODO: poniżej należy jakoś przekazać blobUrl do komponentu Player, bo na razie to on po prostu sobie wyciągał tytuł filmu i tyle.
   return (
     <div className={styles.boxShadowCard}>
       <Button className={styles.editButton}>
@@ -82,6 +81,8 @@ const MosaicElement = (props) => {
         <DeleteForeverIcon className={styles.closeButtonIcon} />
       </Button>
       <Link to={"/player/" + props.videoId} className={styles.linkImage}>
+        <div className={styles.overlay}></div>
+
         <div className={styles.imageContainer}>
           <img src={blobImage} alt="thumbnail" className={styles.thumbnail} />
           <div className={styles.badge}>
