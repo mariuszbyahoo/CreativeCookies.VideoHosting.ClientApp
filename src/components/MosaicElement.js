@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import styles from "./MosaicElement.module.css";
 import { useEffect, useState } from "react";
 import { BlobServiceClient } from "@azure/storage-blob";
-import { HighlightOffRounded } from "@mui/icons-material";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { Button } from "@mui/material";
 
 const fetchSasToken = async (title) => {
@@ -74,8 +75,11 @@ const MosaicElement = (props) => {
   // HACK TODO: poniżej należy jakoś przekazać blobUrl do komponentu Player, bo na razie to on po prostu sobie wyciągał tytuł filmu i tyle.
   return (
     <div className={styles.boxShadowCard}>
+      <Button className={styles.editButton}>
+        <BorderColorIcon className={styles.editButtonIcon} />
+      </Button>
       <Button className={styles.closeButton}>
-        <HighlightOffRounded className={styles.closeButtonIcon} />
+        <DeleteForeverIcon className={styles.closeButtonIcon} />
       </Button>
       <Link to={"/player/" + props.videoId} className={styles.linkImage}>
         <div className={styles.imageContainer}>

@@ -7,6 +7,23 @@ a {
     text-decoration: none;
 }
 
+.editButtonIcon {
+  font-size: xx-large;
+}
+
+.editButton {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  color: orange !important;
+  display: none !important;
+  z-index: 2 !important; 
+}
+
+.boxShadowCard:hover .editButton {
+  display: block !important; 
+}
+
 .closeButtonIcon {
   font-size: xx-large;
 }
@@ -17,7 +34,7 @@ a {
   right: 0 !important;
   color: red !important;
   display: none !important;
-  z-index: 1 !important;  
+  z-index: 2 !important;  
 }
 
 .boxShadowCard:hover .closeButton {
