@@ -1,4 +1,14 @@
-.container {
+.videoPlayer {
+    text-align: center;
+    margin-top: 1vmax;
+}
+
+.creationDate {
+    margin-block: 1vmax;
+    color: gray;
+}
+
+.title {
     text-align: center;
     margin-top: 1vmax;
 }

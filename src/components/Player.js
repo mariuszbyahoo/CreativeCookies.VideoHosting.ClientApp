@@ -10,7 +10,9 @@ const Player = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
   const [videoDescription, setVideoDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [uploadDate, setUploadDate] = useState("");
   const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
@@ -29,6 +31,16 @@ const Player = (props) => {
     );
 
     const blobResponseJson = await apiResponse.json();
+    setUploadDate(
+      new Date(blobResponseJson.createdOn).toLocaleString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
@@ -76,10 +88,6 @@ const Player = (props) => {
         }}
         options={videoOptions}
       />
-      <h3>{videoTitle}</h3>
-      {videoDescription && (
-        <div dangerouslySetInnerHTML={{ __html: videoDescription }} />
-      )}
     </>
   );
 
@@ -91,6 +99,21 @@ const Player = (props) => {
     content = plyrVideo;
   }
 
-  return <div className={styles.container}>{content}</div>;
+  let description = (
+    <>
+      <h3 className={styles.title}>{videoTitle}</h3>
+      <p className={styles.creationDate}>{uploadDate}</p>
+      {videoDescription && (
+        <div dangerouslySetInnerHTML={{ __html: videoDescription }} />
+      )}
+    </>
+  );
+
+  return (
+    <>
+      <div className={styles.videoPlayer}>{content}</div>
+      {description}
+    </>
+  );
 };
 export default Player;
