@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
     const grantType = "authorization_code";
