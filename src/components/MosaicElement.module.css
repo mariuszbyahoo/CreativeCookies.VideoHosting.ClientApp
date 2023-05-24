@@ -7,6 +7,23 @@ a {
     text-decoration: none;
 }
 
+.closeButtonIcon {
+  font-size: xx-large;
+}
+
+.closeButton {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  color: red !important;
+  display: none !important;
+  z-index: 1 !important;  
+}
+
+.boxShadowCard:hover .closeButton {
+  display: block !important; 
+}
+
 .boxShadowCard {
   position: relative;
   border: 1px solid #c2c2c2;
