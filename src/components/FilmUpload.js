@@ -13,6 +13,51 @@ import { v4 } from "uuid";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
+const quillModules = {
+  toolbar: [
+    ["bold", "italic", "underline", "strike"], // toggled buttons
+    ["blockquote", "code-block"],
+
+    [{ header: 1 }, { header: 2 }], // custom button values
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ script: "sub" }, { script: "super" }], // superscript/subscript
+    [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+    [{ direction: "rtl" }], // text direction
+
+    [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+    [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+    [{ font: [] }],
+    [{ align: [] }],
+
+    ["clean"], // remove formatting button
+
+    ["link", "image"], // link and image, video
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "bullet",
+  "indent",
+  "link",
+  "image",
+  "color",
+  "background",
+  "font",
+  "align",
+  "direction",
+  "size",
+  "script",
+];
+
 // function to get SAS token
 const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
   const fetchUrl = isVideo
@@ -122,7 +167,10 @@ const FilmUpload = (props) => {
   const { accessToken } = useAuth();
 
   const titleChangeHandler = (e) => setTitle(e.target.value);
-  const descriptionChangeHandler = (e) => setDescription(e.target.value);
+
+  const descriptionChangeHandler = (e) => {
+    setDescription(e); // ReactQuill sends an event which actually is generated HTML already
+  };
 
   const videoChangeHandler = (e) => {
     if (e.target.files) {
@@ -179,6 +227,8 @@ const FilmUpload = (props) => {
               CreatedOn: new Date(),
               VideoType: "Premium",
             };
+
+            alert("deserialised metadata: " + JSON.stringify(metadata));
 
             fetch(`https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`, {
               method: "POST",
@@ -269,19 +319,12 @@ const FilmUpload = (props) => {
           </div>
         </div>
         <div className={`row ${styles["row-margin"]}`}>
-          <label htmlFor="description-input">Description</label>
-          <Input
-            id="description-input"
-            type="text"
-            value={description}
-            onChange={descriptionChangeHandler}
-          />
-        </div>
-        <div className={`row ${styles["row-margin"]}`}>
           <ReactQuill
             theme="snow"
             value={description}
             onChange={descriptionChangeHandler}
+            modules={quillModules}
+            formats={quillFormats}
           />
         </div>
         <Button
