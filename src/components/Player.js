@@ -100,13 +100,13 @@ const Player = (props) => {
   }
 
   let description = (
-    <>
+    <div className="ql-editor">
       <h3 className={styles.title}>{videoTitle}</h3>
       <p className={styles.creationDate}>{uploadDate}</p>
       {videoDescription && (
         <div dangerouslySetInnerHTML={{ __html: videoDescription }} />
       )}
-    </>
+    </div>
   );
 
   return (
