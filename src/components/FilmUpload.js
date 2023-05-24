@@ -10,7 +10,8 @@ import { Button, Input } from "@mui/material";
 import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import { v4 } from "uuid";
-import RichTextEditor from "./SlateTextEditor/RichTextEditor";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 // function to get SAS token
 const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
@@ -277,7 +278,11 @@ const FilmUpload = (props) => {
           />
         </div>
         <div className={`row ${styles["row-margin"]}`}>
-          <RichTextEditor></RichTextEditor>
+          <ReactQuill
+            theme="snow"
+            value={description}
+            onChange={descriptionChangeHandler}
+          />
         </div>
         <Button
           variant="contained"
