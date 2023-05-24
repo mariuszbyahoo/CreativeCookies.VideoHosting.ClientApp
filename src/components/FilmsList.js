@@ -84,6 +84,25 @@ const FilmsList = () => {
     await fetchMoviesHandler();
   };
 
+  const deleteVideoHandler = async (videoId) => {
+    setVideoMetadatas((prev) => prev.filter((video) => video.id !== videoId));
+
+    try {
+      await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideoMetadata?Id=${videoId}`,
+        { method: "DELETE" }
+      );
+    } catch (error) {
+      const video = videoMetadatas.find((video) => video.id === videoId);
+      setVideoMetadatas((prev) => [...prev, video]);
+
+      alert("An error occured while deleting a video: " + videoId);
+      return;
+    }
+
+    //HACK TODO: delete video from Blob Storage. (where would be the best place to do so?)
+  };
+
   let content = <p>Upload a movie to get started!</p>;
   if (loading) {
     content = <p>Loading...</p>;
@@ -97,7 +116,12 @@ const FilmsList = () => {
     videoMetadatas.sort(
       (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
     );
-    content = <Mosaic videoMetadatas={videoMetadatas} />;
+    content = (
+      <Mosaic
+        videoMetadatas={videoMetadatas}
+        deleteVideoHandler={deleteVideoHandler}
+      />
+    );
   }
 
   let loadBtn = hasMore && (

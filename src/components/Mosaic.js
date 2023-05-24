@@ -11,6 +11,7 @@ const Mosaic = (props) => {
           thumbnail={videoMetadata.thumbnailName}
           duration={videoMetadata.length}
           createdOn={videoMetadata.createdOn}
+          deleteVideoHandler={props.deleteVideoHandler}
           key={index}
         />
       ))}

@@ -6,9 +6,9 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { Button } from "@mui/material";
 
-const fetchSasToken = async (title) => {
+const fetchSasToken = async (id) => {
   const response = await fetch(
-    `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/thumbnail/${title}`
+    `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/thumbnail/${id}`
   );
   const data = await response.json();
   return data.sasToken;
@@ -77,7 +77,10 @@ const MosaicElement = (props) => {
       <Button className={styles.editButton}>
         <BorderColorIcon className={styles.editButtonIcon} />
       </Button>
-      <Button className={styles.closeButton}>
+      <Button
+        className={styles.closeButton}
+        onClick={() => props.deleteVideoHandler(props.videoId)}
+      >
         <DeleteForeverIcon className={styles.closeButtonIcon} />
       </Button>
       <Link to={"/player/" + props.videoId} className={styles.linkImage}>
