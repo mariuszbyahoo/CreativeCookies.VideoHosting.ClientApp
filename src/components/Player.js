@@ -4,6 +4,7 @@ import "plyr-react/plyr.css";
 import Plyr from "plyr-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./Account/AuthContext";
+import DOMPurify from "dompurify";
 
 const Player = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
@@ -18,21 +19,19 @@ const Player = (props) => {
   if (params.id === ":id") navigate("/films-list");
 
   useEffect(() => {
-    fetchUrlWithSAS();
+    fetchMetadataWithSAS();
   }, []);
-  async function fetchUrlWithSAS() {
+  async function fetchMetadataWithSAS() {
     setLoading(true);
     // FROM HERE Encapsulate it to another function
     const apiResponse = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/getMetadata?Id=${params.id}`
     );
-    // Responses with an empty JSON?
 
     const blobResponseJson = await apiResponse.json();
-    console.log("JSON.stringify(blobResponseJson): ", blobResponseJson);
-    alert("BlobResponseJson: " + blobResponseJson);
     setVideoTitle(blobResponseJson.name);
-    setVideoDescription(blobResponseJson.description);
+    const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
+    setVideoDescription(sanitizedHTML);
     // TILL HERE
     const sasTokenResponse = await fetchSasToken();
     setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
@@ -78,8 +77,9 @@ const Player = (props) => {
         options={videoOptions}
       />
       <h3>{videoTitle}</h3>
-      {videoDescription && <div>{videoDescription}</div>}{" "}
-      {/* DOES NOT RENDERING VIDEO DESCRIPTION */}
+      {videoDescription && (
+        <div dangerouslySetInnerHTML={{ __html: videoDescription }} />
+      )}
     </>
   );
 
