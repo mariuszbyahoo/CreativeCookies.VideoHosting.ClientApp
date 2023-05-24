@@ -80,7 +80,7 @@ const AppRoutes = [
     ),
   },
   {
-    path: "/player/:title",
+    path: "/player/:id",
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}

@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./Account/AuthContext";
 
 const Player = (props) => {
+  const [videoTitle, setVideoTitle] = useState("");
+  const [videoDescription, setVideoDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -13,30 +15,36 @@ const Player = (props) => {
   const ref = useRef(null);
   const { accessToken } = useAuth();
 
-  if (params.title === ":title") navigate("/films-list");
+  if (params.id === ":id") navigate("/films-list");
 
   useEffect(() => {
-    async function fetchUrlWithSAS() {
-      setLoading(true);
-      // FROM HERE Encapsulate it to another function
-      const blobUrlResponse = await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/storageUrl?Id=${params.title}`
-      );
-      const blobResponseJson = await blobUrlResponse.json();
-      // TILL HERE
-      const sasTokenResponse = await fetchSasToken();
-      setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
-      setLoading(false);
-    }
     fetchUrlWithSAS();
   }, []);
+  async function fetchUrlWithSAS() {
+    setLoading(true);
+    // FROM HERE Encapsulate it to another function
+    const apiResponse = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/getMetadata?Id=${params.id}`
+    );
+    // Responses with an empty JSON?
+
+    const blobResponseJson = await apiResponse.json();
+    console.log("JSON.stringify(blobResponseJson): ", blobResponseJson);
+    alert("BlobResponseJson: " + blobResponseJson);
+    setVideoTitle(blobResponseJson.name);
+    setVideoDescription(blobResponseJson.description);
+    // TILL HERE
+    const sasTokenResponse = await fetchSasToken();
+    setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
+    setLoading(false);
+  }
 
   async function fetchSasToken() {
     try {
       const response = await fetch(
         `https://${
           process.env.REACT_APP_API_ADDRESS
-        }/api/sas/film/${params.title.toUpperCase()}.mp4`,
+        }/api/sas/film/${params.id.toUpperCase()}.mp4`,
         {
           method: "GET",
           headers: {
@@ -54,20 +62,25 @@ const Player = (props) => {
 
   const videoOptions = undefined;
   const plyrVideo = videoUrl && (
-    <Plyr
-      ref={ref}
-      source={{
-        type: "video",
-        sources: [
-          {
-            src: videoUrl,
-            provider: "html5",
-            type: "video/mp4",
-          },
-        ],
-      }}
-      options={videoOptions}
-    />
+    <>
+      <Plyr
+        ref={ref}
+        source={{
+          type: "video",
+          sources: [
+            {
+              src: videoUrl,
+              provider: "html5",
+              type: "video/mp4",
+            },
+          ],
+        }}
+        options={videoOptions}
+      />
+      <h3>{videoTitle}</h3>
+      {videoDescription && <div>{videoDescription}</div>}{" "}
+      {/* DOES NOT RENDERING VIDEO DESCRIPTION */}
+    </>
   );
 
   let content;
