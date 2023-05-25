@@ -6,6 +6,7 @@ import Mosaic from "./Mosaic";
 import { Button, FormControl, InputAdornment, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const FilmsList = () => {
   const [videoMetadatas, setVideoMetadatas] = useState([]);
@@ -14,6 +15,8 @@ const FilmsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [dialogIsOpened, setDialogIsOpened] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [error, setError] = useState();
   const { accessToken } = useAuth();
 
@@ -85,13 +88,31 @@ const FilmsList = () => {
 
     await fetchMoviesHandler();
   };
+  const openDeleteDialog = (videoId) => {
+    setSelectedVideoId(videoId);
+    setDialogIsOpened(true);
+  };
 
-  const deleteVideoHandler = async (videoId) => {
-    setVideoMetadatas((prev) => prev.filter((video) => video.id !== videoId));
+  const closeDeleteDialog = () => {
+    setSelectedVideoId(null);
+    setDialogIsOpened(false);
+  };
+
+  const deleteVideoHandler = (videoId) => {
+    openDeleteDialog(videoId);
+  };
+
+  const confirmDeleteHandler = async () => {
+    setDialogIsOpened(false);
+    if (!selectedVideoId) return;
+
+    setVideoMetadatas((prev) =>
+      prev.filter((video) => video.id !== selectedVideoId)
+    );
 
     try {
       await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideoMetadata?Id=${videoId}`,
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideoMetadata?Id=${selectedVideoId}`,
         {
           method: "DELETE",
           headers: {
@@ -100,14 +121,17 @@ const FilmsList = () => {
         }
       );
     } catch (error) {
-      const video = videoMetadatas.find((video) => video.id === videoId);
+      const video = videoMetadatas.find(
+        (video) => video.id === selectedVideoId
+      );
       setVideoMetadatas((prev) => [...prev, video]);
 
-      alert("An error occured while deleting a video: " + videoId);
+      console.error(
+        "An error occured while deleting a video: " + selectedVideoId
+      );
       return;
     }
-
-    //HACK TODO: delete video from Blob Storage. (where would be the best place to do so?)
+    setSelectedVideoId(null);
   };
 
   let content = <p>Upload a movie to get started!</p>;
@@ -126,7 +150,7 @@ const FilmsList = () => {
     content = (
       <Mosaic
         videoMetadatas={videoMetadatas}
-        deleteVideoHandler={deleteVideoHandler}
+        deleteVideoHandler={openDeleteDialog}
       />
     );
   }
@@ -158,6 +182,13 @@ const FilmsList = () => {
       </div>
       {content}
       {loadBtn}
+      <ConfirmationDialog
+        open={dialogIsOpened}
+        title="Delete Video"
+        message="Are you sure you want to delete this video?"
+        onConfirm={confirmDeleteHandler}
+        onCancel={closeDeleteDialog}
+      />
     </div>
   );
 };
