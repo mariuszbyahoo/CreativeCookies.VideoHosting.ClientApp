@@ -5,6 +5,7 @@ import styles from "./FilmsList.module.css";
 import Mosaic from "./Mosaic";
 import { Button, FormControl, InputAdornment, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import { useAuth } from "./Account/AuthContext";
 
 const FilmsList = () => {
   const [videoMetadatas, setVideoMetadatas] = useState([]);
@@ -14,6 +15,7 @@ const FilmsList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
+  const { accessToken } = useAuth();
 
   const fetchMoviesHandler = async () => {
     if (!hasMore && pageNumber > 1) return; // Don't fetch if there are no more items and it's not the first page
@@ -90,7 +92,12 @@ const FilmsList = () => {
     try {
       await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideoMetadata?Id=${videoId}`,
-        { method: "DELETE" }
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
     } catch (error) {
       const video = videoMetadatas.find((video) => video.id === videoId);

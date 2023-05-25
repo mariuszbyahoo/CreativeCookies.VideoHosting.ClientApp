@@ -227,11 +227,12 @@ const FilmUpload = (props) => {
               VideoType: "Premium",
             };
 
-            alert("deserialised metadata: " + JSON.stringify(metadata));
-
             fetch(`https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
               body: JSON.stringify(metadata),
             })
               .then((response) => {
