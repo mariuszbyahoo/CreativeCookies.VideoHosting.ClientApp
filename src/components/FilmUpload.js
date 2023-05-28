@@ -11,6 +11,8 @@ import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import { v4 } from "uuid";
 import ReactQuill from "react-quill";
+import ProgressDialog from "./ProgressDialog";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const quillModules = {
   toolbar: [
@@ -89,8 +91,15 @@ const createBlockIds = (fileSize, blockSize) => {
 };
 
 // function to stage blocks
-const stageBlocks = async (blobClient, blockIds, file, blockSize) => {
+const stageBlocks = async (
+  blobClient,
+  blockIds,
+  file,
+  blockSize,
+  setUploadProgress
+) => {
   for (let i = 0; i < blockIds.length; i++) {
+    setUploadProgress(i);
     const start = i * blockSize;
     const end = Math.min(start + blockSize, file.size);
     const chunk = file.slice(start, end);
@@ -100,7 +109,15 @@ const stageBlocks = async (blobClient, blockIds, file, blockSize) => {
 };
 
 // Updated uploadBlob function
-const uploadBlob = async (file, blobName, isVideo, accessToken) => {
+const uploadBlob = async (
+  file,
+  blobName,
+  isVideo,
+  accessToken,
+  setUploadProgress,
+  setMaxPackets,
+  setDialogTitle
+) => {
   const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
   const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
   const thumbnailContainerName =
@@ -116,15 +133,13 @@ const uploadBlob = async (file, blobName, isVideo, accessToken) => {
 
   const blockSize = 100 * 1024 * 1024; // 100MB
   const blockIds = createBlockIds(file.size, blockSize);
-
+  setMaxPackets(blockIds.length);
   const blobURL = `https://${account}.blob.core.windows.net/${
     isVideo ? filmContainerName : thumbnailContainerName
   }/${encodeURIComponent(blobName)}?${sasToken}`;
   const pipeline = newPipeline(new AnonymousCredential());
   const blobClient = new BlockBlobClient(blobURL, pipeline);
-
-  await stageBlocks(blobClient, blockIds, file, blockSize);
-
+  await stageBlocks(blobClient, blockIds, file, blockSize, setUploadProgress);
   await blobClient.commitBlockList(blockIds);
 
   if (isVideo) {
@@ -159,13 +174,20 @@ const getVideoDuration = (file) => {
 };
 
 const FilmUpload = (props) => {
-  const [title, setTitle] = useState("");
+  const [videoTitle, setVideoTitle] = useState("");
   const [description, setDescription] = useState("");
   const [video, setVideo] = useState();
   const [thumbnail, setThumbnail] = useState();
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [maxPackets, setMaxPackets] = useState(0);
+  const [progressDialogTitle, setProgressDialogTitle] = useState("");
+  const [isProgressDialogOpened, setIsProgressDialogOpened] = useState(false);
+  const [videoUploadFinished, setVideoUploadFinished] = useState(false);
   const { accessToken } = useAuth();
-
-  const titleChangeHandler = (e) => setTitle(e.target.value);
+  const videoGuid = v4();
+  const videoBlobName = `${videoGuid.toUpperCase()}.mp4`;
+  const thumbnailBlobName = `${videoGuid.toUpperCase()}.jpg`;
+  const videoTitleChangeHandler = (e) => setVideoTitle(e.target.value);
 
   const descriptionChangeHandler = (e) => {
     setDescription(e); // ReactQuill sends an event which actually is generated HTML already
@@ -193,72 +215,94 @@ const FilmUpload = (props) => {
     }
   };
 
-  const uploadVideoHandler = () => {
-    if (!video) {
-      return;
-    }
-    const guid = v4();
-    const videoBlobName = `${guid.toUpperCase()}.mp4`;
-    const thumbnailName = `${guid.toUpperCase()}.jpg`;
-    if (thumbnail) {
-      uploadBlob(thumbnail, thumbnailName, false, accessToken)
-        .then((res) => {
-          setThumbnail(undefined);
-        })
-        .catch((error) => {
-          console.log("Error while uploading thumbnail: ", error);
-          setThumbnail(undefined);
-        });
-    }
-    getVideoDuration(video)
-      .then((videoDuration) => {
-        uploadBlob(video, videoBlobName, true, accessToken)
-          .then((res) => {
-            setVideo(undefined);
+  const uploadThumbnail = async (thumbnailName) => {
+    await uploadBlob(
+      thumbnail,
+      thumbnailName,
+      false,
+      accessToken,
+      setUploadProgress,
+      setMaxPackets,
+      setProgressDialogTitle
+    );
+    setThumbnail(undefined);
+  };
 
-            const metadata = {
-              Id: guid,
-              Name: title,
-              Description: description,
-              Length: videoDuration.toFixed(0),
-              ThumbnailName: thumbnailName,
-              BlobUrl: `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.REACT_APP_FILMS_CONTAINER_NAME}/${videoBlobName}`, // HACK TODO: this is just a stamp. It has to be pulled from Azure Blob Storage itself.
-              CreatedOn: new Date(),
-              VideoType: "Premium",
-            };
+  const uploadVideo = async (videoName) => {
+    await uploadBlob(
+      video,
+      videoName,
+      true,
+      accessToken,
+      setUploadProgress,
+      setMaxPackets,
+      setProgressDialogTitle
+    );
+    setVideo(undefined);
+  };
 
-            fetch(`https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
-              },
-              body: JSON.stringify(metadata),
-            })
-              .then((response) => {
-                response.json();
-                setTitle("");
-                setDescription("");
-              })
-              .catch((error) => {
-                console.log("Error while saving metadata: ", error);
-                setTitle("");
-                setDescription("");
-              });
-          })
-          .catch((error) => {
-            console.log("Error while uploading video: ", error);
-            setVideo(undefined);
-            setTitle("");
-            setDescription("");
-          });
-      })
-      .catch((error) => {
-        console.log("Error while reading the video's length: ", error);
-        setVideo(undefined);
-        setTitle("");
-        setDescription("");
-      });
+  const postMetadata = async (videoGuid, videoName, videoDuration) => {
+    setUploadProgress(0);
+    setMaxPackets(1);
+    const metadata = {
+      Id: videoGuid,
+      Name: videoTitle,
+      Description: description,
+      Length: videoDuration.toFixed(0),
+      ThumbnailName: thumbnailBlobName,
+      BlobUrl: `https://${process.env.REACT_APP_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.REACT_APP_FILMS_CONTAINER_NAME}/${videoName}`,
+      CreatedOn: new Date(),
+      VideoType: "Premium",
+    };
+
+    const response = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(metadata),
+      }
+    );
+
+    const responseData = await response.json();
+    setUploadProgress(1);
+    return responseData;
+  };
+
+  const uploadVideoHandler = async () => {
+    try {
+      setIsProgressDialogOpened(true);
+      if (thumbnail) {
+        setProgressDialogTitle("Preparing to upload...");
+        setUploadProgress(0);
+        setMaxPackets(1);
+        await uploadThumbnail(thumbnailBlobName);
+        setUploadProgress(1);
+      }
+      setUploadProgress(0);
+      setMaxPackets(1);
+      const videoDuration = await getVideoDuration(video);
+      setUploadProgress(1);
+      setUploadProgress(0);
+      setProgressDialogTitle("Uploading video");
+      await uploadVideo(videoBlobName);
+      setUploadProgress(0);
+      setProgressDialogTitle("Saving video metadata");
+      await postMetadata(videoGuid, videoBlobName, videoDuration);
+      setUploadProgress(1);
+      setVideoTitle("");
+      setDescription("");
+      setIsProgressDialogOpened(false);
+      setVideoUploadFinished(true);
+    } catch (error) {
+      console.error("An error occurred during the upload process:", error);
+      setVideoTitle("");
+      setDescription("");
+      setIsProgressDialogOpened(false);
+    }
   };
 
   let videoInputDescription = video
@@ -270,73 +314,96 @@ const FilmUpload = (props) => {
     : "No file selected";
 
   return (
-    <div className={styles.container}>
-      <h3 style={{ marginBottom: "5%" }}>Upload a new video</h3>
-      <div className={`row ${styles["row-margin"]}`}>
-        <label htmlFor="title-input">Title</label>
-        <Input
-          id="title-input"
-          type="text"
-          value={title}
-          onChange={titleChangeHandler}
-        />
-      </div>
-      <div className={`row ${styles["row-margin"]}`}>
-        <div className="row">
-          <div className="col-6">
-            <label
-              htmlFor="select-film"
-              className={styles["custom-file-upload"]}
-            >
-              <Search />
-              Select mp4 file
-            </label>
-            <Input id="select-film" type="file" onChange={videoChangeHandler} />
-          </div>
-          <div className="col-6">
-            <span className={styles.description}>{videoInputDescription}</span>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-6">
-            <label
-              htmlFor="select-thumbnail"
-              className={styles["custom-file-upload"]}
-            >
-              <InsertPhoto />
-              Select thumbnail file
-            </label>
-            <Input
-              id="select-thumbnail"
-              type="file"
-              onChange={thumbnailChangeHandler}
-            />
-          </div>
-          <div className="col-6">
-            <span className={styles.description}>
-              {thumbnailInputDescription}
-            </span>
-          </div>
-        </div>
+    <>
+      <div className={styles.container}>
+        <h3 style={{ marginBottom: "5%" }}>Upload a new video</h3>
         <div className={`row ${styles["row-margin"]}`}>
-          <ReactQuill
-            theme="snow"
-            value={description}
-            onChange={descriptionChangeHandler}
-            modules={quillModules}
-            formats={quillFormats}
+          <label htmlFor="title-input">Title</label>
+          <Input
+            id="title-input"
+            type="text"
+            value={videoTitle}
+            onChange={videoTitleChangeHandler}
           />
         </div>
-        <Button
-          variant="contained"
-          endIcon={<UploadFile />}
-          onClick={uploadVideoHandler}
-          style={{ marginTop: "5%" }}
-        >
-          Upload
-        </Button>
+        <div className={`row ${styles["row-margin"]}`}>
+          <div className="row">
+            <div className="col-6">
+              <label
+                htmlFor="select-film"
+                className={styles["custom-file-upload"]}
+              >
+                <Search />
+                Select mp4 file
+              </label>
+              <Input
+                id="select-film"
+                type="file"
+                onChange={videoChangeHandler}
+              />
+            </div>
+            <div className="col-6">
+              <span className={styles.description}>
+                {videoInputDescription}
+              </span>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-6">
+              <label
+                htmlFor="select-thumbnail"
+                className={styles["custom-file-upload"]}
+              >
+                <InsertPhoto />
+                Select thumbnail file
+              </label>
+              <Input
+                id="select-thumbnail"
+                type="file"
+                onChange={thumbnailChangeHandler}
+              />
+            </div>
+            <div className="col-6">
+              <span className={styles.description}>
+                {thumbnailInputDescription}
+              </span>
+            </div>
+          </div>
+          <div className={`row ${styles["row-margin"]}`}>
+            <ReactQuill
+              theme="snow"
+              value={description}
+              onChange={descriptionChangeHandler}
+              modules={quillModules}
+              formats={quillFormats}
+            />
+          </div>
+          <Button
+            variant="contained"
+            endIcon={<UploadFile />}
+            onClick={uploadVideoHandler}
+            style={{ marginTop: "5%" }}
+          >
+            Upload
+          </Button>
+        </div>
       </div>
-    </div>
+      <ProgressDialog
+        max={maxPackets}
+        progress={uploadProgress}
+        open={isProgressDialogOpened}
+        title={progressDialogTitle}
+      ></ProgressDialog>
+      <ConfirmationDialog
+        title="Success"
+        message="Video has been uploaded succesfully"
+        open={videoUploadFinished}
+        hasCancelOption={false}
+        onConfirm={() => {
+          setVideoUploadFinished((prevState) => !prevState);
+        }}
+      ></ConfirmationDialog>
+    </>
   );
 };
 
