@@ -98,10 +98,6 @@ const FilmsList = () => {
     setDialogIsOpened(false);
   };
 
-  const deleteVideoHandler = (videoId) => {
-    openDeleteDialog(videoId);
-  };
-
   const confirmDeleteHandler = async () => {
     setDialogIsOpened(false);
     if (!selectedVideoId) return;
@@ -112,7 +108,7 @@ const FilmsList = () => {
 
     try {
       await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideoMetadata?Id=${selectedVideoId}`,
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideo?Id=${selectedVideoId}`,
         {
           method: "DELETE",
           headers: {
