@@ -5,7 +5,7 @@ import {
   LinearProgress,
 } from "@mui/material";
 
-const ProgressDialog = ({ max, progress, open, title }) => (
+const ProgressDialog = ({ max, progress, open, title, textToDisplay }) => (
   <>
     <Dialog open={open} disableEscapeKeyDown>
       <DialogTitle>{title}</DialogTitle>

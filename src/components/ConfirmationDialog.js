@@ -6,14 +6,21 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 
-const ConfirmationDialog = ({ open, title, message, onConfirm, onCancel }) => (
+const ConfirmationDialog = ({
+  open,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  hasCancelOption,
+}) => (
   <Dialog open={open} onClose={onCancel}>
     <DialogTitle>{title}</DialogTitle>
     <DialogContent>
       <DialogContentText>{message}</DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button onClick={onCancel}>Cancel</Button>
+      {hasCancelOption && <Button onClick={onCancel}>Cancel</Button>}
       <Button onClick={onConfirm} color="secondary">
         Confirm
       </Button>

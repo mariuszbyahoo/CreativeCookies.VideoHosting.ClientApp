@@ -186,6 +186,7 @@ const FilmsList = () => {
         open={dialogIsOpened}
         title="Delete Video"
         message="Are you sure you want to delete this video?"
+        hasCancelOption={true}
         onConfirm={confirmDeleteHandler}
         onCancel={closeDeleteDialog}
       />
