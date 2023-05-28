@@ -7,6 +7,7 @@ import { Button, FormControl, InputAdornment, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import ConfirmationDialog from "./ConfirmationDialog";
+import EditMetadataDialogComponent from "./EditMetadataDialog";
 
 const FilmsList = () => {
   const [videoMetadatas, setVideoMetadatas] = useState([]);
@@ -17,6 +18,7 @@ const FilmsList = () => {
   const [loading, setLoading] = useState(true);
   const [dialogIsOpened, setDialogIsOpened] = useState(false);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
+  const [isEditorOpened, setIsEditorOpened] = useState(false);
   const [error, setError] = useState();
   const { accessToken } = useAuth();
 
@@ -98,6 +100,22 @@ const FilmsList = () => {
     setDialogIsOpened(false);
   };
 
+  const openEditorDialog = (videoId) => {
+    setSelectedVideoId(videoId);
+    setIsEditorOpened(true);
+  };
+
+  const closeEditorDialog = () => {
+    setSelectedVideoId(null);
+    setIsEditorOpened(false);
+  };
+
+  const confirmEditorHandler = () => {
+    // HACK TODO: Implement necessary actions!
+    setSelectedVideoId(null);
+    setIsEditorOpened(false);
+  };
+
   const confirmDeleteHandler = async () => {
     setDialogIsOpened(false);
     if (!selectedVideoId) return;
@@ -147,6 +165,7 @@ const FilmsList = () => {
       <Mosaic
         videoMetadatas={videoMetadatas}
         deleteVideoHandler={openDeleteDialog}
+        openEditorHandler={openEditorDialog}
       />
     );
   }
@@ -178,6 +197,12 @@ const FilmsList = () => {
       </div>
       {content}
       {loadBtn}
+      <EditMetadataDialogComponent
+        open={isEditorOpened}
+        selectedVideoId={selectedVideoId}
+        onConfirm={confirmEditorHandler}
+        onCancel={closeEditorDialog}
+      />
       <ConfirmationDialog
         open={dialogIsOpened}
         title="Delete Video"

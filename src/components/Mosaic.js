@@ -12,6 +12,7 @@ const Mosaic = (props) => {
           duration={videoMetadata.length}
           createdOn={videoMetadata.createdOn}
           deleteVideoHandler={props.deleteVideoHandler}
+          openEditorHandler={props.openEditorHandler}
           key={index}
         />
       ))}

@@ -74,7 +74,10 @@ const MosaicElement = (props) => {
 
   return (
     <div className={styles.boxShadowCard}>
-      <Button className={styles.editButton}>
+      <Button
+        className={styles.editButton}
+        onClick={() => props.openEditorHandler(props.videoId)}
+      >
         <BorderColorIcon className={styles.editButtonIcon} />
       </Button>
       <Button
