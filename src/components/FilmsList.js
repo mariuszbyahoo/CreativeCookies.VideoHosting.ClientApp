@@ -7,6 +7,7 @@ import { Button, FormControl, InputAdornment, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { useNavigate } from "react-router-dom";
 
 const FilmsList = () => {
   const [videoMetadatas, setVideoMetadatas] = useState([]);
@@ -18,6 +19,7 @@ const FilmsList = () => {
   const [dialogIsOpened, setDialogIsOpened] = useState(false);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [error, setError] = useState();
+  const navigate = useNavigate();
   const { accessToken } = useAuth();
 
   const fetchMoviesHandler = async () => {
@@ -98,6 +100,10 @@ const FilmsList = () => {
     setDialogIsOpened(false);
   };
 
+  const openEditorDialog = (videoId) => {
+    navigate(`/editor/${videoId}`);
+  };
+
   const confirmDeleteHandler = async () => {
     setDialogIsOpened(false);
     if (!selectedVideoId) return;
@@ -147,6 +153,7 @@ const FilmsList = () => {
       <Mosaic
         videoMetadatas={videoMetadatas}
         deleteVideoHandler={openDeleteDialog}
+        openEditorHandler={openEditorDialog}
       />
     );
   }
