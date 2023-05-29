@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./FilmUpload.module.css";
 import { quillFormats, quillModules } from "./Helpers/quillHelper";
-import { Button, Input } from "@mui/material";
+import { Button, CircularProgress, Input } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import ReactQuill from "react-quill";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -12,6 +12,7 @@ const FilmEditor = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
   const [videoDescription, setVideoDescription] = useState("");
   const [metadata, setMetadata] = useState(undefined);
+  const [isLoading, setIsLoading] = useState(true);
   const [videoEditFinished, setVideoEditFinished] = useState(false);
 
   const params = useParams();
@@ -33,6 +34,7 @@ const FilmEditor = (props) => {
       setMetadata(responseData);
       setVideoTitle(responseData.name || "");
       setVideoDescription(responseData.description || "");
+      setIsLoading(false);
     } else {
       alert("an error occured! Contact the software vendor");
       navigate("/films-list");
@@ -69,7 +71,12 @@ const FilmEditor = (props) => {
       }
     );
 
-    setVideoEditFinished(true);
+    if (response.ok) {
+      setVideoEditFinished(true);
+    } else {
+      alert("an error occured! Contact the software vendor");
+      navigate("/films-list");
+    }
   };
 
   return (
@@ -94,14 +101,18 @@ const FilmEditor = (props) => {
             formats={quillFormats}
           />
         </div>
-        <Button
-          variant="contained"
-          endIcon={<EditIcon />}
-          onClick={editVideoHandler}
-          style={{ marginTop: "5%" }}
-        >
-          Edit
-        </Button>
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
+          <Button
+            variant="contained"
+            endIcon={<EditIcon />}
+            onClick={editVideoHandler}
+            style={{ marginTop: "5%" }}
+          >
+            Edit
+          </Button>
+        )}
       </div>
       <ConfirmationDialog
         title="Success"
