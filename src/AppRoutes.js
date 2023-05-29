@@ -7,6 +7,7 @@ import SignInLandingComponent from "./components/Account/SignInLandingComponent"
 import ProtectedComponent from "./components/Routes/ProtectedComponent";
 import AuthErrorComponent from "./components/Account/AuthError";
 import { useAuth } from "./components/Account/AuthContext";
+import FilmEditor from "./components/FilmEditor";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -95,6 +96,21 @@ const AppRoutes = [
     ),
   },
   {
+    path: "/editor/:id",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <ProtectedComponent isAuthenticated={isAuthenticated}>
+          <FilmEditor />
+        </ProtectedComponent>
+      </ErrorBoundary>
+    ),
+  },
+  {
     path: "/films-upload",
     element: (
       <ErrorBoundary
@@ -104,7 +120,7 @@ const AppRoutes = [
         }}
       >
         <ProtectedComponent isAuthenticated={isAuthenticated}>
-          <FilmUpload />
+          <FilmUpload mode={0} />
         </ProtectedComponent>
       </ErrorBoundary>
     ),
