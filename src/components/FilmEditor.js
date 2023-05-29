@@ -6,27 +6,37 @@ import { Button, Input } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import ReactQuill from "react-quill";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { useAuth } from "./Account/AuthContext";
 
 const FilmEditor = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
-  const [description, setVideoDescription] = useState("");
+  const [videoDescription, setVideoDescription] = useState("");
+  const [metadata, setMetadata] = useState(undefined);
   const [videoEditFinished, setVideoEditFinished] = useState(false);
 
   const params = useParams();
   const navigate = useNavigate();
 
+  const { accessToken } = useAuth();
+
   if (params.id === ":id") navigate("/films-list");
 
   useEffect(() => {
     getMetadata();
-  });
+  }, [params.id]);
   const getMetadata = async () => {
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/getMetadata?id=${params.id}`
     );
-    const responseData = await response.json();
-    setVideoTitle(responseData.name || "");
-    setVideoDescription(responseData.description || "");
+    if (response.ok) {
+      const responseData = await response.json();
+      setMetadata(responseData);
+      setVideoTitle(responseData.name || "");
+      setVideoDescription(responseData.description || "");
+    } else {
+      alert("an error occured! Contact the software vendor");
+      navigate("/films-list");
+    }
   };
 
   const videoTitleChangeHandler = (e) => {
@@ -38,7 +48,28 @@ const FilmEditor = (props) => {
   };
 
   const editVideoHandler = (e) => {
-    console.log("edited!");
+    const updatedMetadata = {
+      ...metadata,
+      name: videoTitle,
+      description: videoDescription,
+    };
+    sendEditRequest(updatedMetadata);
+  };
+
+  const sendEditRequest = async (bodyContent) => {
+    const response = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/editMetadata`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(bodyContent),
+      }
+    );
+
+    setVideoEditFinished(true);
   };
 
   return (
@@ -57,7 +88,7 @@ const FilmEditor = (props) => {
         <div className={`row ${styles["row-margin"]}`}>
           <ReactQuill
             theme="snow"
-            value={description}
+            value={videoDescription}
             onChange={descriptionChangeHandler}
             modules={quillModules}
             formats={quillFormats}
@@ -78,7 +109,7 @@ const FilmEditor = (props) => {
         open={videoEditFinished}
         hasCancelOption={false}
         onConfirm={() => {
-          setVideoEditFinished((prevState) => !prevState);
+          navigate(`/player/${params.id}`);
         }}
       ></ConfirmationDialog>
     </>
