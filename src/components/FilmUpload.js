@@ -134,12 +134,20 @@ const FilmUpload = (props) => {
   const [description, setDescription] = useState("");
   const [video, setVideo] = useState();
   const [thumbnail, setThumbnail] = useState();
+
   const [uploadProgress, setUploadProgress] = useState(0);
   const [maxPackets, setMaxPackets] = useState(0);
   const [progressDialogTitle, setProgressDialogTitle] = useState("");
   const [isProgressDialogOpened, setIsProgressDialogOpened] = useState(false);
-  const [videoUploadFinished, setVideoUploadFinished] = useState(false);
+
+  const [confirmationDialogTitle, setConfirmationDialogTitle] = useState("");
+  const [confirmationDialogMessage, setConfirmationDialogMessage] =
+    useState("");
+  const [isConfirmationDialogOpened, setIsConfirmaitonDialogOpened] =
+    useState(false);
+
   const { accessToken } = useAuth();
+
   const videoGuid = v4();
   const videoBlobName = `${videoGuid.toUpperCase()}.mp4`;
   const thumbnailBlobName = `${videoGuid.toUpperCase()}.jpg`;
@@ -155,7 +163,9 @@ const FilmUpload = (props) => {
         setVideo(e.target.files[0]);
       } else {
         setVideo(undefined);
-        alert("Only mp4!");
+        setConfirmationDialogTitle("Validation error");
+        setConfirmationDialogMessage("Only .mp4 files are allowed");
+        setIsConfirmaitonDialogOpened(true);
       }
     }
   };
@@ -166,7 +176,9 @@ const FilmUpload = (props) => {
         setThumbnail(e.target.files[0]);
       } else {
         setThumbnail(undefined);
-        alert("Only jpg!");
+        setConfirmationDialogTitle("Validation error");
+        setConfirmationDialogMessage("Only .jpg files are allowed");
+        setIsConfirmaitonDialogOpened(true);
       }
     }
   };
@@ -230,19 +242,13 @@ const FilmUpload = (props) => {
 
   const uploadVideoHandler = async () => {
     try {
+      setProgressDialogTitle("Preparing to upload...");
+      setUploadProgress(0);
       setIsProgressDialogOpened(true);
       if (thumbnail) {
-        setProgressDialogTitle("Preparing to upload...");
-        setUploadProgress(0);
-        setMaxPackets(1);
         await uploadThumbnail(thumbnailBlobName);
-        setUploadProgress(1);
       }
-      setUploadProgress(0);
-      setMaxPackets(1);
       const videoDuration = await getVideoDuration(video);
-      setUploadProgress(1);
-      setUploadProgress(0);
       setProgressDialogTitle("Uploading video");
       await uploadVideo(videoBlobName);
       setUploadProgress(0);
@@ -252,12 +258,18 @@ const FilmUpload = (props) => {
       setVideoTitle("");
       setDescription("");
       setIsProgressDialogOpened(false);
-      setVideoUploadFinished(true);
+      setConfirmationDialogTitle("Success!");
+      setConfirmationDialogMessage("Video uploaded successfully");
+      setIsConfirmaitonDialogOpened(true);
     } catch (error) {
-      console.error("An error occurred during the upload process:", error);
+      setIsProgressDialogOpened(false);
+      setConfirmationDialogTitle("Error!");
+      setConfirmationDialogMessage(
+        "Unexpected error occured, please contact support"
+      );
+      setIsConfirmaitonDialogOpened(true);
       setVideoTitle("");
       setDescription("");
-      setIsProgressDialogOpened(false);
     }
   };
 
@@ -351,12 +363,12 @@ const FilmUpload = (props) => {
         title={progressDialogTitle}
       ></ProgressDialog>
       <ConfirmationDialog
-        title="Success"
-        message="Video has been uploaded succesfully"
-        open={videoUploadFinished}
+        title={confirmationDialogTitle}
+        message={confirmationDialogMessage}
+        open={isConfirmationDialogOpened}
         hasCancelOption={false}
         onConfirm={() => {
-          setVideoUploadFinished((prevState) => !prevState);
+          setIsConfirmaitonDialogOpened((prevState) => !prevState);
         }}
       ></ConfirmationDialog>
     </>
