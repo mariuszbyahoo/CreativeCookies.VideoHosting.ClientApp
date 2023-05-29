@@ -4,16 +4,22 @@ import {
   newPipeline,
 } from "@azure/storage-blob";
 import styles from "./FilmUpload.module.css";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Base64 } from "js-base64";
-import { Button, Input } from "@mui/material";
-import { Search, UploadFile, InsertPhoto } from "@mui/icons-material";
+import { Button, IconButton, Input } from "@mui/material";
+import {
+  Search,
+  UploadFile,
+  InsertPhoto,
+  ArrowDownward,
+} from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import { v4 } from "uuid";
 import ReactQuill from "react-quill";
 import ProgressDialog from "./ProgressDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { quillModules, quillFormats } from "./Helpers/quillHelper";
+import { useForm } from "react-hook-form";
 
 // function to get SAS token
 const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
@@ -145,9 +151,35 @@ const FilmUpload = (props) => {
     useState("");
   const [isConfirmationDialogOpened, setIsConfirmaitonDialogOpened] =
     useState(false);
+  const explanationRef = useRef(null);
 
   const { accessToken } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+    clearErrors,
+  } = useForm();
 
+  useEffect(() => {
+    if (description.length > 1500000) {
+      setError("description", {
+        type: "manual",
+        message: "Max description length exceeded.",
+      });
+    } else {
+      clearErrors("description");
+    }
+  }, [description, setError, clearErrors]);
+
+  const scrollIntoExplanation = useCallback(() => {
+    if (explanationRef.current !== null) {
+      explanationRef.current.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }, []); // Add your ref inside the dependencies if it's not constant
   const videoGuid = v4();
   const videoBlobName = `${videoGuid.toUpperCase()}.mp4`;
   const thumbnailBlobName = `${videoGuid.toUpperCase()}.jpg`;
@@ -239,7 +271,11 @@ const FilmUpload = (props) => {
     setUploadProgress(1);
     return responseData;
   };
-
+  const onSubmit = async (data) => {
+    debugger;
+    console.log("Data from form: ");
+    console.log(data);
+  };
   const uploadVideoHandler = async () => {
     try {
       setProgressDialogTitle("Preparing to upload...");
@@ -255,106 +291,165 @@ const FilmUpload = (props) => {
       setProgressDialogTitle("Saving video metadata");
       await postMetadata(videoGuid, videoBlobName, videoDuration);
       setUploadProgress(1);
-      setVideoTitle("");
-      setDescription("");
-      setIsProgressDialogOpened(false);
       setConfirmationDialogTitle("Success!");
       setConfirmationDialogMessage("Video uploaded successfully");
       setIsConfirmaitonDialogOpened(true);
     } catch (error) {
-      setIsProgressDialogOpened(false);
       setConfirmationDialogTitle("Error!");
       setConfirmationDialogMessage(
         "Unexpected error occured, please contact support"
       );
       setIsConfirmaitonDialogOpened(true);
+    } finally {
+      setIsProgressDialogOpened(false);
       setVideoTitle("");
       setDescription("");
+      setVideo(undefined);
+      setThumbnail(undefined);
     }
   };
 
   let videoInputDescription = video
     ? `Selected file: ${video.name}`
-    : "No file selected";
+    : "Please select video";
 
   let thumbnailInputDescription = thumbnail
     ? `Selected file: ${thumbnail.name}`
-    : "No file selected";
+    : "Please select thumbnail";
 
   return (
     <>
-      <div className={styles.container}>
-        <h3 style={{ marginBottom: "5%" }}>Upload a new video</h3>
-        <div className={`row ${styles["row-margin"]}`}>
-          <label htmlFor="title-input">Title</label>
-          <Input
-            id="title-input"
-            type="text"
-            value={videoTitle}
-            onChange={videoTitleChangeHandler}
-          />
-        </div>
-        <div className={`row ${styles["row-margin"]}`}>
-          <div className="row">
-            <div className="col-6">
-              <label
-                htmlFor="select-film"
-                className={styles["custom-file-upload"]}
-              >
-                <Search />
-                Select mp4 file
-              </label>
-              <Input
-                id="select-film"
-                type="file"
-                onChange={videoChangeHandler}
-              />
-            </div>
-            <div className="col-6">
-              <span className={styles.description}>
-                {videoInputDescription}
-              </span>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-6">
-              <label
-                htmlFor="select-thumbnail"
-                className={styles["custom-file-upload"]}
-              >
-                <InsertPhoto />
-                Select thumbnail file
-              </label>
-              <Input
-                id="select-thumbnail"
-                type="file"
-                onChange={thumbnailChangeHandler}
-              />
-            </div>
-            <div className="col-6">
-              <span className={styles.description}>
-                {thumbnailInputDescription}
-              </span>
-            </div>
-          </div>
-          <div className={`row ${styles["row-margin"]}`}>
-            <ReactQuill
-              theme="snow"
-              value={description}
-              onChange={descriptionChangeHandler}
-              modules={quillModules}
-              formats={quillFormats}
-            />
-          </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className={styles.container}>
+          <h3 style={{ marginBottom: "5%" }}>Upload a new video</h3>
           <Button
             variant="contained"
             endIcon={<UploadFile />}
-            onClick={uploadVideoHandler}
-            style={{ marginTop: "5%" }}
+            type="submit"
+            style={{ marginBlock: "1%", width: "50%" }}
           >
             Upload
           </Button>
+          <div className={`row ${styles["row-margin"]}`}>
+            <label htmlFor="title-input">Title</label>
+            <Input
+              {...register("videoTitle", {
+                required: "Title is required",
+                minLength: 3,
+                maxLength: 20,
+              })}
+              id="title-input"
+              type="text"
+              value={videoTitle}
+              onChange={videoTitleChangeHandler}
+            />
+            {errors.videoTitle && (
+              <span style={{ color: "#b71c1c" }}>
+                {errors.videoTitle.message}
+              </span>
+            )}
+          </div>
+          <div className={`row ${styles["row-margin"]}`}>
+            <div className={`row ${styles["row-margin"]}`}>
+              <div className="col-6">
+                <label
+                  htmlFor="select-film"
+                  className={styles["custom-file-upload"]}
+                >
+                  <Search />
+                  Select mp4 file
+                </label>
+                <Input
+                  {...register("video", {
+                    validate: (value) => !value && "Video is required",
+                  })}
+                  id="select-film"
+                  type="file"
+                  onChange={videoChangeHandler}
+                />
+              </div>
+              <div className="col-6">
+                <span className={styles.description}>
+                  {videoInputDescription}
+                </span>
+              </div>
+            </div>
+            <div className={`row ${styles["row-margin"]}`}>
+              <span style={{ color: "#b71c1c" }}>
+                {errors.video && errors.video.message}
+              </span>
+            </div>
+            <div className={`row ${styles["row-margin"]}`}>
+              <div className="col-6">
+                <label
+                  htmlFor="select-thumbnail"
+                  className={styles["custom-file-upload"]}
+                >
+                  <InsertPhoto />
+                  Select thumbnail file
+                </label>
+                <Input
+                  {...register("thumbnail", {
+                    validate: (value) => !value && "Thumbnail is required",
+                  })}
+                  id="select-thumbnail"
+                  type="file"
+                  onChange={thumbnailChangeHandler}
+                />
+              </div>
+              <div className="col-6">
+                <span className={styles.description}>
+                  {thumbnailInputDescription}
+                </span>
+              </div>
+            </div>
+            <div className={`row ${styles["row-margin"]}`}>
+              <span style={{ color: "#b71c1c" }}>
+                {errors.thumbnail && errors.thumbnail.message}
+              </span>
+            </div>
+            <div className={`row ${styles["row-margin"]}`}>
+              <p>
+                Used description length: {description.length} / 1 500 000
+                characters
+              </p>
+              <div className={`row ${styles["row-margin"]}`}>
+                {errors.description && (
+                  <span style={{ color: "#b71c1c" }}>
+                    {errors.description.message}
+                  </span>
+                )}
+              </div>
+              <p>
+                How is description counted?
+                <IconButton variant="contained" onClick={scrollIntoExplanation}>
+                  <ArrowDownward />
+                </IconButton>
+              </p>
+              <ReactQuill
+                theme="snow"
+                value={description}
+                onChange={descriptionChangeHandler}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </div>
+          </div>
         </div>
+      </form>
+      <div style={{ textAlign: "center", marginTop: "5%" }}>
+        <h4 ref={explanationRef}>Description length's explanation</h4>
+        <p>
+          Description is being translated from the editor above into an HTML
+          code.
+          <br />
+          Every image is being encoded into text, and those are huge actually.
+          <br />
+          <strong>Max length of a description is 1 500 000 characters</strong>
+          <br />
+          Generated HTML code of your video's description looks like this:
+        </p>
+        <p className={styles.code}>{description}</p>
       </div>
       <ProgressDialog
         max={maxPackets}
