@@ -338,8 +338,14 @@ const FilmUpload = (props) => {
             <Input
               {...register("videoTitle", {
                 required: "Title is required",
-                minLength: 3,
-                maxLength: 20,
+                minLength: {
+                  value: 3,
+                  message: "Title must be at least 3 characters",
+                },
+                maxLength: {
+                  value: 50,
+                  message: "Title cannot exceed 50 characters",
+                },
               })}
               id="title-input"
               type="text"
