@@ -18,7 +18,7 @@ const quillModules = {
 
     ["clean"], // remove formatting button
 
-    ["link", "image"], // link and image, video
+    ["link"], // link and image, video
   ],
 };
 

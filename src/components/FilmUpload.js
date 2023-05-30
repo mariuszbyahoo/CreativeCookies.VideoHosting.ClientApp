@@ -19,7 +19,7 @@ import ReactQuill from "react-quill";
 import ProgressDialog from "./ProgressDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { quillModules, quillFormats } from "./Helpers/quillHelper";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 // function to get SAS token
 const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
@@ -137,7 +137,6 @@ const getVideoDuration = (file) => {
 
 const FilmUpload = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [video, setVideo] = useState();
   const [thumbnail, setThumbnail] = useState();
 
@@ -159,19 +158,19 @@ const FilmUpload = (props) => {
     handleSubmit,
     formState: { errors },
     setError,
+    control,
+    watch,
+    reset,
+    setValue,
     clearErrors,
   } = useForm();
 
-  useEffect(() => {
-    if (description.length > 1500000) {
-      setError("description", {
-        type: "manual",
-        message: "Max description length exceeded.",
-      });
-    } else {
-      clearErrors("description");
-    }
-  }, [description, setError, clearErrors]);
+  const description = watch("description");
+
+  const videoGuid = v4();
+  const videoBlobName = `${videoGuid.toUpperCase()}.mp4`;
+  const thumbnailBlobName = `${videoGuid.toUpperCase()}.jpg`;
+  const videoTitleChangeHandler = (e) => setVideoTitle(e.target.value);
 
   const scrollIntoExplanation = useCallback(() => {
     if (explanationRef.current !== null) {
@@ -179,19 +178,11 @@ const FilmUpload = (props) => {
         behavior: "smooth",
       });
     }
-  }, []); // Add your ref inside the dependencies if it's not constant
-  const videoGuid = v4();
-  const videoBlobName = `${videoGuid.toUpperCase()}.mp4`;
-  const thumbnailBlobName = `${videoGuid.toUpperCase()}.jpg`;
-  const videoTitleChangeHandler = (e) => setVideoTitle(e.target.value);
-
-  const descriptionChangeHandler = (e) => {
-    setDescription(e); // ReactQuill sends an event which actually is generated HTML already
-  };
+  }, []);
 
   const videoChangeHandler = (e) => {
     if (e.target.files) {
-      if (e.target.files[0].name.includes(".mp4")) {
+      if (e.target.files && e.target.files[0].name.includes(".mp4")) {
         setVideo(e.target.files[0]);
       } else {
         setVideo(undefined);
@@ -204,7 +195,7 @@ const FilmUpload = (props) => {
 
   const thumbnailChangeHandler = (e) => {
     if (e.target.files) {
-      if (e.target.files[0].name.includes(".jpg")) {
+      if (e.target.files && e.target.files[0].name.includes(".jpg")) {
         setThumbnail(e.target.files[0]);
       } else {
         setThumbnail(undefined);
@@ -272,9 +263,19 @@ const FilmUpload = (props) => {
     return responseData;
   };
   const onSubmit = async (data) => {
-    debugger;
-    console.log("Data from form: ");
-    console.log(data);
+    if (!video) {
+      setConfirmationDialogTitle("Error");
+      setConfirmationDialogMessage("Video is required to select");
+      setIsConfirmaitonDialogOpened(true);
+      return;
+    }
+    if (!thumbnail) {
+      setConfirmationDialogTitle("Error");
+      setConfirmationDialogMessage("Thumbnail image is required to select");
+      setIsConfirmaitonDialogOpened(true);
+      return;
+    }
+    uploadVideoHandler();
   };
   const uploadVideoHandler = async () => {
     try {
@@ -294,16 +295,18 @@ const FilmUpload = (props) => {
       setConfirmationDialogTitle("Success!");
       setConfirmationDialogMessage("Video uploaded successfully");
       setIsConfirmaitonDialogOpened(true);
+      return true;
     } catch (error) {
       setConfirmationDialogTitle("Error!");
       setConfirmationDialogMessage(
         "Unexpected error occured, please contact support"
       );
       setIsConfirmaitonDialogOpened(true);
+      return false;
     } finally {
       setIsProgressDialogOpened(false);
       setVideoTitle("");
-      setDescription("");
+      reset({ description: "" });
       setVideo(undefined);
       setThumbnail(undefined);
     }
@@ -360,9 +363,9 @@ const FilmUpload = (props) => {
                   Select mp4 file
                 </label>
                 <Input
-                  {...register("video", {
-                    validate: (value) => !value && "Video is required",
-                  })}
+                  // {...register("video", {
+                  //   validate: (value) => !value && "Video is required",
+                  // })}
                   id="select-film"
                   type="file"
                   onChange={videoChangeHandler}
@@ -389,9 +392,9 @@ const FilmUpload = (props) => {
                   Select thumbnail file
                 </label>
                 <Input
-                  {...register("thumbnail", {
-                    validate: (value) => !value && "Thumbnail is required",
-                  })}
+                  // {...register("thumbnail", {
+                  //   validate: (value) => !value && "Thumbnail is required",
+                  // })}
                   id="select-thumbnail"
                   type="file"
                   onChange={thumbnailChangeHandler}
@@ -410,14 +413,16 @@ const FilmUpload = (props) => {
             </div>
             <div className={`row ${styles["row-margin"]}`}>
               <p>
-                Used description length: {description.length} / 1 500 000
-                characters
+                Used description length:{" "}
+                {description ? description.length : "0"} / 5000 characters
               </p>
               <div className={`row ${styles["row-margin"]}`}>
                 {errors.description && (
-                  <span style={{ color: "#b71c1c" }}>
-                    {errors.description.message}
-                  </span>
+                  <>
+                    <span style={{ color: "#b71c1c" }}>
+                      Description cannot exceed 5000 characters.
+                    </span>
+                  </>
                 )}
               </div>
               <p>
@@ -426,13 +431,38 @@ const FilmUpload = (props) => {
                   <ArrowDownward />
                 </IconButton>
               </p>
-              <ReactQuill
+              <Controller
+                name="description"
+                control={control}
+                defaultValue=""
+                rules={{ maxLength: 5000 }}
+                render={({ field }) => (
+                  <ReactQuill
+                    theme="snow"
+                    value={field.value}
+                    onChange={(value) => {
+                      if (value.trim().length > 5000) {
+                        setError("description", {
+                          type: "manual",
+                          message: "Description cannot exceed 5000 characters",
+                        });
+                      } else {
+                        clearErrors("description");
+                      }
+                      setValue("description", value, { shouldValidate: true }); // this will trigger validation
+                    }}
+                    modules={quillModules}
+                    formats={quillFormats}
+                  />
+                )}
+              />
+              {/* <ReactQuill
                 theme="snow"
                 value={description}
                 onChange={descriptionChangeHandler}
                 modules={quillModules}
                 formats={quillFormats}
-              />
+              /> */}
             </div>
           </div>
         </div>
@@ -441,15 +471,13 @@ const FilmUpload = (props) => {
         <h4 ref={explanationRef}>Description length's explanation</h4>
         <p>
           Description is being translated from the editor above into an HTML
-          code.
+          code, so any stylings will enlarge the amount of used characters.
           <br />
-          Every image is being encoded into text, and those are huge actually.
-          <br />
-          <strong>Max length of a description is 1 500 000 characters</strong>
+          <strong>Max length of a description is 5000 characters</strong>
           <br />
           Generated HTML code of your video's description looks like this:
         </p>
-        <p className={styles.code}>{description}</p>
+        {description && <p className={styles.code}>{description}</p>}
       </div>
       <ProgressDialog
         max={maxPackets}
