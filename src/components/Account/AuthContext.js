@@ -27,6 +27,47 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
 
+  const refreshTokens = useCallback(async () => {
+    const clientId = process.env.REACT_APP_CLIENT_ID;
+    const refreshToken = ""; // get the refresh token from wherever you stored it
+
+    try {
+      const body = new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+        client_id: clientId,
+      });
+
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: body,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const decodedToken = jwtDecode(data.access_token);
+        setAccessToken(data.access_token);
+        const email = decodedToken.email;
+        setUserEmail(email);
+        // optionally store the new refresh token if the server returns one
+        navigate("/films-list");
+      } else {
+        // Handle errors, e.g., display an error message
+        console.error("Error requesting access token: ", response.statusText);
+        navigate("/auth-error");
+      }
+    } catch (error) {
+      console.error("Error fetching access token:", error);
+      navigate("/auth-error");
+    }
+  }, []);
+
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
@@ -125,6 +166,7 @@ export const AuthProvider = ({ children }) => {
     userEmail,
     accessToken,
     requestAccessToken,
+    refreshTokens,
     logout,
     generatePkceData,
     login,
