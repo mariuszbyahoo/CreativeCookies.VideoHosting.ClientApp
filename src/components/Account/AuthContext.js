@@ -29,12 +29,10 @@ export const AuthProvider = ({ children }) => {
 
   const refreshTokens = useCallback(async () => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
-    const refreshToken = ""; // get the refresh token from wherever you stored it
 
     try {
       const body = new URLSearchParams({
         grant_type: "refresh_token",
-        refresh_token: refreshToken,
         client_id: clientId,
       });
 
@@ -46,6 +44,7 @@ export const AuthProvider = ({ children }) => {
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: body,
+          credentials: "include",
         }
       );
 
