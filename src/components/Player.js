@@ -16,7 +16,7 @@ const Player = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
-  const { accessToken } = useAuth();
+  const { accessToken, refreshTokens } = useAuth();
 
   if (params.id === ":id") navigate("/films-list");
 
@@ -24,6 +24,7 @@ const Player = (props) => {
     fetchMetadataWithSAS();
   }, []);
   async function fetchMetadataWithSAS() {
+    console.log("fetching SAS token");
     setLoading(true);
     // FROM HERE Encapsulate it to another function
     const apiResponse = await fetch(
@@ -50,8 +51,9 @@ const Player = (props) => {
     setLoading(false);
   }
 
-  async function fetchSasToken() {
+  async function fetchSasToken(retry = true) {
     try {
+      debugger;
       const response = await fetch(
         `https://${
           process.env.REACT_APP_API_ADDRESS
@@ -63,8 +65,20 @@ const Player = (props) => {
           },
         }
       );
-      const data = await response.json();
-      return data.sasToken;
+      if (response.ok) {
+        const data = await response.json();
+        return data.sasToken;
+      } else if (response.status == "401" && retry) {
+        console.log("Refreshing an access token...");
+        console.log(`Old token: ${accessToken}`);
+        await refreshTokens();
+        console.log("Refreshed");
+        console.log(`New accessToken: ${accessToken}`);
+        debugger;
+        return fetchSasToken(false);
+      } else {
+        // HACK TODO Handle some other scenarios (like redirect to nice error page)
+      }
     } catch (error) {
       console.log("error happened: ", error);
       console.log("JSON.stringinfy(error): ", JSON.stringify(error));
