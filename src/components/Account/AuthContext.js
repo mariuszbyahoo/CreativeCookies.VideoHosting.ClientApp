@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }) => {
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: body,
+          credentials: "include",
         }
       );
 
