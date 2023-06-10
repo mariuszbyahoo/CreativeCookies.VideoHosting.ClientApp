@@ -47,7 +47,6 @@ export const AuthProvider = ({ children }) => {
         const decodedToken = jwtDecode(data.access_token);
         console.log(`Refreshed Access Token: ${data.access_token}`);
         setAccessToken(data.access_token);
-        // HACK: What with refresh_token? Update backend and a cookie?
         const email = decodedToken.email;
         setUserEmail(email);
         setIsAuthenticated(true);
@@ -55,7 +54,6 @@ export const AuthProvider = ({ children }) => {
         return data.access_token;
       } else {
         console.error("Error requesting access token: ", response.statusText);
-        navigate("/auth-error");
       }
     } catch (err) {
       console.error(`Error while fetching the AccessToken: ${err}`);
@@ -64,18 +62,12 @@ export const AuthProvider = ({ children }) => {
 
   const refreshTokens = useCallback(async () => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
+    const body = new URLSearchParams({
+      grant_type: "refresh_token",
+      client_id: clientId,
+    });
 
-    try {
-      const body = new URLSearchParams({
-        grant_type: "refresh_token",
-        client_id: clientId,
-      });
-
-      return await fetchAccessToken(body, false);
-    } catch (error) {
-      console.error("Error fetching access token:", error);
-      navigate("/auth-error");
-    }
+    return await fetchAccessToken(body, false);
   }, []);
 
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
@@ -94,7 +86,6 @@ export const AuthProvider = ({ children }) => {
       fetchAccessToken(body);
     } catch (error) {
       console.error("Error fetching access token:", error);
-      navigate("/auth-error");
     }
   }, []);
 
@@ -111,7 +102,6 @@ export const AuthProvider = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        // Add any necessary authentication headers, e.g., an access token
       }
     );
 

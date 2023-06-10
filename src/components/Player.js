@@ -16,7 +16,7 @@ const Player = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
-  const { accessToken, refreshTokens } = useAuth();
+  const { accessToken, refreshTokens, logout, login } = useAuth();
 
   if (params.id === ":id") navigate("/films-list");
 
@@ -68,9 +68,9 @@ const Player = (props) => {
         const newAccessToken = await refreshTokens();
         return fetchSasToken(false, newAccessToken);
       } else {
-        alert(
-          "Received unexcpected response from the API. Contact software vendor."
-        );
+        await logout();
+        alert("Login again.");
+        login(); //HACK: add returnUrl to the watched film - what with timestamp of a film?
       }
     } catch (error) {
       console.log("error happened: ", error);
