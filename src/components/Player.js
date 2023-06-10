@@ -24,9 +24,7 @@ const Player = (props) => {
     fetchMetadataWithSAS();
   }, []);
   async function fetchMetadataWithSAS() {
-    console.log("fetching SAS token");
     setLoading(true);
-    // FROM HERE Encapsulate it to another function
     const apiResponse = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/getMetadata?Id=${params.id}`
     );
@@ -45,7 +43,6 @@ const Player = (props) => {
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
-    // TILL HERE
     const sasTokenResponse = await fetchSasToken();
     setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
     setLoading(false);
@@ -53,7 +50,6 @@ const Player = (props) => {
 
   async function fetchSasToken(retry = true, token = accessToken) {
     try {
-      debugger;
       const response = await fetch(
         `https://${
           process.env.REACT_APP_API_ADDRESS
@@ -69,14 +65,12 @@ const Player = (props) => {
         const data = await response.json();
         return data.sasToken;
       } else if (response.status == "401" && retry) {
-        console.log("Refreshing an access token...");
-        console.log(`Old token: ${token}`);
         const newAccessToken = await refreshTokens();
-        console.log("Refreshed");
-        console.log(`New accessToken: ${newAccessToken}`);
         return fetchSasToken(false, newAccessToken);
       } else {
-        // HACK TODO Handle some other scenarios (like redirect to nice error page)
+        alert(
+          "Received unexcpected response from the API. Contact software vendor."
+        );
       }
     } catch (error) {
       console.log("error happened: ", error);
