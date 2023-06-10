@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
 
-  const fetchAccessToken = async (body) => {
+  const fetchAccessToken = async (body, shouldNavigate = true) => {
     try {
       const response = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
@@ -47,17 +47,17 @@ export const AuthProvider = ({ children }) => {
         const decodedToken = jwtDecode(data.access_token);
         console.log(`Refreshed Access Token: ${data.access_token}`);
         setAccessToken(data.access_token);
+        // HACK: What with refresh_token? Update backend and a cookie?
         const email = decodedToken.email;
         setUserEmail(email);
         setIsAuthenticated(true);
-        navigate("/films-list");
+        shouldNavigate && navigate("/films-list");
+        return data.access_token;
       } else {
-        // Handle errors, e.g., display an error message
         console.error("Error requesting access token: ", response.statusText);
         navigate("/auth-error");
       }
     } catch (err) {
-      debugger;
       console.error(`Error while fetching the AccessToken: ${err}`);
     }
   };
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
         client_id: clientId,
       });
 
-      fetchAccessToken(body);
+      return await fetchAccessToken(body, false);
     } catch (error) {
       console.error("Error fetching access token:", error);
       navigate("/auth-error");

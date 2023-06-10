@@ -51,7 +51,7 @@ const Player = (props) => {
     setLoading(false);
   }
 
-  async function fetchSasToken(retry = true) {
+  async function fetchSasToken(retry = true, token = accessToken) {
     try {
       debugger;
       const response = await fetch(
@@ -61,7 +61,7 @@ const Player = (props) => {
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -70,12 +70,11 @@ const Player = (props) => {
         return data.sasToken;
       } else if (response.status == "401" && retry) {
         console.log("Refreshing an access token...");
-        console.log(`Old token: ${accessToken}`);
-        await refreshTokens();
+        console.log(`Old token: ${token}`);
+        const newAccessToken = await refreshTokens();
         console.log("Refreshed");
-        console.log(`New accessToken: ${accessToken}`);
-        debugger;
-        return fetchSasToken(false);
+        console.log(`New accessToken: ${newAccessToken}`);
+        return fetchSasToken(false, newAccessToken);
       } else {
         // HACK TODO Handle some other scenarios (like redirect to nice error page)
       }
