@@ -31,7 +31,10 @@ const FilmsList = () => {
     fetchSasToken()
       .then((token) => {
         fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/films?search=${searchTerm}&pageNumber=${pageNumber}&pageSize=24`
+          `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/films?search=${searchTerm}&pageNumber=${pageNumber}&pageSize=24`,
+          {
+            credentials: "include",
+          }
         )
           .then((response) => response.json())
           .then((data) => {

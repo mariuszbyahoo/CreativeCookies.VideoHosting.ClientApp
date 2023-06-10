@@ -27,6 +27,49 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
 
+  const fetchAccessToken = async (body, shouldNavigate = true) => {
+    try {
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: body,
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        console.log(`Current Access Token: ${accessToken}`);
+        const data = await response.json();
+        const decodedToken = jwtDecode(data.access_token);
+        console.log(`Refreshed Access Token: ${data.access_token}`);
+        setAccessToken(data.access_token);
+        const email = decodedToken.email;
+        setUserEmail(email);
+        setIsAuthenticated(true);
+        shouldNavigate && navigate("/films-list");
+        return data.access_token;
+      } else {
+        console.error("Error requesting access token: ", response.statusText);
+      }
+    } catch (err) {
+      console.error(`Error while fetching the AccessToken: ${err}`);
+    }
+  };
+
+  const refreshTokens = useCallback(async () => {
+    const clientId = process.env.REACT_APP_CLIENT_ID;
+    const body = new URLSearchParams({
+      grant_type: "refresh_token",
+      client_id: clientId,
+    });
+
+    return await fetchAccessToken(body, false);
+  }, []);
+
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
     const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
@@ -40,33 +83,9 @@ export const AuthProvider = ({ children }) => {
         code_verifier: codeVerifier,
       });
 
-      const response = await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: body,
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const decodedToken = jwtDecode(data.access_token);
-        setAccessToken(data.access_token);
-        const email = decodedToken.email;
-        setUserEmail(email);
-        setIsAuthenticated(true);
-        navigate("/films-list");
-      } else {
-        // Handle errors, e.g., display an error message
-        console.error("Error requesting access token: ", response.statusText);
-        navigate("/auth-error");
-      }
+      fetchAccessToken(body);
     } catch (error) {
       console.error("Error fetching access token:", error);
-      navigate("/auth-error");
     }
   }, []);
 
@@ -76,7 +95,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    // Call your API to perform the logout action
     await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/logout`,
       {
@@ -84,7 +102,6 @@ export const AuthProvider = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        // Add any necessary authentication headers, e.g., an access token
       }
     );
 
@@ -125,6 +142,7 @@ export const AuthProvider = ({ children }) => {
     userEmail,
     accessToken,
     requestAccessToken,
+    refreshTokens,
     logout,
     generatePkceData,
     login,

@@ -8,6 +8,7 @@ const ProtectedComponent = ({ children }) => {
 
   if (!isAuthenticated) {
     //HACK TODO: Change this to be redirected towards the film, right after obtaining the Access token.
+    // pass returnUrl to the login function and redirect to it
     login();
     return <div>Redirecting...</div>;
   } else {
