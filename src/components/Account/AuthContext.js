@@ -128,8 +128,26 @@ export const AuthProvider = ({ children }) => {
 
   // Check if the user is authenticated on initial render
   useEffect(() => {
-    // Implement logic to check if the user is authenticated, e.g., check for a valid token
-    // Set isAuthenticated accordingly
+    const checkAuthentication = async () => {
+      try {
+        const response = await fetch(
+          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated`,
+          {
+            credentials: "include", // This line ensures cookies are sent with the fetch request
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const email = data.email;
+          setUserEmail(email);
+          setIsAuthenticated(data.isAuthenticated);
+        }
+      } catch (error) {
+        console.error("Error checking authentication status: ", error);
+      }
+    };
+
+    checkAuthentication();
   }, []);
 
   const value = {
