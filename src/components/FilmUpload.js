@@ -13,7 +13,6 @@ import {
   InsertPhoto,
   ArrowDownward,
 } from "@mui/icons-material";
-import { useAuth } from "./Account/AuthContext";
 import { v4 } from "uuid";
 import ReactQuill from "react-quill";
 import ProgressDialog from "./ProgressDialog";
