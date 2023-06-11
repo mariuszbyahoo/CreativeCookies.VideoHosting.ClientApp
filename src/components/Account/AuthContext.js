@@ -23,6 +23,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isUserMenuLoading, setIsUserMenuLoading] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
   const navigate = useNavigate();
@@ -128,6 +129,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
+        setIsUserMenuLoading(true);
         const response = await fetch(
           `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated?clientId=${clientId}`,
           {
@@ -142,6 +144,8 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Error checking authentication status: ", error);
+      } finally {
+        setIsUserMenuLoading(false);
       }
     };
 
@@ -156,6 +160,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     generatePkceData,
     login,
+    isUserMenuLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

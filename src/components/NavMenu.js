@@ -13,9 +13,10 @@ import LoginComponent from "./Account/Login";
 import RegisterComponent from "./Account/Register";
 import LogoutComponent from "./Account/Logout";
 import { useAuth } from "./Account/AuthContext";
+import { CircularProgress } from "@mui/material";
 
 const NavMenu = () => {
-  const { isAuthenticated, userEmail } = useAuth();
+  const { isAuthenticated, userEmail, isUserMenuLoading } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
 
   const toggleNavbar = () => {
@@ -23,6 +24,9 @@ const NavMenu = () => {
   };
 
   const accountNav = () => {
+    if (isUserMenuLoading) {
+      return <CircularProgress />;
+    }
     if (isAuthenticated && userEmail && userEmail.length > 0) {
       let link = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/Manage`;
       return (
