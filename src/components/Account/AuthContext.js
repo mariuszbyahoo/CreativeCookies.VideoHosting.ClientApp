@@ -24,6 +24,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
   const navigate = useNavigate();
 
   const fetchAccessToken = async (body, shouldNavigate = true) => {
@@ -56,7 +57,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshTokens = useCallback(async () => {
-    const clientId = process.env.REACT_APP_CLIENT_ID;
     const body = new URLSearchParams({
       grant_type: "refresh_token",
       client_id: clientId,
@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const requestAccessToken = useCallback(async (code, codeVerifier) => {
-    const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_REDIRECT_URI;
     const grantType = "authorization_code";
     try {
@@ -105,7 +104,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async () => {
-    const clientId = process.env.REACT_APP_CLIENT_ID;
     const redirectUri = encodeURIComponent(process.env.REACT_APP_REDIRECT_URI);
     const responseType = "code";
     const codeChallengeMethod = "S256";
@@ -131,7 +129,7 @@ export const AuthProvider = ({ children }) => {
     const checkAuthentication = async () => {
       try {
         const response = await fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated`,
+          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated?clientId=${clientId}`,
           {
             credentials: "include", // This line ensures cookies are sent with the fetch request
           }
