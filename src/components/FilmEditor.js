@@ -19,7 +19,6 @@ const FilmEditor = (props) => {
   const navigate = useNavigate();
   const explanationRef = useRef(null);
 
-  const { accessToken } = useAuth();
   const {
     register,
     handleSubmit,
@@ -46,7 +45,10 @@ const FilmEditor = (props) => {
   }, [params.id]);
   const getMetadata = async () => {
     const response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/getMetadata?id=${params.id}`
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/getMetadata?id=${params.id}`,
+      {
+        credentials: "include",
+      }
     );
     if (response.ok) {
       const responseData = await response.json();
@@ -84,12 +86,11 @@ const FilmEditor = (props) => {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(bodyContent),
+        credentials: "include",
       }
     );
-
     if (response.ok) {
       setVideoEditFinished(true);
     } else {
