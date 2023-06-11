@@ -120,9 +120,7 @@ const FilmsList = () => {
         `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideo?Id=${selectedVideoId}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          credentials: "include",
         }
       );
     } catch (error) {
