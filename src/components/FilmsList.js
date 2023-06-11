@@ -20,7 +20,6 @@ const FilmsList = () => {
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [error, setError] = useState();
   const navigate = useNavigate();
-  const { accessToken } = useAuth();
 
   const fetchMoviesHandler = async () => {
     if (!hasMore && pageNumber > 1) return; // Don't fetch if there are no more items and it's not the first page

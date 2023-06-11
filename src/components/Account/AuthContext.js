@@ -23,7 +23,6 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [accessToken, setAccessToken] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
 
@@ -42,16 +41,12 @@ export const AuthProvider = ({ children }) => {
       );
 
       if (response.ok) {
-        console.log(`Current Access Token: ${accessToken}`);
         const data = await response.json();
         const decodedToken = jwtDecode(data.access_token);
-        console.log(`Refreshed Access Token: ${data.access_token}`);
-        setAccessToken(data.access_token);
         const email = decodedToken.email;
         setUserEmail(email);
         setIsAuthenticated(true);
         shouldNavigate && navigate("/films-list");
-        return data.access_token;
       } else {
         console.error("Error requesting access token: ", response.statusText);
       }
@@ -140,7 +135,6 @@ export const AuthProvider = ({ children }) => {
   const value = {
     isAuthenticated,
     userEmail,
-    accessToken,
     requestAccessToken,
     refreshTokens,
     logout,

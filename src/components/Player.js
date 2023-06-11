@@ -16,7 +16,7 @@ const Player = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
-  const { accessToken, refreshTokens, logout, login } = useAuth();
+  const { refreshTokens, logout, login } = useAuth();
 
   if (params.id === ":id") navigate("/films-list");
 
@@ -48,7 +48,7 @@ const Player = (props) => {
     setLoading(false);
   }
 
-  async function fetchSasToken(retry = true, token = accessToken) {
+  async function fetchSasToken(retry = true) {
     try {
       const response = await fetch(
         `https://${
@@ -63,8 +63,8 @@ const Player = (props) => {
         const data = await response.json();
         return data.sasToken;
       } else if (response.status == "401" && retry) {
-        const newAccessToken = await refreshTokens();
-        return fetchSasToken(false, newAccessToken);
+        await refreshTokens();
+        return fetchSasToken(false);
       } else {
         await logout();
         alert("Login again.");

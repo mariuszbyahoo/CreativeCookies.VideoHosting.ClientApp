@@ -22,15 +22,13 @@ import { quillModules, quillFormats } from "./Helpers/quillHelper";
 import { Controller, useForm } from "react-hook-form";
 
 // function to get SAS token
-const getSASToken = async (blobName, isVideo, accessToken, apiAddress) => {
+const getSASToken = async (blobName, isVideo, apiAddress) => {
   const fetchUrl = isVideo
     ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
     : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
   const response = await fetch(fetchUrl, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -75,7 +73,6 @@ const uploadBlob = async (
   file,
   blobName,
   isVideo,
-  accessToken,
   setUploadProgress,
   setMaxPackets,
   setDialogTitle
@@ -86,12 +83,7 @@ const uploadBlob = async (
     process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME;
   const apiAddress = process.env.REACT_APP_API_ADDRESS;
 
-  const sasToken = await getSASToken(
-    blobName,
-    isVideo,
-    accessToken,
-    apiAddress
-  );
+  const sasToken = await getSASToken(blobName, isVideo, apiAddress);
 
   const blockSize = 100 * 1024 * 1024; // 100MB
   const blockIds = createBlockIds(file.size, blockSize);
@@ -152,7 +144,6 @@ const FilmUpload = (props) => {
     useState(false);
   const explanationRef = useRef(null);
 
-  const { accessToken } = useAuth();
   const {
     register,
     handleSubmit,
@@ -211,7 +202,6 @@ const FilmUpload = (props) => {
       thumbnail,
       thumbnailName,
       false,
-      accessToken,
       setUploadProgress,
       setMaxPackets,
       setProgressDialogTitle
@@ -224,7 +214,6 @@ const FilmUpload = (props) => {
       video,
       videoName,
       true,
-      accessToken,
       setUploadProgress,
       setMaxPackets,
       setProgressDialogTitle
@@ -252,8 +241,8 @@ const FilmUpload = (props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify(metadata),
       }
     );
