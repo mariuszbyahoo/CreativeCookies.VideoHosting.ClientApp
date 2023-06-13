@@ -14,6 +14,7 @@ const FilmEditor = (props) => {
   const [metadata, setMetadata] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [videoEditFinished, setVideoEditFinished] = useState(false);
+  const { refreshTokens } = useAuth();
 
   const params = useParams();
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ const FilmEditor = (props) => {
       }
     );
     if (response.ok) {
+      debugger;
       const responseData = await response.json();
       setMetadata(responseData);
       setValue("videoTitle", responseData.name || ""); // Update the form value here
@@ -79,7 +81,8 @@ const FilmEditor = (props) => {
     sendEditRequest(updatedMetadata);
   };
 
-  const sendEditRequest = async (bodyContent) => {
+  // HACK: APICall
+  const sendEditRequest = async (bodyContent, retry = true) => {
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/editMetadata`,
       {
@@ -91,8 +94,15 @@ const FilmEditor = (props) => {
         credentials: "include",
       }
     );
+    debugger;
     if (response.ok) {
       setVideoEditFinished(true);
+    } else if (
+      (response.status == "401" || response.status == "400") && // Why is this returning 400 with Bearer = "invalid_token" instead of standard 401??
+      retry
+    ) {
+      await refreshTokens();
+      return sendEditRequest(bodyContent, false);
     } else {
       alert("an error occured! Contact the software vendor");
       navigate("/films-list");
