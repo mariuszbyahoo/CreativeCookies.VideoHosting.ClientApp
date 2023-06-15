@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "./FilmsList.module.css";
 import Mosaic from "./Mosaic";
-import { Button, FormControl, InputAdornment, TextField } from "@mui/material";
+import { Button, FormControl, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -16,7 +16,8 @@ const FilmsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [dialogIsOpened, setDialogIsOpened] = useState(false);
+  const [confirmDialogIsOpened, setConfirmDialogIsOpened] = useState(false);
+  const [authDialogIsOpened, setAuthDialogIsOpened] = useState(false);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [error, setError] = useState();
   const navigate = useNavigate();
@@ -96,12 +97,12 @@ const FilmsList = () => {
   };
   const openDeleteDialog = (videoId) => {
     setSelectedVideoId(videoId);
-    setDialogIsOpened(true);
+    setConfirmDialogIsOpened(true);
   };
 
   const closeDeleteDialog = () => {
     setSelectedVideoId(null);
-    setDialogIsOpened(false);
+    setConfirmDialogIsOpened(false);
   };
 
   const openEditorDialog = (videoId) => {
@@ -109,7 +110,7 @@ const FilmsList = () => {
   };
 
   const confirmDeleteHandler = async () => {
-    setDialogIsOpened(false);
+    setConfirmDialogIsOpened(false);
     if (!selectedVideoId) return;
 
     try {
@@ -140,9 +141,10 @@ const FilmsList = () => {
     }
     if ((result.status == "401" || result.status == "400") && retry) {
       // Why is this returning 400 with Bearer = "invalid_token" instead of standard 401??
-      console.log(result.headers);
-
-      await refreshTokens();
+      var refreshRes = await refreshTokens();
+      if (refreshRes.length > 0 && refreshRes == "LoginAgain") {
+        setAuthDialogIsOpened(true);
+      }
       return sendDeleteRequest(selectedVideoId, false);
     } else {
       return false;
@@ -199,12 +201,21 @@ const FilmsList = () => {
       {content}
       {loadBtn}
       <ConfirmationDialog
-        open={dialogIsOpened}
+        open={confirmDialogIsOpened}
         title="Delete Video"
         message="Are you sure you want to delete this video?"
         hasCancelOption={true}
         onConfirm={confirmDeleteHandler}
         onCancel={closeDeleteDialog}
+      />
+      <ConfirmationDialog
+        open={authDialogIsOpened}
+        title="Tokens expired"
+        message="Please login again"
+        hasCancelOption={false}
+        onConfirm={() => {
+          setAuthDialogIsOpened(false);
+        }}
       />
     </div>
   );

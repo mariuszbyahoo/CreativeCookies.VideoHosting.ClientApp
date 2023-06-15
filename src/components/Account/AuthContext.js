@@ -51,14 +51,14 @@ export const AuthProvider = ({ children }) => {
       } else if (response.status == "400") {
         console.log(response.headers);
         await logout();
-        alert("login again!"); // HACK Change to nice modal window from ux lib
-        // HACK TODO: Prompt window login again.
+        return "LoginAgain";
       } else {
         console.error("Error requesting access token: ", response.statusText);
       }
     } catch (err) {
       console.error(`Error while fetching the AccessToken: ${err}`);
     }
+    return "";
   };
 
   const refreshTokens = useCallback(async () => {
