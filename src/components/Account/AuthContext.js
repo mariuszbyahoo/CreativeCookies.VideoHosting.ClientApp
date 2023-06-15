@@ -41,7 +41,6 @@ export const AuthProvider = ({ children }) => {
           credentials: "include",
         }
       );
-
       if (response.ok) {
         const data = await response.json();
         const decodedToken = jwtDecode(data.access_token);
@@ -49,6 +48,11 @@ export const AuthProvider = ({ children }) => {
         setUserEmail(email);
         setIsAuthenticated(true);
         shouldNavigate && navigate("/films-list");
+      } else if (response.status == "400") {
+        console.log(response.headers);
+        await logout();
+        alert("login again!"); // HACK Change to nice modal window from ux lib
+        // HACK TODO: Prompt window login again.
       } else {
         console.error("Error requesting access token: ", response.statusText);
       }

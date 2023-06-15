@@ -21,6 +21,8 @@ const FilmsList = () => {
   const [error, setError] = useState();
   const navigate = useNavigate();
 
+  const { refreshTokens } = useAuth();
+
   const fetchMoviesHandler = async () => {
     if (!hasMore && pageNumber > 1) return; // Don't fetch if there are no more items and it's not the first page
 
@@ -110,30 +112,41 @@ const FilmsList = () => {
     setDialogIsOpened(false);
     if (!selectedVideoId) return;
 
-    setVideoMetadatas((prev) =>
-      prev.filter((video) => video.id !== selectedVideoId)
-    );
-
     try {
-      await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideo?Id=${selectedVideoId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      if (await sendDeleteRequest(selectedVideoId)) {
+        setVideoMetadatas((prev) =>
+          prev.filter((video) => video.id !== selectedVideoId)
+        );
+      }
     } catch (error) {
-      const video = videoMetadatas.find(
-        (video) => video.id === selectedVideoId
-      );
-      setVideoMetadatas((prev) => [...prev, video]);
-
       console.error(
         "An error occured while deleting a video: " + selectedVideoId
       );
       return;
     }
     setSelectedVideoId(null);
+  };
+
+  const sendDeleteRequest = async (selectedVideoId, retry = true) => {
+    var result = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideo?Id=${selectedVideoId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+    if (result.status == "204") {
+      return true;
+    }
+    if ((result.status == "401" || result.status == "400") && retry) {
+      // Why is this returning 400 with Bearer = "invalid_token" instead of standard 401??
+      console.log(result.headers);
+
+      await refreshTokens();
+      return sendDeleteRequest(selectedVideoId, false);
+    } else {
+      return false;
+    }
   };
 
   let content = <p>Upload a movie to get started!</p>;
