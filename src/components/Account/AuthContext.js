@@ -49,7 +49,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         shouldNavigate && navigate("/films-list");
       } else if (response.status == "400") {
-        console.log(response.headers);
         await logout();
         return "LoginAgain";
       } else {
