@@ -14,6 +14,8 @@ const FilmEditor = (props) => {
   const [metadata, setMetadata] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [videoEditFinished, setVideoEditFinished] = useState(false);
+  const [authDialogIsOpened, setAuthDialogIsOpened] = useState(false);
+  const [errorDialogIsOpened, setErrorDialogIsOpened] = useState(false);
   const { refreshTokens } = useAuth();
 
   const params = useParams();
@@ -52,19 +54,19 @@ const FilmEditor = (props) => {
       }
     );
     if (response.ok) {
-      debugger;
       const responseData = await response.json();
       setMetadata(responseData);
-      setValue("videoTitle", responseData.name || ""); // Update the form value here
+      setValue("videoTitle", responseData.name || "");
       setValue("description", responseData.description || "");
       setIsLoading(false);
     } else {
-      alert("an error occured! Contact the software vendor");
+      setErrorDialogIsOpened(true);
       navigate("/films-list");
     }
   };
 
   const onSubmit = (data) => {
+    console.log(data);
     editVideoHandler();
   };
 
@@ -73,6 +75,8 @@ const FilmEditor = (props) => {
   };
 
   const editVideoHandler = (e) => {
+    console.log(e);
+    e.preventDefault();
     const updatedMetadata = {
       ...metadata,
       name: watch("videoTitle"),
@@ -81,8 +85,8 @@ const FilmEditor = (props) => {
     sendEditRequest(updatedMetadata);
   };
 
-  // HACK: APICall
   const sendEditRequest = async (bodyContent, retry = true) => {
+    debugger;
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/editMetadata`,
       {
@@ -94,18 +98,25 @@ const FilmEditor = (props) => {
         credentials: "include",
       }
     );
-    debugger;
     if (response.ok) {
+      debugger;
       setVideoEditFinished(true);
+      return true;
     } else if (
-      (response.status == "401" || response.status == "400") && // Why is this returning 400 with Bearer = "invalid_token" instead of standard 401??
+      (response.status == "401" || response.status == "400") &&
       retry
     ) {
-      await refreshTokens();
+      // 400 indicates lack of token or expired cookie
+      var refreshResponse = await refreshTokens();
+      if (refreshResponse == "LoginAgain") {
+        setAuthDialogIsOpened(true);
+        return false;
+      }
       return sendEditRequest(bodyContent, false);
     } else {
-      alert("an error occured! Contact the software vendor");
-      navigate("/films-list");
+      setErrorDialogIsOpened(true);
+      return false;
+      //navigate("/films-list");
     }
   };
 
@@ -119,6 +130,7 @@ const FilmEditor = (props) => {
 
   return (
     <>
+      {/* presence of form element causes different behavior from filmDelete flow */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.container}>
           <h3>Edit video metadata</h3>
@@ -233,6 +245,24 @@ const FilmEditor = (props) => {
           navigate(`/player/${params.id}`);
         }}
       ></ConfirmationDialog>
+      <ConfirmationDialog
+        open={authDialogIsOpened}
+        title="Tokens expired"
+        message="Please login again"
+        hasCancelOption={false}
+        onConfirm={() => {
+          setAuthDialogIsOpened(false);
+        }}
+      />
+      <ConfirmationDialog
+        open={errorDialogIsOpened}
+        title="Tokens expired"
+        message="Please login again"
+        hasCancelOption={false}
+        onConfirm={() => {
+          setErrorDialogIsOpened(false);
+        }}
+      />
     </>
   );
 };
