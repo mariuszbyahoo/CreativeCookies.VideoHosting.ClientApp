@@ -143,7 +143,8 @@ const FilmsList = () => {
       // Why is this returning 400 with Bearer = "invalid_token" instead of standard 401??
       var refreshRes = await refreshTokens();
       if (refreshRes.length > 0 && refreshRes == "LoginAgain") {
-        setAuthDialogIsOpened(true);
+        setAuthDialogIsOpened(true); // warning pops up
+        return false;
       }
       return sendDeleteRequest(selectedVideoId, false);
     } else {
