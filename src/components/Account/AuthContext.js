@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   const fetchAccessToken = async (
     body,
     shouldNavigate = true,
-    redirectsOnLogout = false
+    logsOut = false
   ) => {
     try {
       const response = await fetch(
@@ -53,8 +53,11 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         shouldNavigate && navigate("/films-list");
       } else if (response.status == "400") {
-        redirectsOnLogout ? await logout(true) : await logout(false);
-        return "LoginAgain";
+        var res = "LoginAgain";
+        if (logsOut) {
+          await logout();
+        }
+        return res;
       } else {
         console.error("Error requesting access token: ", response.statusText);
       }
@@ -64,17 +67,17 @@ export const AuthProvider = ({ children }) => {
     return "";
   };
 
-  const refreshTokens = useCallback(async (redirectsOnLogout) => {
+  const refreshTokens = useCallback(async (logsOut = true) => {
     const body = new URLSearchParams({
       grant_type: "refresh_token",
       client_id: clientId,
     });
 
-    return await fetchAccessToken(body, false, redirectsOnLogout);
+    return await fetchAccessToken(body, false, logsOut);
   }, []);
 
   const requestAccessToken = useCallback(
-    async (code, codeVerifier, redirectsOnLogout) => {
+    async (code, codeVerifier, logsOut) => {
       const redirectUri = process.env.REACT_APP_REDIRECT_URI;
       const grantType = "authorization_code";
       try {
@@ -86,7 +89,7 @@ export const AuthProvider = ({ children }) => {
           code_verifier: codeVerifier,
         });
 
-        fetchAccessToken(body, true, redirectsOnLogout);
+        fetchAccessToken(body, true, logsOut);
       } catch (error) {
         console.error("Error fetching access token:", error);
       }

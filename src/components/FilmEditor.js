@@ -58,7 +58,7 @@ const FilmEditor = (props) => {
       setValue("description", responseData.description || "");
       setIsLoading(false);
     } else {
-      navigate("/films-list");
+      navigate("/logout");
     }
   };
 
@@ -82,7 +82,6 @@ const FilmEditor = (props) => {
   };
 
   const sendEditRequest = async (bodyContent, retry = true) => {
-    debugger;
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/editMetadata`,
       {
@@ -95,14 +94,12 @@ const FilmEditor = (props) => {
       }
     );
     if (response.ok) {
-      debugger;
       setVideoEditFinished(true);
       return true;
     } else if (
       (response.status == "401" || response.status == "400") &&
       retry
     ) {
-      // 400 indicates lack of token or expired cookie
       var refreshResponse = await refreshTokens(false);
       if (refreshResponse == "LoginAgain") {
         navigate("/logout");
