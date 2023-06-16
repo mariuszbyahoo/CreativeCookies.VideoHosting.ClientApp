@@ -14,8 +14,6 @@ const FilmEditor = (props) => {
   const [metadata, setMetadata] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [videoEditFinished, setVideoEditFinished] = useState(false);
-  const [authDialogIsOpened, setAuthDialogIsOpened] = useState(false);
-  const [errorDialogIsOpened, setErrorDialogIsOpened] = useState(false);
   const { refreshTokens } = useAuth();
 
   const params = useParams();
@@ -60,7 +58,6 @@ const FilmEditor = (props) => {
       setValue("description", responseData.description || "");
       setIsLoading(false);
     } else {
-      setErrorDialogIsOpened(true);
       navigate("/films-list");
     }
   };
@@ -76,7 +73,6 @@ const FilmEditor = (props) => {
 
   const editVideoHandler = (e) => {
     console.log(e);
-    e.preventDefault();
     const updatedMetadata = {
       ...metadata,
       name: watch("videoTitle"),
@@ -107,16 +103,15 @@ const FilmEditor = (props) => {
       retry
     ) {
       // 400 indicates lack of token or expired cookie
-      var refreshResponse = await refreshTokens();
+      var refreshResponse = await refreshTokens(false);
       if (refreshResponse == "LoginAgain") {
-        setAuthDialogIsOpened(true);
-        return false;
+        navigate("/logout");
+      } else {
+        return sendEditRequest(bodyContent, false);
       }
-      return sendEditRequest(bodyContent, false);
     } else {
-      setErrorDialogIsOpened(true);
-      return false;
-      //navigate("/films-list");
+      console.error(`Received unexpected API response: ${response.status}`);
+      navigate("/logout");
     }
   };
 
@@ -245,24 +240,6 @@ const FilmEditor = (props) => {
           navigate(`/player/${params.id}`);
         }}
       ></ConfirmationDialog>
-      <ConfirmationDialog
-        open={authDialogIsOpened}
-        title="Tokens expired"
-        message="Please login again"
-        hasCancelOption={false}
-        onConfirm={() => {
-          setAuthDialogIsOpened(false);
-        }}
-      />
-      <ConfirmationDialog
-        open={errorDialogIsOpened}
-        title="Tokens expired"
-        message="Please login again"
-        hasCancelOption={false}
-        onConfirm={() => {
-          setErrorDialogIsOpened(false);
-        }}
-      />
     </>
   );
 };

@@ -127,7 +127,7 @@ const AppRoutes = [
     ),
   },
   {
-    path: "logout",
+    path: "/logout",
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -135,9 +135,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent isAuthenticated={isAuthenticated}>
-          <LogoutComponent />
-        </ProtectedComponent>
+        <LogoutComponent />
       </ErrorBoundary>
     ),
   },

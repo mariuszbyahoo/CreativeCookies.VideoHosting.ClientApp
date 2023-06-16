@@ -28,7 +28,11 @@ export const AuthProvider = ({ children }) => {
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
   const navigate = useNavigate();
 
-  const fetchAccessToken = async (body, shouldNavigate = true) => {
+  const fetchAccessToken = async (
+    body,
+    shouldNavigate = true,
+    redirectsOnLogout = false
+  ) => {
     try {
       const response = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
@@ -49,7 +53,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         shouldNavigate && navigate("/films-list");
       } else if (response.status == "400") {
-        await logout();
+        redirectsOnLogout ? await logout(true) : await logout(false);
         return "LoginAgain";
       } else {
         console.error("Error requesting access token: ", response.statusText);
@@ -60,32 +64,35 @@ export const AuthProvider = ({ children }) => {
     return "";
   };
 
-  const refreshTokens = useCallback(async () => {
+  const refreshTokens = useCallback(async (redirectsOnLogout) => {
     const body = new URLSearchParams({
       grant_type: "refresh_token",
       client_id: clientId,
     });
 
-    return await fetchAccessToken(body, false);
+    return await fetchAccessToken(body, false, redirectsOnLogout);
   }, []);
 
-  const requestAccessToken = useCallback(async (code, codeVerifier) => {
-    const redirectUri = process.env.REACT_APP_REDIRECT_URI;
-    const grantType = "authorization_code";
-    try {
-      const body = new URLSearchParams({
-        grant_type: grantType,
-        code: code,
-        redirect_uri: redirectUri,
-        client_id: clientId,
-        code_verifier: codeVerifier,
-      });
+  const requestAccessToken = useCallback(
+    async (code, codeVerifier, redirectsOnLogout) => {
+      const redirectUri = process.env.REACT_APP_REDIRECT_URI;
+      const grantType = "authorization_code";
+      try {
+        const body = new URLSearchParams({
+          grant_type: grantType,
+          code: code,
+          redirect_uri: redirectUri,
+          client_id: clientId,
+          code_verifier: codeVerifier,
+        });
 
-      fetchAccessToken(body);
-    } catch (error) {
-      console.error("Error fetching access token:", error);
-    }
-  }, []);
+        fetchAccessToken(body, true, redirectsOnLogout);
+      } catch (error) {
+        console.error("Error fetching access token:", error);
+      }
+    },
+    []
+  );
 
   const generatePkceData = () => {
     const { codeVerifier, codeChallenge } = generateCodeChallenge();
