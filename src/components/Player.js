@@ -63,12 +63,14 @@ const Player = (props) => {
         const data = await response.json();
         return data.sasToken;
       } else if (response.status == "401" && retry) {
-        await refreshTokens();
-        return fetchSasToken(false);
+        var refreshResponse = await refreshTokens();
+        if (refreshResponse == "LoginAgain") {
+          navigate("/logout");
+        } else {
+          return fetchSasToken(false);
+        }
       } else {
-        await logout();
-        alert("Login again.");
-        login(); //HACK: add returnUrl to the watched film - what with timestamp of a film?
+        navigate("/logout");
       }
     } catch (error) {
       console.log("error happened: ", error);

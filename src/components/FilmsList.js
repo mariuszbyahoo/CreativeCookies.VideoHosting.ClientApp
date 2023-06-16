@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "./FilmsList.module.css";
 import Mosaic from "./Mosaic";
-import { Button, FormControl, InputAdornment, TextField } from "@mui/material";
+import { Button, FormControl, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -16,10 +16,13 @@ const FilmsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [dialogIsOpened, setDialogIsOpened] = useState(false);
+  const [confirmDialogIsOpened, setConfirmDialogIsOpened] = useState(false);
+  const [authDialogIsOpened, setAuthDialogIsOpened] = useState(false);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [error, setError] = useState();
   const navigate = useNavigate();
+
+  const { refreshTokens } = useAuth();
 
   const fetchMoviesHandler = async () => {
     if (!hasMore && pageNumber > 1) return; // Don't fetch if there are no more items and it's not the first page
@@ -94,12 +97,12 @@ const FilmsList = () => {
   };
   const openDeleteDialog = (videoId) => {
     setSelectedVideoId(videoId);
-    setDialogIsOpened(true);
+    setConfirmDialogIsOpened(true);
   };
 
   const closeDeleteDialog = () => {
     setSelectedVideoId(null);
-    setDialogIsOpened(false);
+    setConfirmDialogIsOpened(false);
   };
 
   const openEditorDialog = (videoId) => {
@@ -107,33 +110,46 @@ const FilmsList = () => {
   };
 
   const confirmDeleteHandler = async () => {
-    setDialogIsOpened(false);
+    setConfirmDialogIsOpened(false);
     if (!selectedVideoId) return;
 
-    setVideoMetadatas((prev) =>
-      prev.filter((video) => video.id !== selectedVideoId)
-    );
-
     try {
-      await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideo?Id=${selectedVideoId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      if (await sendDeleteRequest(selectedVideoId)) {
+        setVideoMetadatas((prev) =>
+          prev.filter((video) => video.id !== selectedVideoId)
+        );
+      }
     } catch (error) {
-      const video = videoMetadatas.find(
-        (video) => video.id === selectedVideoId
-      );
-      setVideoMetadatas((prev) => [...prev, video]);
-
       console.error(
         "An error occured while deleting a video: " + selectedVideoId
       );
       return;
     }
     setSelectedVideoId(null);
+  };
+
+  const sendDeleteRequest = async (selectedVideoId, retry = true) => {
+    var result = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideo?Id=${selectedVideoId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+    if (result.status == "204") {
+      return true;
+    }
+    if ((result.status == "401" || result.status == "400") && retry) {
+      // Why is this returning 400 with Bearer = "invalid_token" instead of standard 401??
+      var refreshRes = await refreshTokens();
+      if (refreshRes.length > 0 && refreshRes == "LoginAgain") {
+        setAuthDialogIsOpened(true); // warning pops up
+        return false;
+      }
+      return sendDeleteRequest(selectedVideoId, false);
+    } else {
+      return false;
+    }
   };
 
   let content = <p>Upload a movie to get started!</p>;
@@ -186,12 +202,21 @@ const FilmsList = () => {
       {content}
       {loadBtn}
       <ConfirmationDialog
-        open={dialogIsOpened}
+        open={confirmDialogIsOpened}
         title="Delete Video"
         message="Are you sure you want to delete this video?"
         hasCancelOption={true}
         onConfirm={confirmDeleteHandler}
         onCancel={closeDeleteDialog}
+      />
+      <ConfirmationDialog
+        open={authDialogIsOpened}
+        title="Tokens expired"
+        message="Please login again"
+        hasCancelOption={false}
+        onConfirm={() => {
+          setAuthDialogIsOpened(false);
+        }}
       />
     </div>
   );

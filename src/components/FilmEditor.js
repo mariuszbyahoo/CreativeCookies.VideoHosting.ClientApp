@@ -14,6 +14,7 @@ const FilmEditor = (props) => {
   const [metadata, setMetadata] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [videoEditFinished, setVideoEditFinished] = useState(false);
+  const { refreshTokens } = useAuth();
 
   const params = useParams();
   const navigate = useNavigate();
@@ -53,16 +54,16 @@ const FilmEditor = (props) => {
     if (response.ok) {
       const responseData = await response.json();
       setMetadata(responseData);
-      setValue("videoTitle", responseData.name || ""); // Update the form value here
+      setValue("videoTitle", responseData.name || "");
       setValue("description", responseData.description || "");
       setIsLoading(false);
     } else {
-      alert("an error occured! Contact the software vendor");
-      navigate("/films-list");
+      navigate("/logout");
     }
   };
 
   const onSubmit = (data) => {
+    console.log(data);
     editVideoHandler();
   };
 
@@ -71,6 +72,7 @@ const FilmEditor = (props) => {
   };
 
   const editVideoHandler = (e) => {
+    console.log(e);
     const updatedMetadata = {
       ...metadata,
       name: watch("videoTitle"),
@@ -79,7 +81,7 @@ const FilmEditor = (props) => {
     sendEditRequest(updatedMetadata);
   };
 
-  const sendEditRequest = async (bodyContent) => {
+  const sendEditRequest = async (bodyContent, retry = true) => {
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/editMetadata`,
       {
@@ -93,9 +95,20 @@ const FilmEditor = (props) => {
     );
     if (response.ok) {
       setVideoEditFinished(true);
+      return true;
+    } else if (
+      (response.status == "401" || response.status == "400") &&
+      retry
+    ) {
+      var refreshResponse = await refreshTokens(false);
+      if (refreshResponse == "LoginAgain") {
+        navigate("/logout");
+      } else {
+        return sendEditRequest(bodyContent, false);
+      }
     } else {
-      alert("an error occured! Contact the software vendor");
-      navigate("/films-list");
+      console.error(`Received unexpected API response: ${response.status}`);
+      navigate("/logout");
     }
   };
 
@@ -109,6 +122,7 @@ const FilmEditor = (props) => {
 
   return (
     <>
+      {/* presence of form element causes different behavior from filmDelete flow */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.container}>
           <h3>Edit video metadata</h3>

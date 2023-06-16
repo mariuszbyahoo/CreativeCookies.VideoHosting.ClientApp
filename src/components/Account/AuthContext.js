@@ -28,7 +28,11 @@ export const AuthProvider = ({ children }) => {
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
   const navigate = useNavigate();
 
-  const fetchAccessToken = async (body, shouldNavigate = true) => {
+  const fetchAccessToken = async (
+    body,
+    shouldNavigate = true,
+    logsOut = false
+  ) => {
     try {
       const response = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
@@ -41,7 +45,6 @@ export const AuthProvider = ({ children }) => {
           credentials: "include",
         }
       );
-
       if (response.ok) {
         const data = await response.json();
         const decodedToken = jwtDecode(data.access_token);
@@ -49,40 +52,50 @@ export const AuthProvider = ({ children }) => {
         setUserEmail(email);
         setIsAuthenticated(true);
         shouldNavigate && navigate("/films-list");
+      } else if (response.status == "400") {
+        var res = "LoginAgain";
+        if (logsOut) {
+          await logout();
+        }
+        return res;
       } else {
         console.error("Error requesting access token: ", response.statusText);
       }
     } catch (err) {
       console.error(`Error while fetching the AccessToken: ${err}`);
     }
+    return "";
   };
 
-  const refreshTokens = useCallback(async () => {
+  const refreshTokens = useCallback(async (logsOut = true) => {
     const body = new URLSearchParams({
       grant_type: "refresh_token",
       client_id: clientId,
     });
 
-    return await fetchAccessToken(body, false);
+    return await fetchAccessToken(body, false, logsOut);
   }, []);
 
-  const requestAccessToken = useCallback(async (code, codeVerifier) => {
-    const redirectUri = process.env.REACT_APP_REDIRECT_URI;
-    const grantType = "authorization_code";
-    try {
-      const body = new URLSearchParams({
-        grant_type: grantType,
-        code: code,
-        redirect_uri: redirectUri,
-        client_id: clientId,
-        code_verifier: codeVerifier,
-      });
+  const requestAccessToken = useCallback(
+    async (code, codeVerifier, logsOut) => {
+      const redirectUri = process.env.REACT_APP_REDIRECT_URI;
+      const grantType = "authorization_code";
+      try {
+        const body = new URLSearchParams({
+          grant_type: grantType,
+          code: code,
+          redirect_uri: redirectUri,
+          client_id: clientId,
+          code_verifier: codeVerifier,
+        });
 
-      fetchAccessToken(body);
-    } catch (error) {
-      console.error("Error fetching access token:", error);
-    }
-  }, []);
+        fetchAccessToken(body, true, logsOut);
+      } catch (error) {
+        console.error("Error fetching access token:", error);
+      }
+    },
+    []
+  );
 
   const generatePkceData = () => {
     const { codeVerifier, codeChallenge } = generateCodeChallenge();

@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import "./NavMenu.css";
 import LoginComponent from "./Account/Login";
 import RegisterComponent from "./Account/Register";
-import LogoutComponent from "./Account/Logout";
+import LogoutLinkComponent from "./Account/LogoutLink";
 import { useAuth } from "./Account/AuthContext";
 import { CircularProgress } from "@mui/material";
 
@@ -37,7 +37,7 @@ const NavMenu = () => {
             </a>
           </NavItem>
           <NavItem>
-            <LogoutComponent className="text-dark  nav-link" />
+            <LogoutLinkComponent className="text-dark  nav-link" />
           </NavItem>
         </>
       );
