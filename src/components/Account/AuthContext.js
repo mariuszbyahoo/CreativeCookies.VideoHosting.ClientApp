@@ -114,7 +114,6 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
-    // Clear any stored tokens and set isAuthenticated to false
     setIsAuthenticated(false);
   };
 
