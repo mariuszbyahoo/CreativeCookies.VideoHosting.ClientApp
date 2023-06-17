@@ -19,112 +19,8 @@ import ProgressDialog from "./ProgressDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { quillModules, quillFormats } from "./Helpers/quillHelper";
 import { Controller, useForm } from "react-hook-form";
-
-// function to get SAS token
-const getSASToken = async (blobName, isVideo, apiAddress) => {
-  const fetchUrl = isVideo
-    ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
-    : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
-  const response = await fetch(fetchUrl, {
-    method: "GET",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to get SAS token");
-  }
-
-  const data = await response.json();
-  return data.sasToken;
-};
-
-// function to create block IDs
-const createBlockIds = (fileSize, blockSize) => {
-  const blockCount = Math.ceil(fileSize / blockSize);
-  return Array.from({ length: blockCount }, (_, i) => {
-    const id = ("0000" + i).slice(-5); // Create a 5-character zero-padded string
-    const encoder = new TextEncoder();
-    const idBytes = encoder.encode(id);
-    return Base64.encode(idBytes);
-  });
-};
-
-// function to stage blocks
-const stageBlocks = async (
-  blobClient,
-  blockIds,
-  file,
-  blockSize,
-  setUploadProgress
-) => {
-  for (let i = 0; i < blockIds.length; i++) {
-    setUploadProgress(i);
-    const start = i * blockSize;
-    const end = Math.min(start + blockSize, file.size);
-    const chunk = file.slice(start, end);
-    const chunkSize = end - start;
-    await blobClient.stageBlock(blockIds[i], chunk, chunkSize);
-  }
-};
-
-// Updated uploadBlob function
-const uploadBlob = async (
-  file,
-  blobName,
-  isVideo,
-  setUploadProgress,
-  setMaxPackets,
-  setDialogTitle
-) => {
-  const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
-  const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
-  const thumbnailContainerName =
-    process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME;
-  const apiAddress = process.env.REACT_APP_API_ADDRESS;
-
-  const sasToken = await getSASToken(blobName, isVideo, apiAddress);
-
-  const blockSize = 100 * 1024 * 1024; // 100MB
-  const blockIds = createBlockIds(file.size, blockSize);
-  setMaxPackets(blockIds.length);
-  const blobURL = `https://${account}.blob.core.windows.net/${
-    isVideo ? filmContainerName : thumbnailContainerName
-  }/${encodeURIComponent(blobName)}?${sasToken}`;
-  const pipeline = newPipeline(new AnonymousCredential());
-  const blobClient = new BlockBlobClient(blobURL, pipeline);
-  await stageBlocks(blobClient, blockIds, file, blockSize, setUploadProgress);
-  await blobClient.commitBlockList(blockIds);
-
-  if (isVideo) {
-    const length = await getVideoDuration(file);
-
-    const metadata = {
-      length: length.toFixed(0), // length in seconds
-    };
-
-    await blobClient.setMetadata(metadata);
-  }
-};
-
-const getVideoDuration = (file) => {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    const url = URL.createObjectURL(file);
-
-    video.preload = "metadata";
-    video.src = url;
-
-    video.onloadedmetadata = () => {
-      URL.revokeObjectURL(url);
-      resolve(video.duration);
-    };
-
-    video.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Error loading video metadata"));
-    };
-  });
-};
+import { useAuth } from "./Account/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const FilmUpload = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
@@ -141,7 +37,9 @@ const FilmUpload = (props) => {
     useState("");
   const [isConfirmationDialogOpened, setIsConfirmaitonDialogOpened] =
     useState(false);
+  const { refreshTokens } = useAuth();
   const explanationRef = useRef(null);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -155,12 +53,133 @@ const FilmUpload = (props) => {
     clearErrors,
   } = useForm();
 
+  useEffect(() => {
+    async function callRefreshTokens() {
+      var res = await refreshTokens(false);
+      if (res == "LoginAgain") {
+        navigate("/logout");
+      }
+    }
+    callRefreshTokens();
+  }, [refreshTokens]);
+
   const description = watch("description");
 
   const videoGuid = v4();
   const videoBlobName = `${videoGuid.toUpperCase()}.mp4`;
   const thumbnailBlobName = `${videoGuid.toUpperCase()}.jpg`;
   const videoTitleChangeHandler = (e) => setVideoTitle(e.target.value);
+
+  // function to get SAS token
+  const getSASToken = async (blobName, isVideo, apiAddress) => {
+    const fetchUrl = isVideo
+      ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
+      : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
+    const response = await fetch(fetchUrl, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.sasToken;
+    } else if (response.status == "401" || response.status == "400") {
+      var refreshResponse = await refreshTokens(false);
+      if (refreshResponse == "LoginAgain") {
+        navigate("/logout");
+      }
+    } else {
+      throw new Error("Failed to get SAS token");
+    }
+  };
+
+  // function to create block IDs
+  const createBlockIds = (fileSize, blockSize) => {
+    const blockCount = Math.ceil(fileSize / blockSize);
+    return Array.from({ length: blockCount }, (_, i) => {
+      const id = ("0000" + i).slice(-5); // Create a 5-character zero-padded string
+      const encoder = new TextEncoder();
+      const idBytes = encoder.encode(id);
+      return Base64.encode(idBytes);
+    });
+  };
+
+  // function to stage blocks
+  const stageBlocks = async (
+    blobClient,
+    blockIds,
+    file,
+    blockSize,
+    setUploadProgress
+  ) => {
+    for (let i = 0; i < blockIds.length; i++) {
+      setUploadProgress(i);
+      const start = i * blockSize;
+      const end = Math.min(start + blockSize, file.size);
+      const chunk = file.slice(start, end);
+      const chunkSize = end - start;
+      await blobClient.stageBlock(blockIds[i], chunk, chunkSize);
+    }
+  };
+
+  // Updated uploadBlob function
+  const uploadBlob = async (
+    file,
+    blobName,
+    isVideo,
+    setUploadProgress,
+    setMaxPackets,
+    setDialogTitle
+  ) => {
+    const account = process.env.REACT_APP_STORAGE_ACCOUNT_NAME;
+    const filmContainerName = process.env.REACT_APP_FILMS_CONTAINER_NAME;
+    const thumbnailContainerName =
+      process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME;
+    const apiAddress = process.env.REACT_APP_API_ADDRESS;
+
+    const sasToken = await getSASToken(blobName, isVideo, apiAddress);
+
+    const blockSize = 100 * 1024 * 1024; // 100MB
+    const blockIds = createBlockIds(file.size, blockSize);
+    setMaxPackets(blockIds.length);
+    const blobURL = `https://${account}.blob.core.windows.net/${
+      isVideo ? filmContainerName : thumbnailContainerName
+    }/${encodeURIComponent(blobName)}?${sasToken}`;
+    const pipeline = newPipeline(new AnonymousCredential());
+    const blobClient = new BlockBlobClient(blobURL, pipeline);
+    await stageBlocks(blobClient, blockIds, file, blockSize, setUploadProgress);
+    await blobClient.commitBlockList(blockIds);
+
+    if (isVideo) {
+      const length = await getVideoDuration(file);
+
+      const metadata = {
+        length: length.toFixed(0), // length in seconds
+      };
+
+      await blobClient.setMetadata(metadata);
+    }
+  };
+
+  const getVideoDuration = (file) => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      const url = URL.createObjectURL(file);
+
+      video.preload = "metadata";
+      video.src = url;
+
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(url);
+        resolve(video.duration);
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Error loading video metadata"));
+      };
+    });
+  };
 
   const scrollIntoExplanation = useCallback(() => {
     if (explanationRef.current !== null) {
@@ -267,6 +286,7 @@ const FilmUpload = (props) => {
   };
   const uploadVideoHandler = async () => {
     try {
+      debugger;
       setProgressDialogTitle("Preparing to upload...");
       setUploadProgress(0);
       setIsProgressDialogOpened(true);
@@ -290,6 +310,7 @@ const FilmUpload = (props) => {
         "Unexpected error occured, please contact support"
       );
       setIsConfirmaitonDialogOpened(true);
+      console.error(error);
       return false;
     } finally {
       setIsProgressDialogOpened(false);
@@ -450,13 +471,6 @@ const FilmUpload = (props) => {
                   />
                 )}
               />
-              {/* <ReactQuill
-                theme="snow"
-                value={description}
-                onChange={descriptionChangeHandler}
-                modules={quillModules}
-                formats={quillFormats}
-              /> */}
             </div>
           </div>
         </div>
