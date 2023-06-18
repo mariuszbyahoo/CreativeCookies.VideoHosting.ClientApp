@@ -1,16 +1,16 @@
 import React from "react";
 import { useAuth } from "../Account/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 
 const ProtectedComponent = ({ children }) => {
   const { isAuthenticated, login } = useAuth();
-  const navigate = useNavigate();
+  const location = useLocation();
 
   if (!isAuthenticated) {
     //HACK TODO: Change this to be redirected towards the film, right after obtaining the Access token.
     // pass returnUrl to the login function and redirect to it
-    login();
+    login(location.pathname);
     return (
       <div
         style={{

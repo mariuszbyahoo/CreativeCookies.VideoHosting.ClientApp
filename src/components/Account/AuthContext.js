@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
         const email = decodedToken.email;
         setUserEmail(email);
         setIsAuthenticated(true);
+        // HACK: HERE IS THE PLACE FOR #114
         shouldNavigate && navigate("/films-list");
       } else if (response.status == "400") {
         var res = "LoginAgain";
@@ -117,13 +118,13 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const login = async () => {
+  const login = async (redirectAfterLogin) => {
     const redirectUri = encodeURIComponent(process.env.REACT_APP_REDIRECT_URI);
     const responseType = "code";
     const codeChallengeMethod = "S256";
 
     const { codeVerifier, codeChallenge } = generatePkceData();
-    const state = generateRandomString(32);
+    const state = `${redirectAfterLogin}|${generateRandomString(4)}`;
     const encodedState = encodeURIComponent(state);
     deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
     deleteCookie(process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME);
