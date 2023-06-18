@@ -38,13 +38,14 @@ function getAuthCookie(name) {
 }
 
 function setAuthCookie(name, value) {
-  const expiresInMinutes = 60 * 5;
+  const expiresInMinutes = 60 * 10;
   let expires = "";
   const date = new Date();
   date.setTime(date.getTime() + expiresInMinutes * 1000);
-  expires = "; expires=" + date.toUTCString();
-  document.cookie =
-    `${name}=` + encodeURIComponent(value) + expires + "; path=/; Secure;";
+  expires = "expires=" + date.toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(
+    value
+  )}; ${expires}; path=/; Secure;`;
 }
 
 function deleteCookie(name) {
@@ -52,11 +53,10 @@ function deleteCookie(name) {
 }
 
 function isStateValid(stateFromParams, stateFromCookies) {
+  debugger;
   const areTheyEqual = stateFromParams === stateFromCookies;
 
-  if (areTheyEqual) {
-    document.cookie = `${process.env.REACT_APP_STATE_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-  } else if (!areTheyEqual && !stateFromCookies) {
+  if (!areTheyEqual || !stateFromCookies) {
     console.error("State cookie expired!");
     // add reaction if cookie will expire itself before the equality test
     // i.e. component receives a request, but state param from cookie is not present.

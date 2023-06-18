@@ -14,6 +14,7 @@ import {
 } from "./authHelper";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const AuthContext = createContext();
 
@@ -51,8 +52,11 @@ export const AuthProvider = ({ children }) => {
         const email = decodedToken.email;
         setUserEmail(email);
         setIsAuthenticated(true);
-        // HACK: HERE IS THE PLACE FOR #114
-        shouldNavigate && navigate("/films-list");
+        let returnPath = decodeURIComponent(
+          Cookies.get(process.env.REACT_APP_STATE_COOKIE_NAME).split("|")[0]
+        );
+        deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
+        shouldNavigate && navigate(returnPath);
       } else if (response.status == "400") {
         var res = "LoginAgain";
         if (logsOut) {
@@ -124,6 +128,7 @@ export const AuthProvider = ({ children }) => {
     const codeChallengeMethod = "S256";
 
     const { codeVerifier, codeChallenge } = generatePkceData();
+    debugger;
     const state = `${redirectAfterLogin}|${generateRandomString(4)}`;
     const encodedState = encodeURIComponent(state);
     deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
