@@ -129,14 +129,14 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const login = async (redirectAfterLogin) => {
+  const login = async (pathToRedirectAfterLogin) => {
     const redirectUri = encodeURIComponent(process.env.REACT_APP_REDIRECT_URI);
     const responseType = "code";
     const codeChallengeMethod = "S256";
 
     const { codeVerifier, codeChallenge } = generatePkceData();
-    const state = redirectAfterLogin
-      ? `${redirectAfterLogin}|${generateRandomString(4)}`
+    const state = pathToRedirectAfterLogin
+      ? `${pathToRedirectAfterLogin}|${generateRandomString(4)}`
       : generateRandomString(32);
     const encodedState = encodeURIComponent(state);
     deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
