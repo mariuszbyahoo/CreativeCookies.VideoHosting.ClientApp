@@ -114,27 +114,27 @@ export const AuthProvider = ({ children }) => {
     return { codeVerifier, codeChallenge };
   };
 
-  const logout = async () => {
-    let response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/logout`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
-
-    if (response.ok) {
-      navigate("/");
-    } else {
-      console.error(
-        `response status code returned from logout request: ${response.status}`
-      );
-    }
-
+  const logout = async (pathToRedirectAfterLogout) => {
     setIsAuthenticated(false);
+    window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/identity/account/logout?returnPath=${pathToRedirectAfterLogout}`;
+    // let response = await fetch(
+    //   `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/logout`,
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     credentials: "include",
+    //   }
+    // );
+
+    // if (response.ok) {
+    //   navigate("/");
+    // } else {
+    //   console.error(
+    //     `response status code returned from logout request: ${response.status}`
+    //   );
+    // }
   };
 
   const login = async (pathToRedirectAfterLogin) => {
