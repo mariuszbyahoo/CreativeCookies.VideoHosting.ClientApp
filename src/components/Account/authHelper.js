@@ -53,7 +53,6 @@ function deleteCookie(name) {
 }
 
 function isStateValid(stateFromParams, stateFromCookies) {
-  debugger;
   const areTheyEqual = stateFromParams === stateFromCookies;
 
   if (!areTheyEqual || !stateFromCookies) {

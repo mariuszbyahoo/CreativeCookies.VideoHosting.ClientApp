@@ -286,7 +286,6 @@ const FilmUpload = (props) => {
   };
   const uploadVideoHandler = async () => {
     try {
-      debugger;
       setProgressDialogTitle("Preparing to upload...");
       setUploadProgress(0);
       setIsProgressDialogOpened(true);
