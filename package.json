@@ -15,6 +15,7 @@
     "crypto-js": "^4.1.1",
     "dompurify": "^3.0.3",
     "js-base64": "^3.7.5",
+    "js-cookie": "^3.0.5",
     "jwt-decode": "^3.1.2",
     "merge": "^2.1.1",
     "plyr-react": "^5.1.2",
