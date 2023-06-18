@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch(
+    let response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/logout`,
       {
         method: "POST",
@@ -125,6 +125,14 @@ export const AuthProvider = ({ children }) => {
         credentials: "include",
       }
     );
+
+    if (response.ok) {
+      navigate("/");
+    } else {
+      console.error(
+        `response status code returned from logout request: ${response.status}`
+      );
+    }
 
     setIsAuthenticated(false);
   };
