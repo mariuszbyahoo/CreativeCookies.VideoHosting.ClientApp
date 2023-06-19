@@ -20,6 +20,7 @@ const LogoutLinkComponent = (props) => {
    */
   const handleLogout = async (event) => {
     event.preventDefault();
+    // HACK: CHange GUID to :id in lookupstring
     let isProtectedRoute = checkRoute(location.pathname);
 
     if (isProtectedRoute) return await logout("/films-list");
@@ -47,9 +48,9 @@ const LogoutLinkComponent = (props) => {
   return (
     <>
       <a
-        href={process.env.REACT_APP_HOME_PAGE_URI}
+        href={`https://${process.env.REACT_APP_API_ADDRESS}/identity/account/logout`}
         className={props.className}
-        onClick={handleLogout}
+        // onClick={handleLogout}
       >
         Logout
       </a>
