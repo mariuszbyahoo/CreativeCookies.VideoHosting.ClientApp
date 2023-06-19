@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }) => {
     if (response.ok) {
       setIsAuthenticated(false);
       setUserEmail("");
-      navigate(pathToRedirectAfterLogout && pathToRedirectAfterLogout);
+      navigate(pathToRedirectAfterLogout);
     } else {
       console.error(
         `response status code returned from logout request: ${response.status}`
