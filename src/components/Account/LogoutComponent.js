@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import { CircularProgress } from "@mui/material";
 import ConfirmationDialog from "../ConfirmationDialog";
 import { useNavigate } from "react-router-dom";
+import { Error } from "@mui/icons-material";
 
 const LogoutComponent = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -12,19 +13,13 @@ const LogoutComponent = () => {
 
   useEffect(() => {
     setIsLoggingOut(true);
-    async function callLogout() {
-      await logout();
-    }
-    callLogout().then(() => {
-      setIsLoggingOut(false);
-      setDialogIsOpened(true);
-    });
+
+    setDialogIsOpened(true);
   }, [logout]);
 
   let spinner = isLoggingOut ? (
     <>
-      <p>Logging out...</p>
-      <CircularProgress size={200} />
+      <Error style={{ fontSize: 200, color: "red" }} />
     </>
   ) : (
     <></>
@@ -50,8 +45,8 @@ const LogoutComponent = () => {
         message="Please login again"
         hasCancelOption={false}
         onConfirm={() => {
+          logout("/");
           setDialogIsOpened(false);
-          navigate("/");
         }}
       />
     </>

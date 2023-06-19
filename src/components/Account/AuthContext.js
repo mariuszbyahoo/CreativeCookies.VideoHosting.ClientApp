@@ -18,6 +18,18 @@ import Cookies from "js-cookie";
 
 const AuthContext = createContext();
 
+/**
+ * AuthContext gives access to:
+ *  isAuthenticated,
+ *  userEmail,
+ *  requestAccessToken,
+ *  refreshTokens,
+ *  logout,
+ *  generatePkceData,
+ *  login,
+ *  isUserMenuLoading,
+ * @returns AuthContext
+ */
 export const useAuth = () => {
   return useContext(AuthContext);
 };
@@ -67,7 +79,7 @@ export const AuthProvider = ({ children }) => {
       } else if (response.status == "400") {
         var res = "LoginAgain";
         if (logsOut) {
-          await logout();
+          await logout("/films-list");
         }
         return res;
       } else {
@@ -115,25 +127,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async (pathToRedirectAfterLogout) => {
-    let response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/logout`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
-    if (response.ok) {
-      setIsAuthenticated(false);
-      setUserEmail("");
-      navigate(pathToRedirectAfterLogout);
-    } else {
-      console.error(
-        `response status code returned from logout request: ${response.status}`
-      );
-    }
+    setIsAuthenticated(false);
+    setUserEmail("");
+    if (
+      pathToRedirectAfterLogout === "undefined" ||
+      pathToRedirectAfterLogout === "null"
+    )
+      pathToRedirectAfterLogout = "/films-list";
+    window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/identity/account/logout?returnPath=${pathToRedirectAfterLogout}`;
   };
 
   const login = async (pathToRedirectAfterLogin) => {
@@ -145,6 +146,7 @@ export const AuthProvider = ({ children }) => {
     const state = pathToRedirectAfterLogin
       ? `${pathToRedirectAfterLogin}|${generateRandomString(4)}`
       : generateRandomString(32);
+    // HACK: Tutaj trzeba zmienić redirectUrl
     const encodedState = encodeURIComponent(state);
     deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
     deleteCookie(process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME);
