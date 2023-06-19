@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }) => {
     return { codeVerifier, codeChallenge };
   };
 
-  const logout = async () => {
+  const logout = async (pathToRedirectAfterLogout) => {
     let response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/logout`,
       {
@@ -125,16 +125,15 @@ export const AuthProvider = ({ children }) => {
         credentials: "include",
       }
     );
-
     if (response.ok) {
-      navigate("/");
+      setIsAuthenticated(false);
+      setUserEmail("");
+      navigate(pathToRedirectAfterLogout && pathToRedirectAfterLogout);
     } else {
       console.error(
         `response status code returned from logout request: ${response.status}`
       );
     }
-
-    setIsAuthenticated(false);
   };
 
   const login = async (pathToRedirectAfterLogin) => {
