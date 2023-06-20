@@ -62,6 +62,7 @@ export const AuthProvider = ({ children }) => {
         const data = await response.json();
         const decodedToken = jwtDecode(data.access_token);
         const email = decodedToken.email;
+        // extract role from accessToken and then redirect to requested path, or films-list if user hasn't enough permissions.
         setUserEmail(email);
         setIsAuthenticated(true);
         const stateCookie = Cookies.get(
@@ -146,7 +147,6 @@ export const AuthProvider = ({ children }) => {
     const state = pathToRedirectAfterLogin
       ? `${pathToRedirectAfterLogin}|${generateRandomString(4)}`
       : generateRandomString(32);
-    // HACK: Tutaj trzeba zmienić redirectUrl
     const encodedState = encodeURIComponent(state);
     deleteCookie(process.env.REACT_APP_STATE_COOKIE_NAME);
     deleteCookie(process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME);
