@@ -5,6 +5,10 @@ import ConfirmationDialog from "../ConfirmationDialog";
 import { useNavigate } from "react-router-dom";
 import { Error } from "@mui/icons-material";
 
+/**
+ * This component serves as a session expiration page.
+ * @returns JSX.Element
+ */
 const LogoutComponent = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [dialogIsOpened, setDialogIsOpened] = useState(false);
