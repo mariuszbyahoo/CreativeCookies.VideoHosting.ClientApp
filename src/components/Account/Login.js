@@ -2,11 +2,17 @@ import React from "react";
 import { useAuth } from "./AuthContext";
 import { useLocation } from "react-router";
 
+/**
+ *
+ * @param {ReactComponentProperties[]} props
+ * @returns
+ */
 const LoginComponent = (props) => {
   const { login } = useAuth();
   const location = useLocation();
 
-  const handleLoginClick = () => {
+  const handleLoginClick = (event) => {
+    event.preventDefault();
     login(location.pathname);
   };
 
