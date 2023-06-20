@@ -3,12 +3,21 @@ import { useAuth } from "./AuthContext";
 import { getAuthCookie, isStateValid } from "./authHelper";
 
 const SignInLandingComponent = () => {
-  const { requestAccessToken } = useAuth();
+  const { requestAccessToken, login } = useAuth();
   const [stateFromCookies, setStateFromCookies] = useState(
     getAuthCookie(process.env.REACT_APP_STATE_COOKIE_NAME)
   );
   const [error, setError] = useState(null);
   const [errorDescription, setErrorDescription] = useState(null);
+
+  const isStateValid = (stateFromParams, stateFromCookies) => {
+    const areTheyEqual = stateFromParams === stateFromCookies;
+
+    if (!areTheyEqual || !stateFromCookies) {
+      login();
+    }
+    return areTheyEqual;
+  };
 
   useEffect(() => {
     // Verify the state parameter and extract the code and error parameters from the URL

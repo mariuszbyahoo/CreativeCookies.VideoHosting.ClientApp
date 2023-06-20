@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         const stateCookie = Cookies.get(
           process.env.REACT_APP_STATE_COOKIE_NAME
         );
-        let returnPath = "/";
+        let returnPath = "/films-list";
         if (stateCookie) {
           const containsReturnPath = stateCookie.split("|").length > 1;
           if (containsReturnPath) {
