@@ -63,7 +63,7 @@ const Player = (props) => {
         const data = await response.json();
         return data.sasToken;
       } else if (response.status == "401" && retry) {
-        var refreshResponse = await refreshTokens();
+        var refreshResponse = await refreshTokens(false);
         if (refreshResponse == "LoginAgain") {
           navigate("/logout");
         } else {
