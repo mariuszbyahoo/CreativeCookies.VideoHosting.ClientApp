@@ -5,6 +5,7 @@ import Plyr from "plyr-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./Account/AuthContext";
 import DOMPurify from "dompurify";
+import { CircularProgress } from "@mui/material";
 
 const Player = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
@@ -101,7 +102,11 @@ const Player = (props) => {
   let content;
 
   if (loading) {
-    content = <p>loading</p>;
+    content = (
+      <div className={styles.progress}>
+        <CircularProgress size={200} />
+      </div>
+    );
   } else {
     content = plyrVideo;
   }
