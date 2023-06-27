@@ -8,6 +8,7 @@ import ProtectedComponent from "./components/Routes/ProtectedComponent";
 import AuthErrorComponent from "./components/Account/AuthError";
 import FilmEditor from "./components/FilmEditor";
 import LogoutComponent from "./components/Account/LogoutComponent";
+import UsersList from "./components/UsersList";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -31,6 +32,22 @@ const AppRoutes = [
         }}
       >
         <Home />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/users-list",
+    protected: true,
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <ProtectedComponent accessFor="ADMIN">
+          <UsersList />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },

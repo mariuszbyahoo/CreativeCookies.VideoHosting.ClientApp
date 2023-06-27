@@ -58,11 +58,18 @@ const NavMenu = () => {
   const filmUploadComponent = () => {
     if (userRole === "ADMIN" || userRole === "admin")
       return (
-        <NavItem>
-          <NavLink tag={Link} className="text-dark" to="/films-upload">
-            Film upload
-          </NavLink>
-        </NavItem>
+        <>
+          <NavItem>
+            <NavLink tag={Link} className="text-dark" to="/films-upload">
+              Film upload
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink tag={Link} className="text-dark" to="/users-list">
+              Users list
+            </NavLink>
+          </NavItem>
+        </>
       );
   };
 
