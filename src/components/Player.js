@@ -14,6 +14,8 @@ const Player = (props) => {
   const [videoDescription, setVideoDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [uploadDate, setUploadDate] = useState("");
+  const [thumbnailName, setThumbnailName] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ const Player = (props) => {
   useEffect(() => {
     fetchPlayerData();
   }, []);
+
   async function fetchPlayerData() {
     setLoading(true);
     const apiResponse = await fetch(
@@ -43,18 +46,38 @@ const Player = (props) => {
         minute: "2-digit",
       })
     );
-
+    setThumbnailName(blobResponseJson.thumbnailName);
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
     if (userRole && allowedTo.includes(userRole.toUpperCase())) {
-      const sasTokenResponse = await fetchSasToken();
+      const sasTokenResponse = await fetchSasTokenForVideo();
       setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
+    } else {
+      setThumbnailUrl(
+        `https://${
+          process.env.REACT_APP_STORAGE_ACCOUNT_NAME
+        }.blob.core.windows.net/${
+          process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME
+        }/${
+          blobResponseJson.thumbnailName
+        }?${await fetchSasTokenForThumbnail()}`
+      );
     }
     setLoading(false);
   }
 
-  async function fetchSasToken(retry = true) {
+  const fetchSasTokenForThumbnail = async () => {
+    const response = await fetch(
+      `https://${
+        process.env.REACT_APP_API_ADDRESS
+      }/api/sas/thumbnail/${params.id.toUpperCase()}.jpg`
+    );
+    const data = await response.json();
+    return data.sasToken;
+  };
+
+  async function fetchSasTokenForVideo(retry = true) {
     try {
       const response = await fetch(
         `https://${
@@ -73,7 +96,7 @@ const Player = (props) => {
         if (refreshResponse == "LoginAgain") {
           navigate("/logout");
         } else {
-          return fetchSasToken(false);
+          return fetchSasTokenForVideo(false);
         }
       } else {
         navigate("/logout");
@@ -91,6 +114,7 @@ const Player = (props) => {
       onClick={() =>
         isAuthenticated ? navigate("/subscribe") : login(location.pathname)
       }
+      style={{ backgroundImage: `url(${thumbnailUrl})` }}
     ></div>
   );
 
