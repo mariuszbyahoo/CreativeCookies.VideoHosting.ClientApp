@@ -95,12 +95,17 @@ const MosaicElement = (props) => {
     }
   };
 
+  const overlay = () => {
+    if (isAuthenticated && (userRole === "ADMIN" || userRole === "admin")) {
+      return <div className={styles.overlay}></div>;
+    }
+  };
+
   return (
     <div className={styles.boxShadowCard}>
       {editDeleteButtons()}
       <Link to={"/player/" + props.videoId} className={styles.linkImage}>
-        <div className={styles.overlay}></div>
-
+        {overlay()}
         <div className={styles.imageContainer}>
           <img src={blobImage} alt="thumbnail" className={styles.thumbnail} />
           <div className={styles.badge}>
