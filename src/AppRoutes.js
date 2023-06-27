@@ -20,7 +20,7 @@ function fallbackRender({ error, resetErrorBoundary }) {
   );
 }
 
-const { isAuthenticated } = useAuth;
+const { isAuthenticated, userRole } = useAuth;
 const AppRoutes = [
   {
     index: true,
@@ -52,7 +52,7 @@ const AppRoutes = [
   },
   {
     path: "/player/:id",
-    protected: true,
+    protected: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -60,9 +60,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent isAuthenticated={isAuthenticated}>
-          <Player />
-        </ProtectedComponent>
+        <Player />
       </ErrorBoundary>
     ),
   },
@@ -76,7 +74,10 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent isAuthenticated={isAuthenticated}>
+        <ProtectedComponent
+          isAuthenticated={isAuthenticated}
+          userRole={userRole}
+        >
           <FilmEditor />
         </ProtectedComponent>
       </ErrorBoundary>
@@ -92,7 +93,10 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent isAuthenticated={isAuthenticated}>
+        <ProtectedComponent
+          isAuthenticated={isAuthenticated}
+          userRole={userRole}
+        >
           <FilmUpload mode={0} />
         </ProtectedComponent>
       </ErrorBoundary>
