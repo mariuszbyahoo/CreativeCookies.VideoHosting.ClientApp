@@ -20,7 +20,7 @@ const ProtectedComponent = ({ accessFor, children }) => {
     ) {
       navigate("/films-list");
     }
-  }, []);
+  }, [isAuthenticated, userRole, accessFor, navigate]);
 
   if (!isAuthenticated) {
     login(location.pathname);
