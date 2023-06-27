@@ -17,3 +17,12 @@
     text-align: center;
     margin-top: 50vm;
 }
+
+.subscribeBox {
+    width: 100%;  /* Set the width to match the video player */
+    height: 80vh; /* Set the height to match the video player */
+    /*background-image: url('path_to_your_image'); /* HACK: REPLACE THIS WITH VIDEO THUMBNAIL*/
+    background-color: black;
+    background-size: cover;
+    cursor: pointer;
+  }

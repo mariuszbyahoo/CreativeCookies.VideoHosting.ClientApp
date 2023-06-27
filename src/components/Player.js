@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styles from "./Player.module.css";
 import "plyr-react/plyr.css";
 import Plyr from "plyr-react";
@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./Account/AuthContext";
 import DOMPurify from "dompurify";
 import { CircularProgress } from "@mui/material";
+
+const allowedTo = "admin,ADMIN,subscriber,SUBSCRIBER";
 
 const Player = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
@@ -17,14 +19,15 @@ const Player = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
-  const { refreshTokens, logout, login } = useAuth();
+  const { refreshTokens, userRole, isAuthenticated, login } = useAuth();
+  const location = useLocation();
 
   if (params.id === ":id") navigate("/films-list");
 
   useEffect(() => {
-    fetchMetadataWithSAS();
+    fetchPlayerData();
   }, []);
-  async function fetchMetadataWithSAS() {
+  async function fetchPlayerData() {
     setLoading(true);
     const apiResponse = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/getMetadata?Id=${params.id}`
@@ -44,8 +47,10 @@ const Player = (props) => {
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
-    const sasTokenResponse = await fetchSasToken();
-    setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
+    if (userRole && allowedTo.includes(userRole.toUpperCase())) {
+      const sasTokenResponse = await fetchSasToken();
+      setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
+    }
     setLoading(false);
   }
 
@@ -80,7 +85,16 @@ const Player = (props) => {
   }
 
   const videoOptions = undefined;
-  const plyrVideo = videoUrl && (
+  const subscribeBox = (
+    <div
+      className={styles.subscribeBox}
+      onClick={() =>
+        isAuthenticated ? navigate("/subscribe") : login(location.pathname)
+      }
+    ></div>
+  );
+
+  const plyrVideo = videoUrl ? (
     <>
       <Plyr
         ref={ref}
@@ -97,6 +111,8 @@ const Player = (props) => {
         options={videoOptions}
       />
     </>
+  ) : (
+    subscribeBox
   );
 
   let content;
