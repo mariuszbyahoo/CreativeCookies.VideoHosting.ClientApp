@@ -86,7 +86,6 @@ export const AuthProvider = ({ children }) => {
         }
         return res;
       } else {
-        debugger;
         console.error("Error requesting access token: ", response.statusText);
       }
     } catch (err) {

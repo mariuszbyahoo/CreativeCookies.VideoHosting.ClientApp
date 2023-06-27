@@ -6,7 +6,6 @@ import Player from "./components/Player";
 import SignInLandingComponent from "./components/Account/SignInLandingComponent";
 import ProtectedComponent from "./components/Routes/ProtectedComponent";
 import AuthErrorComponent from "./components/Account/AuthError";
-import { useAuth } from "./components/Account/AuthContext";
 import FilmEditor from "./components/FilmEditor";
 import LogoutComponent from "./components/Account/LogoutComponent";
 
@@ -20,7 +19,6 @@ function fallbackRender({ error, resetErrorBoundary }) {
   );
 }
 
-const { isAuthenticated, userRole } = useAuth;
 const AppRoutes = [
   {
     index: true,
@@ -74,10 +72,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent
-          isAuthenticated={isAuthenticated}
-          userRole={userRole}
-        >
+        <ProtectedComponent accessFor="ADMIN">
           <FilmEditor />
         </ProtectedComponent>
       </ErrorBoundary>
@@ -93,11 +88,8 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent
-          isAuthenticated={isAuthenticated}
-          userRole={userRole}
-        >
-          <FilmUpload mode={0} />
+        <ProtectedComponent accessFor="ADMIN">
+          <FilmUpload />
         </ProtectedComponent>
       </ErrorBoundary>
     ),
