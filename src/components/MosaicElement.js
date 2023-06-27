@@ -5,6 +5,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { Button } from "@mui/material";
+import { useAuth } from "./Account/AuthContext";
 
 const fetchSasToken = async (id) => {
   const response = await fetch(
@@ -30,6 +31,7 @@ const fetchBlob = async (blobName, sasToken) => {
 
 const MosaicElement = (props) => {
   const [blobImage, setBlobImage] = useState(undefined);
+  const { userRole, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (
@@ -72,20 +74,30 @@ const MosaicElement = (props) => {
     return timeSpan;
   };
 
+  const editDeleteButtons = () => {
+    if (isAuthenticated && (userRole === "ADMIN" || userRole === "admin")) {
+      return (
+        <>
+          <Button
+            className={styles.editButton}
+            onClick={() => props.openEditorHandler(props.videoId)}
+          >
+            <BorderColorIcon className={styles.editButtonIcon} />
+          </Button>
+          <Button
+            className={styles.closeButton}
+            onClick={() => props.deleteVideoHandler(props.videoId)}
+          >
+            <DeleteForeverIcon className={styles.closeButtonIcon} />
+          </Button>
+        </>
+      );
+    }
+  };
+
   return (
     <div className={styles.boxShadowCard}>
-      <Button
-        className={styles.editButton}
-        onClick={() => props.openEditorHandler(props.videoId)}
-      >
-        <BorderColorIcon className={styles.editButtonIcon} />
-      </Button>
-      <Button
-        className={styles.closeButton}
-        onClick={() => props.deleteVideoHandler(props.videoId)}
-      >
-        <DeleteForeverIcon className={styles.closeButtonIcon} />
-      </Button>
+      {editDeleteButtons()}
       <Link to={"/player/" + props.videoId} className={styles.linkImage}>
         <div className={styles.overlay}></div>
 
