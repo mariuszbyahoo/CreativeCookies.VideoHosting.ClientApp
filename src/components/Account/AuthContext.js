@@ -191,7 +191,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuthentication();
-  }, []);
+  }, [clientId]);
 
   const value = {
     isAuthenticated,
