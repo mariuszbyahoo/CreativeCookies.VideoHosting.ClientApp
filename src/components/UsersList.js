@@ -32,7 +32,7 @@ const UsersList = () => {
 
   const fetchUsers = () => {
     fetch(
-      `https://localhost:7034/api/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}`,
+      `https://localhost:7034/api/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}&role=${selectedRole}`,
       {
         method: "GET",
         headers: {
