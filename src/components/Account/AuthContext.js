@@ -178,7 +178,9 @@ export const AuthProvider = ({ children }) => {
         if (response.ok) {
           const data = await response.json();
           const email = data.email;
+          const role = data.userRole;
           setUserEmail(email);
+          setUserRole(role);
           setIsAuthenticated(data.isAuthenticated);
         }
       } catch (error) {
