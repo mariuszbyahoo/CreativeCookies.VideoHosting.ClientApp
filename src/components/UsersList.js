@@ -11,7 +11,10 @@ import {
   MenuItem,
   Button,
   Input,
+  FormControl,
+  TextField,
 } from "@mui/material";
+import { Search } from "@mui/icons-material";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -21,9 +24,13 @@ const UsersList = () => {
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
 
-  const roles = ["admin", "subscriber", "nonsubscriber", "any"];
+  const roles = ["Admin", "Subscriber", "NonSubscriber", "any"];
 
   useEffect(() => {
+    fetchUsers();
+  }, [page, pageSize]);
+
+  const fetchUsers = () => {
     fetch(
       `https://localhost:7034/api/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}`,
       {
@@ -35,7 +42,6 @@ const UsersList = () => {
       }
     )
       .then((response) => {
-        setTotalPages(parseInt(response.headers.get("X-Total-Pages")));
         return response.json();
       })
       .then((data) => {
@@ -44,7 +50,7 @@ const UsersList = () => {
         setUsers(data.users);
       })
       .catch((error) => console.error("Error:", error));
-  }, [page, pageSize, search]);
+  };
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
@@ -62,25 +68,44 @@ const UsersList = () => {
     setPage(newPage);
   };
 
-  // TODO: Add UI for controlling pageSize, if desired.
-
   return (
     <>
-      <Input
-        value={search}
-        onChange={handleSearchChange}
-        placeholder="Search..."
-      />
-      <Select value={selectedRole} onChange={handleRoleChange}>
-        {roles.map((role) => (
-          <MenuItem key={role} value={role}>
-            {role}
-          </MenuItem>
-        ))}
-      </Select>
-      <Button variant="contained" color="primary" onClick={handleDownload}>
-        Download CSV
-      </Button>
+      <div className="row">
+        <div className="col-7">
+          <FormControl variant="standard" style={{ minWidth: "100%" }}>
+            <TextField
+              label="Search"
+              id="filter-search"
+              onChange={handleSearchChange}
+              value={search}
+              variant="filled"
+            />
+          </FormControl>
+        </div>
+        <div className="col-3">
+          <Select
+            value={selectedRole}
+            onChange={handleRoleChange}
+            style={{ minWidth: "100%" }}
+          >
+            {roles.map((role) => (
+              <MenuItem key={role} value={role}>
+                {role}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+        <div className="col-2" style={{ alignItems: "center" }}>
+          <Button
+            variant="outlined"
+            style={{ marginTop: 5, minWidth: "100%", minHeight: "80%" }}
+            onClick={fetchUsers}
+          >
+            <Search />
+          </Button>
+        </div>
+      </div>
+
       <br />
       <span>
         Page {page} of {totalPages}
@@ -94,14 +119,15 @@ const UsersList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell component="th" scope="row">
-                  {user.userEmail}
-                </TableCell>
-                <TableCell>{user.role}</TableCell>
-              </TableRow>
-            ))}
+            {users &&
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell component="th" scope="row">
+                    {user.userEmail}
+                  </TableCell>
+                  <TableCell>{user.role}</TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -113,6 +139,10 @@ const UsersList = () => {
         disabled={page >= totalPages}
       >
         Next Page
+      </Button>
+      <br />
+      <Button variant="contained" color="primary" onClick={handleDownload}>
+        Download CSV
       </Button>
     </>
   );
