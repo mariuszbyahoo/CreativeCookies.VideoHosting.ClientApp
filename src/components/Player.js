@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styles from "./Player.module.css";
 import "plyr-react/plyr.css";
 import Plyr from "plyr-react";
@@ -7,24 +7,30 @@ import { useAuth } from "./Account/AuthContext";
 import DOMPurify from "dompurify";
 import { CircularProgress } from "@mui/material";
 
+const allowedTo = "admin,ADMIN,subscriber,SUBSCRIBER";
+
 const Player = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
   const [videoDescription, setVideoDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [uploadDate, setUploadDate] = useState("");
+  const [thumbnailName, setThumbnailName] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
-  const { refreshTokens, logout, login } = useAuth();
+  const { refreshTokens, userRole, isAuthenticated, login } = useAuth();
+  const location = useLocation();
 
   if (params.id === ":id") navigate("/films-list");
 
   useEffect(() => {
-    fetchMetadataWithSAS();
+    fetchPlayerData();
   }, []);
-  async function fetchMetadataWithSAS() {
+
+  async function fetchPlayerData() {
     setLoading(true);
     const apiResponse = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/getMetadata?Id=${params.id}`
@@ -40,16 +46,38 @@ const Player = (props) => {
         minute: "2-digit",
       })
     );
-
+    setThumbnailName(blobResponseJson.thumbnailName);
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
-    const sasTokenResponse = await fetchSasToken();
-    setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
+    if (userRole && allowedTo.includes(userRole.toUpperCase())) {
+      const sasTokenResponse = await fetchSasTokenForVideo();
+      setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
+    } else {
+      setThumbnailUrl(
+        `https://${
+          process.env.REACT_APP_STORAGE_ACCOUNT_NAME
+        }.blob.core.windows.net/${
+          process.env.REACT_APP_THUMBNAILS_CONTAINER_NAME
+        }/${
+          blobResponseJson.thumbnailName
+        }?${await fetchSasTokenForThumbnail()}`
+      );
+    }
     setLoading(false);
   }
 
-  async function fetchSasToken(retry = true) {
+  const fetchSasTokenForThumbnail = async () => {
+    const response = await fetch(
+      `https://${
+        process.env.REACT_APP_API_ADDRESS
+      }/api/sas/thumbnail/${params.id.toUpperCase()}.jpg`
+    );
+    const data = await response.json();
+    return data.sasToken;
+  };
+
+  async function fetchSasTokenForVideo(retry = true) {
     try {
       const response = await fetch(
         `https://${
@@ -68,7 +96,7 @@ const Player = (props) => {
         if (refreshResponse == "LoginAgain") {
           navigate("/logout");
         } else {
-          return fetchSasToken(false);
+          return fetchSasTokenForVideo(false);
         }
       } else {
         navigate("/logout");
@@ -80,7 +108,17 @@ const Player = (props) => {
   }
 
   const videoOptions = undefined;
-  const plyrVideo = videoUrl && (
+  const subscribeBox = (
+    <div
+      className={styles.subscribeBox}
+      onClick={() =>
+        isAuthenticated ? navigate("/subscribe") : login(location.pathname)
+      }
+      style={{ backgroundImage: `url(${thumbnailUrl})` }}
+    ></div>
+  );
+
+  const plyrVideo = videoUrl ? (
     <>
       <Plyr
         ref={ref}
@@ -97,6 +135,8 @@ const Player = (props) => {
         options={videoOptions}
       />
     </>
+  ) : (
+    subscribeBox
   );
 
   let content;

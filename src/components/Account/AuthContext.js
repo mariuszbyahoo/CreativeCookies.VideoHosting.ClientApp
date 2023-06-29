@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isUserMenuLoading, setIsUserMenuLoading] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
   const navigate = useNavigate();
 
@@ -62,7 +63,8 @@ export const AuthProvider = ({ children }) => {
         const data = await response.json();
         const decodedToken = jwtDecode(data.access_token);
         const email = decodedToken.email;
-        // extract role from accessToken and then redirect to requested path, or films-list if user hasn't enough permissions.
+        const role = decodedToken.role;
+        setUserRole(role);
         setUserEmail(email);
         setIsAuthenticated(true);
         const stateCookie = Cookies.get(
@@ -130,6 +132,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async (pathToRedirectAfterLogout) => {
     setIsAuthenticated(false);
     setUserEmail("");
+    setUserRole("");
     if (
       pathToRedirectAfterLogout === "undefined" ||
       pathToRedirectAfterLogout === "null"
@@ -175,7 +178,9 @@ export const AuthProvider = ({ children }) => {
         if (response.ok) {
           const data = await response.json();
           const email = data.email;
+          const role = data.userRole;
           setUserEmail(email);
+          setUserRole(role);
           setIsAuthenticated(data.isAuthenticated);
         }
       } catch (error) {
@@ -186,11 +191,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuthentication();
-  }, []);
+  }, [clientId]);
 
   const value = {
     isAuthenticated,
     userEmail,
+    userRole,
     requestAccessToken,
     refreshTokens,
     logout,

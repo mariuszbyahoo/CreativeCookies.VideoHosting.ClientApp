@@ -6,9 +6,9 @@ import Player from "./components/Player";
 import SignInLandingComponent from "./components/Account/SignInLandingComponent";
 import ProtectedComponent from "./components/Routes/ProtectedComponent";
 import AuthErrorComponent from "./components/Account/AuthError";
-import { useAuth } from "./components/Account/AuthContext";
 import FilmEditor from "./components/FilmEditor";
 import LogoutComponent from "./components/Account/LogoutComponent";
+import UsersList from "./components/UsersList";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -20,7 +20,6 @@ function fallbackRender({ error, resetErrorBoundary }) {
   );
 }
 
-const { isAuthenticated } = useAuth;
 const AppRoutes = [
   {
     index: true,
@@ -33,6 +32,22 @@ const AppRoutes = [
         }}
       >
         <Home />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/users-list",
+    protected: true,
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <ProtectedComponent accessFor="ADMIN">
+          <UsersList />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },
@@ -52,7 +67,7 @@ const AppRoutes = [
   },
   {
     path: "/player/:id",
-    protected: true,
+    protected: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -60,9 +75,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent isAuthenticated={isAuthenticated}>
-          <Player />
-        </ProtectedComponent>
+        <Player />
       </ErrorBoundary>
     ),
   },
@@ -76,7 +89,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent isAuthenticated={isAuthenticated}>
+        <ProtectedComponent accessFor="ADMIN">
           <FilmEditor />
         </ProtectedComponent>
       </ErrorBoundary>
@@ -92,8 +105,8 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent isAuthenticated={isAuthenticated}>
-          <FilmUpload mode={0} />
+        <ProtectedComponent accessFor="ADMIN">
+          <FilmUpload />
         </ProtectedComponent>
       </ErrorBoundary>
     ),

@@ -16,7 +16,7 @@ import { useAuth } from "./Account/AuthContext";
 import { CircularProgress } from "@mui/material";
 
 const NavMenu = () => {
-  const { isAuthenticated, userEmail, isUserMenuLoading } = useAuth();
+  const { isAuthenticated, userEmail, userRole, isUserMenuLoading } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
 
   const toggleNavbar = () => {
@@ -55,6 +55,24 @@ const NavMenu = () => {
     }
   };
 
+  const filmUploadComponent = () => {
+    if (userRole === "ADMIN" || userRole === "admin")
+      return (
+        <>
+          <NavItem>
+            <NavLink tag={Link} className="text-dark" to="/films-upload">
+              Film upload
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink tag={Link} className="text-dark" to="/users-list">
+              Users list
+            </NavLink>
+          </NavItem>
+        </>
+      );
+  };
+
   return (
     <header>
       <Navbar
@@ -82,11 +100,7 @@ const NavMenu = () => {
                 Films list
               </NavLink>
             </NavItem>
-            <NavItem>
-              <NavLink tag={Link} className="text-dark" to="/films-upload">
-                Film upload
-              </NavLink>
-            </NavItem>
+            {filmUploadComponent()}
             {accountNav()}
           </ul>
         </Collapse>

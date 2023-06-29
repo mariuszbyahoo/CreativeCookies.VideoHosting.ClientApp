@@ -1,15 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../Account/AuthContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 
-const ProtectedComponent = ({ children }) => {
-  const { isAuthenticated, login } = useAuth();
+/**
+ * Redirects unauthenticated users to login page and those, who do not posses the permissions - to films-list
+ * @param {String} accessFor CommaSeparatedValues, set of roles which has access to this component
+ * @returns
+ */
+const ProtectedComponent = ({ accessFor, children }) => {
+  const { isAuthenticated, login, userRole } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (
+      isAuthenticated &&
+      !accessFor.toUpperCase().includes(userRole.toUpperCase())
+    ) {
+      navigate("/films-list");
+    }
+  }, [isAuthenticated, userRole, accessFor, navigate]);
 
   if (!isAuthenticated) {
-    //HACK TODO: Change this to be redirected towards the film, right after obtaining the Access token.
-    // pass returnUrl to the login function and redirect to it
     login(location.pathname);
     return (
       <div

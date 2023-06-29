@@ -1,6 +1,7 @@
 .videoPlayer {
     text-align: center;
-    margin-top: 1vmax;
+    width: 100%;  
+    height: 80vh; 
 }
 
 .creationDate {
@@ -17,3 +18,10 @@
     text-align: center;
     margin-top: 50vm;
 }
+
+.subscribeBox {
+    width: 100%;  
+    height: 80vh; 
+    background-size: cover;
+    cursor: pointer;
+  }
