@@ -45,7 +45,6 @@ const UsersList = () => {
         return response.json();
       })
       .then((data) => {
-        console.log(`Data received: ${JSON.stringify(data)}`);
         setTotalPages(data.totalPages);
         setUsers(data.users);
       })
@@ -116,6 +115,7 @@ const UsersList = () => {
             <TableRow>
               <TableCell style={{ fontSize: "20px" }}>Email</TableCell>
               <TableCell style={{ fontSize: "20px" }}>Role</TableCell>
+              <TableCell style={{ fontSize: "20px" }}>Is user active</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -125,7 +125,12 @@ const UsersList = () => {
                   <TableCell component="th" scope="row">
                     {user.userEmail}
                   </TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell component="th" scope="row">
+                    {user.role}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {user.isActive ? "yes" : "no"}
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>
