@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { getAuthCookie, isStateValid } from "./authHelper";
+import { CircularProgress } from "@mui/material";
 
 const SignInLandingComponent = () => {
   const { requestAccessToken, login } = useAuth();
@@ -48,7 +49,15 @@ const SignInLandingComponent = () => {
       </>
     );
   } else {
-    content = <h4>Processing Auth...</h4>;
+    content = (
+      <div
+        className="row"
+        style={{ marginLeft: "auto", marginRight: "auto", width: "40%" }}
+      >
+        <h4>Logging in...</h4>
+        <CircularProgress size={300} />
+      </div>
+    );
   }
 
   return <div>{content}</div>;
