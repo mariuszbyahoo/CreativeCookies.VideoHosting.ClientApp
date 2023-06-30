@@ -15,6 +15,8 @@ import {
   TextField,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import { useAuth } from "./Account/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -24,32 +26,44 @@ const UsersList = () => {
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
 
+  const { refreshTokens } = useAuth();
+  const navigate = useNavigate();
+
   const roles = ["Admin", "Subscriber", "NonSubscriber", "any"];
+
+  const fetchUsers = async (retry = true) => {
+    try {
+      let apiResponse = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}&role=${selectedRole}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      if (apiResponse.ok) {
+        let data = await apiResponse.json();
+        setTotalPages(data.totalPages);
+        setUsers(data.users);
+      } else if (apiResponse.status === 401 && retry) {
+        var refreshResponse = await refreshTokens(false);
+        if (refreshResponse == "LoginAgain") {
+          navigate("/logout");
+        } else {
+          return fetchUsers(false);
+        }
+      }
+    } catch (error) {
+      console.log("error happened: ", error);
+      console.log("JSON.stringinfy(error): ", JSON.stringify(error));
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
   }, [page, pageSize]);
-
-  const fetchUsers = () => {
-    fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}&role=${selectedRole}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    )
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setTotalPages(data.totalPages);
-        setUsers(data.users);
-      })
-      .catch((error) => console.error("Error:", error));
-  };
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
@@ -145,10 +159,10 @@ const UsersList = () => {
       >
         Next Page
       </Button>
-      <br />
+      {/* <br />
       <Button variant="contained" color="primary" onClick={handleDownload}>
         Download CSV
-      </Button>
+      </Button> */}
     </>
   );
 };
