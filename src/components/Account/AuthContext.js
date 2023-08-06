@@ -40,7 +40,57 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
+  const [isStripeAccountConnected, setIsStripeAccountConnected] =
+    useState(false);
   const navigate = useNavigate();
+
+  // Check if the user is authenticated on initial render
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      var res = false;
+      try {
+        setIsUserMenuLoading(true);
+        const response = await fetch(
+          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated?clientId=${clientId}`,
+          {
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const email = data.email;
+          const role = data.userRole;
+          setUserEmail(email);
+          setUserRole(role);
+          setIsAuthenticated(data.isAuthenticated);
+          await checkStripeAccountStatus(role);
+        }
+      } catch (error) {
+        console.error("Error checking authentication status: ", error);
+      } finally {
+        setIsUserMenuLoading(false);
+      }
+    };
+
+    checkAuthentication();
+  }, [clientId]);
+
+  const checkStripeAccountStatus = async (role) => {
+    if (role === "admin" || role === "ADMIN") {
+      const paymentAccountResponse = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/api/stripe/IsSetUp`,
+        {
+          credentials: "include",
+        }
+      );
+      if (paymentAccountResponse.ok) {
+        setIsStripeAccountConnected(await paymentAccountResponse.json());
+        if (!isStripeAccountConnected) {
+          window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/stripe/onboarding`;
+        }
+      }
+    }
+  };
 
   const fetchAccessToken = async (
     body,
@@ -71,6 +121,7 @@ export const AuthProvider = ({ children }) => {
           process.env.REACT_APP_STATE_COOKIE_NAME
         );
         let returnPath = "/films-list";
+        await checkStripeAccountStatus(role);
         if (stateCookie) {
           const containsReturnPath = stateCookie.split("|").length > 1;
           if (containsReturnPath) {
@@ -164,35 +215,6 @@ export const AuthProvider = ({ children }) => {
     window.location.href = loginUrl;
   };
 
-  // Check if the user is authenticated on initial render
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        setIsUserMenuLoading(true);
-        const response = await fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated?clientId=${clientId}`,
-          {
-            credentials: "include", // This line ensures cookies are sent with the fetch request
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          const email = data.email;
-          const role = data.userRole;
-          setUserEmail(email);
-          setUserRole(role);
-          setIsAuthenticated(data.isAuthenticated);
-        }
-      } catch (error) {
-        console.error("Error checking authentication status: ", error);
-      } finally {
-        setIsUserMenuLoading(false);
-      }
-    };
-
-    checkAuthentication();
-  }, [clientId]);
-
   const value = {
     isAuthenticated,
     userEmail,
@@ -203,6 +225,8 @@ export const AuthProvider = ({ children }) => {
     generatePkceData,
     login,
     isUserMenuLoading,
+    isStripeAccountConnected,
+    checkStripeAccountStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
