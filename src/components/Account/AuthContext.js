@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
       if (paymentAccountResponse.ok) {
         setIsStripeAccountConnected(await paymentAccountResponse.json());
         if (!isStripeAccountConnected) {
-          window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/stripe/onboarding`;
+          window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/StripeOnboarding`;
         }
       }
     }
