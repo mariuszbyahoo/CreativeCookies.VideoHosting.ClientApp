@@ -84,8 +84,9 @@ export const AuthProvider = ({ children }) => {
         }
       );
       if (paymentAccountResponse.ok) {
-        setIsStripeAccountConnected(await paymentAccountResponse.json());
-        if (!isStripeAccountConnected) {
+        let newState = await paymentAccountResponse.json();
+        setIsStripeAccountConnected(newState);
+        if (!newState) {
           window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/StripeOnboarding`;
         }
       }
@@ -225,7 +226,6 @@ export const AuthProvider = ({ children }) => {
     generatePkceData,
     login,
     isUserMenuLoading,
-    isStripeAccountConnected,
     checkStripeAccountStatus,
   };
 
