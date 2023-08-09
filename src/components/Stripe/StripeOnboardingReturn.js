@@ -22,7 +22,6 @@ const StripeOnboardingReturn = () => {
           credentials: "include",
         }
       );
-      debugger;
       if (response.ok) {
         let booleanResponse = await response.json();
         if (booleanResponse) {
@@ -31,14 +30,12 @@ const StripeOnboardingReturn = () => {
         } else {
           setIsLoading(false);
           setAccountSetUp(false);
-          logout();
         }
       } else if (response.status == 401) {
         login();
       } else {
         setIsLoading(false);
         setAccountSetUp(false);
-        logout();
       }
     };
     verifyAccount();
