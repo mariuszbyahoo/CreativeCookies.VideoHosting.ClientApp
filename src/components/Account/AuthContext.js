@@ -40,8 +40,7 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
-  const [isStripeAccountConnected, setIsStripeAccountConnected] =
-    useState(false);
+  const [StripeAccountStatus, setStripeAccountStatus] = useState(false);
   const navigate = useNavigate();
 
   // Check if the user is authenticated on initial render
@@ -85,7 +84,7 @@ export const AuthProvider = ({ children }) => {
       );
       if (paymentAccountResponse.ok) {
         let newState = await paymentAccountResponse.json();
-        setIsStripeAccountConnected(newState);
+        setStripeAccountStatus(newState);
         if (!newState) {
           window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/StripeOnboarding`;
         }
@@ -227,6 +226,7 @@ export const AuthProvider = ({ children }) => {
     login,
     isUserMenuLoading,
     checkStripeAccountStatus,
+    stripeAccountStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
