@@ -41,6 +41,10 @@ export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
   const [stripeAccountStatus, setStripeAccountStatus] = useState(false);
+  const [
+    stripeAccountVerificationPending,
+    setStripeAccountVerificationPending,
+  ] = useState(false);
   const navigate = useNavigate();
 
   // Check if the user is authenticated on initial render
@@ -75,6 +79,7 @@ export const AuthProvider = ({ children }) => {
   }, [clientId]);
 
   const checkStripeAccountStatus = async (role) => {
+    setStripeAccountVerificationPending(true);
     if (role === "admin" || role === "ADMIN") {
       const paymentAccountResponse = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/api/stripe/IsSetUp`,
@@ -90,6 +95,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
     }
+    setStripeAccountVerificationPending(false);
   };
 
   const fetchAccessToken = async (
@@ -227,6 +233,7 @@ export const AuthProvider = ({ children }) => {
     isUserMenuLoading,
     checkStripeAccountStatus,
     stripeAccountStatus,
+    stripeAccountVerificationPending,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

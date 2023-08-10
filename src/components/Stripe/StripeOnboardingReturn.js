@@ -4,31 +4,22 @@ import { useEffect } from "react";
 import { useAuth } from "../Account/AuthContext";
 
 const StripeOnboardingReturn = () => {
-  const { isAuthenticated, stripeAccountStatus, refreshTokens, login } =
-    useAuth();
+  const {
+    isAuthenticated,
+    stripeAccountStatus,
+    stripeAccountVerificationPending,
+  } = useAuth();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      refreshTokens().then((result) => {
-        if (result === "LoginAgain") {
-          login();
-        }
-      });
-    }
-  }, [isAuthenticated, refreshTokens, login]);
+  let content = (
+    <>
+      <h4>Verifying onboarding status, please wait</h4>
+      <div className={styles.container}>
+        <CircularProgress size={350} />
+      </div>
+    </>
+  );
 
-  let content = <></>;
-
-  if (!isAuthenticated) {
-    content = (
-      <>
-        <h4>Verifying onboarding status, please wait</h4>
-        <div className={styles.container}>
-          <CircularProgress size={350} />
-        </div>
-      </>
-    );
-  } else if (stripeAccountStatus === 2) {
+  if (stripeAccountStatus === 2) {
     content = (
       <>
         <h3>Success</h3>
@@ -51,7 +42,7 @@ const StripeOnboardingReturn = () => {
         </h5>
       </>
     );
-  } else {
+  } else if (stripeAccountStatus === 0 && !stripeAccountVerificationPending) {
     content = (
       <>
         <h3>Something went wrong</h3>
