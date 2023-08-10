@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
-  const [StripeAccountStatus, setStripeAccountStatus] = useState(false);
+  const [stripeAccountStatus, setStripeAccountStatus] = useState(false);
   const navigate = useNavigate();
 
   // Check if the user is authenticated on initial render
