@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
       if (paymentAccountResponse.ok) {
         let newState = await paymentAccountResponse.json();
         setStripeAccountStatus(newState);
-        if (!newState) {
+        if (newState !== 2) {
           window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/StripeOnboarding`;
         }
       }
