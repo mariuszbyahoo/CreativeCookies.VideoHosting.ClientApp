@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
           setUserRole(role);
           setIsAuthenticated(data.isAuthenticated);
           if (role === "admin" || role === "ADMIN") {
-            await delayedCheckStripeAccountStatus();
+            await delayedCheckStripeAccountStatus(true);
           }
         }
       } catch (error) {
@@ -80,8 +80,8 @@ export const AuthProvider = ({ children }) => {
     checkAuthentication();
   }, [clientId]);
 
-  const delayedCheckStripeAccountStatus = async () => {
-    await checkStripeAccountStatus(false);
+  const delayedCheckStripeAccountStatus = async (checkImmediately) => {
+    checkImmediately && (await checkStripeAccountStatus(false));
     setTimeout(async () => {
       await checkStripeAccountStatus(true);
     }, 60000);
@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
           setStripeAccountVerificationPending(false);
           break;
         case 3:
-          usingRecurency && (await delayedCheckStripeAccountStatus());
+          usingRecurency && (await delayedCheckStripeAccountStatus(false));
           break;
         default:
           setStripeAccountVerificationPending(false);
