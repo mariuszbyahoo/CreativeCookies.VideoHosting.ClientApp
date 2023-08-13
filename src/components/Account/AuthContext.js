@@ -66,7 +66,9 @@ export const AuthProvider = ({ children }) => {
           setUserEmail(email);
           setUserRole(role);
           setIsAuthenticated(data.isAuthenticated);
-          await checkStripeAccountStatus(role);
+          if (role === "admin" || role === "ADMIN") {
+            await delayedCheckStripeAccountStatus();
+          }
         }
       } catch (error) {
         console.error("Error checking authentication status: ", error);
@@ -78,21 +80,38 @@ export const AuthProvider = ({ children }) => {
     checkAuthentication();
   }, [clientId]);
 
-  const checkStripeAccountStatus = async (role) => {
+  const delayedCheckStripeAccountStatus = async () => {
+    setTimeout(async () => {
+      await checkStripeAccountStatus();
+    }, 5000);
+  };
+
+  const checkStripeAccountStatus = async () => {
     setStripeAccountVerificationPending(true);
-    if (role === "admin" || role === "ADMIN") {
-      const paymentAccountResponse = await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/stripe/IsSetUp`,
-        {
-          credentials: "include",
-        }
-      );
-      if (paymentAccountResponse.ok) {
-        let newState = await paymentAccountResponse.json();
-        setStripeAccountStatus(newState);
-        if (newState !== 2) {
+
+    const connectAccountResponse = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/stripe/IsSetUp`,
+      {
+        credentials: "include",
+      }
+    );
+    if (connectAccountResponse.ok) {
+      let connectAccountResult = await connectAccountResponse.json();
+      setStripeAccountStatus(connectAccountResult);
+      switch (connectAccountResult.data) {
+        case 0:
+        case 1:
           window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/StripeOnboarding`;
-        }
+          break;
+        case 2:
+          setStripeAccountVerificationPending(false);
+          break;
+        case 3:
+          await delayedCheckStripeAccountStatus();
+          break;
+        default:
+          setStripeAccountVerificationPending(false);
+          throw new Error("API returned invalid key for stripe onboarding");
       }
     }
     setStripeAccountVerificationPending(false);

@@ -10,6 +10,20 @@ const StripeOnboardingReturn = () => {
     stripeAccountVerificationPending,
   } = useAuth();
 
+  // useEffect(() => {
+  //   switch (stripeAccountStatus) {
+  //     case 0:
+  //       break;
+  //     case 1:
+  //       break;
+  //     case 2:
+  //       break;
+  //     case 3:
+  //       break;
+  //   }
+  //   // HACK: TODO - change static one time run to useEffect with array of deps to check for accountStatus.
+  // }, [stripeAccountStatus, stripeAccountVerificationPending]);
+
   let content = (
     <>
       <h4>Verifying onboarding status, please wait</h4>
