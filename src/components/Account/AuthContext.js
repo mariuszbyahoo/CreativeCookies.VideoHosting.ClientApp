@@ -81,12 +81,13 @@ export const AuthProvider = ({ children }) => {
   }, [clientId]);
 
   const delayedCheckStripeAccountStatus = async () => {
+    await checkStripeAccountStatus(false);
     setTimeout(async () => {
-      await checkStripeAccountStatus();
-    }, 5000);
+      await checkStripeAccountStatus(true);
+    }, 60000);
   };
 
-  const checkStripeAccountStatus = async () => {
+  const checkStripeAccountStatus = async (usingRecurency) => {
     setStripeAccountVerificationPending(true);
 
     const connectAccountResponse = await fetch(
@@ -107,7 +108,7 @@ export const AuthProvider = ({ children }) => {
           setStripeAccountVerificationPending(false);
           break;
         case 3:
-          await delayedCheckStripeAccountStatus();
+          usingRecurency && (await delayedCheckStripeAccountStatus());
           break;
         default:
           setStripeAccountVerificationPending(false);
