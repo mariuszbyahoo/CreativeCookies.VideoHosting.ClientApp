@@ -10,20 +10,11 @@ const StripeOnboardingReturn = () => {
     stripeAccountVerificationPending,
   } = useAuth();
 
-  const [content, setContent] = useState(
-    <>
-      <h4>Verifying onboarding status, please wait</h4>
-      <div className={styles.container}>
-        <CircularProgress size={350} />
-      </div>
-    </>
-  );
-
-  useEffect(() => {
+  const determineContent = () => {
     switch (stripeAccountStatus.data) {
       case 0:
         if (!stripeAccountVerificationPending) {
-          setContent(
+          return (
             <>
               <h3>Something went wrong</h3>
               <h5>
@@ -33,12 +24,13 @@ const StripeOnboardingReturn = () => {
             </>
           );
         }
-        break;
+        return defaultContent();
+
       case 1:
-        // keep the default content
-        break;
+        return defaultContent();
+
       case 2:
-        setContent(
+        return (
           <>
             <h3>Success</h3>
             <h5>
@@ -47,9 +39,9 @@ const StripeOnboardingReturn = () => {
             </h5>
           </>
         );
-        break;
+
       case 3:
-        setContent(
+        return (
           <>
             <h4>Verifying onboarding status, please wait</h4>
             <p>
@@ -61,14 +53,22 @@ const StripeOnboardingReturn = () => {
             </div>
           </>
         );
-        break;
-      default:
-        // Keep the default content
-        break;
-    }
-  }, [stripeAccountStatus, stripeAccountVerificationPending]);
 
-  return <div className={styles.container}>{content}</div>;
+      default:
+        return defaultContent();
+    }
+  };
+
+  const defaultContent = () => (
+    <>
+      <h4>Verifying onboarding status, please wait</h4>
+      <div className={styles.container}>
+        <CircularProgress size={350} />
+      </div>
+    </>
+  );
+
+  return <div className={styles.container}>{determineContent()}</div>;
 };
 
 export default StripeOnboardingReturn;
