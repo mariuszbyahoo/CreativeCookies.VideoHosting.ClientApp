@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
-  const [stripeAccountStatus, setStripeAccountStatus] = useState(false);
+  const [stripeAccountStatus, setStripeAccountStatus] = useState({ data: 3 });
   const [
     stripeAccountVerificationPending,
     setStripeAccountVerificationPending,
