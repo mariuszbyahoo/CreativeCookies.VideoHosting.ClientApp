@@ -40,7 +40,83 @@ export const AuthProvider = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("");
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
+  const [stripeAccountStatus, setStripeAccountStatus] = useState(false);
+  const [
+    stripeAccountVerificationPending,
+    setStripeAccountVerificationPending,
+  ] = useState(false);
   const navigate = useNavigate();
+
+  // Check if the user is authenticated on initial render
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      var res = false;
+      try {
+        setIsUserMenuLoading(true);
+        const response = await fetch(
+          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated?clientId=${clientId}`,
+          {
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const email = data.email;
+          const role = data.userRole;
+          setUserEmail(email);
+          setUserRole(role);
+          setIsAuthenticated(data.isAuthenticated);
+          if (role === "admin" || role === "ADMIN") {
+            await delayedCheckStripeAccountStatus();
+          }
+        }
+      } catch (error) {
+        console.error("Error checking authentication status: ", error);
+      } finally {
+        setIsUserMenuLoading(false);
+      }
+    };
+
+    checkAuthentication();
+  }, [clientId]);
+
+  const delayedCheckStripeAccountStatus = async () => {
+    await checkStripeAccountStatus(false);
+    setTimeout(async () => {
+      await checkStripeAccountStatus(true);
+    }, 60000);
+  };
+
+  const checkStripeAccountStatus = async (usingRecurency) => {
+    setStripeAccountVerificationPending(true);
+
+    const connectAccountResponse = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/stripe/IsSetUp`,
+      {
+        credentials: "include",
+      }
+    );
+    if (connectAccountResponse.ok) {
+      let connectAccountResult = await connectAccountResponse.json();
+      setStripeAccountStatus(connectAccountResult);
+      switch (connectAccountResult.data) {
+        case 0:
+        case 1:
+          window.location.href = `https://${process.env.REACT_APP_API_ADDRESS}/Identity/Account/StripeOnboarding`;
+          break;
+        case 2:
+          setStripeAccountVerificationPending(false);
+          break;
+        case 3:
+          usingRecurency && (await delayedCheckStripeAccountStatus());
+          break;
+        default:
+          setStripeAccountVerificationPending(false);
+          throw new Error("API returned invalid key for stripe onboarding");
+      }
+    }
+    setStripeAccountVerificationPending(false);
+  };
 
   const fetchAccessToken = async (
     body,
@@ -71,6 +147,7 @@ export const AuthProvider = ({ children }) => {
           process.env.REACT_APP_STATE_COOKIE_NAME
         );
         let returnPath = "/films-list";
+        await checkStripeAccountStatus(role);
         if (stateCookie) {
           const containsReturnPath = stateCookie.split("|").length > 1;
           if (containsReturnPath) {
@@ -164,35 +241,6 @@ export const AuthProvider = ({ children }) => {
     window.location.href = loginUrl;
   };
 
-  // Check if the user is authenticated on initial render
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        setIsUserMenuLoading(true);
-        const response = await fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated?clientId=${clientId}`,
-          {
-            credentials: "include", // This line ensures cookies are sent with the fetch request
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          const email = data.email;
-          const role = data.userRole;
-          setUserEmail(email);
-          setUserRole(role);
-          setIsAuthenticated(data.isAuthenticated);
-        }
-      } catch (error) {
-        console.error("Error checking authentication status: ", error);
-      } finally {
-        setIsUserMenuLoading(false);
-      }
-    };
-
-    checkAuthentication();
-  }, [clientId]);
-
   const value = {
     isAuthenticated,
     userEmail,
@@ -203,6 +251,9 @@ export const AuthProvider = ({ children }) => {
     generatePkceData,
     login,
     isUserMenuLoading,
+    checkStripeAccountStatus,
+    stripeAccountStatus,
+    stripeAccountVerificationPending,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
