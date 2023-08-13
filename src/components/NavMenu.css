@@ -3,14 +3,32 @@ a.navbar-brand {
     text-align: center;
     word-break: break-all;
   }
-  
-  html {
-    font-size: 14px;
+
+  .nav-item {
+    list-style-type: none;
+    font-weight: 600;
   }
-  @media (min-width: 768px) {
-    html {
-      font-size: 16px;
-    }
+
+  .partners-with{
+    font-weight: 300;
+    font-size: 6 !important;
+    margin-right: "1%";
+  }
+
+  .text-green {
+    color: green;
+  }
+
+  .text-orange {
+    color: darkorange;
+  }
+
+  .text-purple {
+    color: purple;
+  }
+
+  .text-red {
+    color: darkred;
   }
   
   .box-shadow {
