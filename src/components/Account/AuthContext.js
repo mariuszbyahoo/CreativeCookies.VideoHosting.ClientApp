@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     setStripeAccountVerificationPending(true);
 
     const connectAccountResponse = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/stripe/IsSetUp`,
+      `https://${process.env.REACT_APP_API_ADDRESS}/api/stripeAccounts/IsSetUp`,
       {
         credentials: "include",
       }
