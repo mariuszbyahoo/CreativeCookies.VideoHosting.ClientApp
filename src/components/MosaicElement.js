@@ -9,7 +9,7 @@ import { useAuth } from "./Account/AuthContext";
 
 const fetchSasToken = async (id) => {
   const response = await fetch(
-    `https://${process.env.REACT_APP_API_ADDRESS}/api/sas/thumbnail/${id}`
+    `https://${process.env.REACT_APP_API_ADDRESS}/sas/thumbnail/${id}`
   );
   const data = await response.json();
   return data.sasToken;

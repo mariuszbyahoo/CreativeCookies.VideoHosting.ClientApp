@@ -33,7 +33,7 @@ const FilmsList = () => {
     fetchSasToken()
       .then((token) => {
         fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/films?search=${searchTerm}&pageNumber=${pageNumber}&pageSize=24`,
+          `https://${process.env.REACT_APP_API_ADDRESS}/blobs/films?search=${searchTerm}&pageNumber=${pageNumber}&pageSize=24`,
           {
             credentials: "include",
           }
@@ -72,7 +72,7 @@ const FilmsList = () => {
 
   async function fetchSasToken() {
     const response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/SAS/filmsList/`
+      `https://${process.env.REACT_APP_API_ADDRESS}/SAS/filmsList/`
     );
     const data = await response.json();
     return data.sasToken;
@@ -130,7 +130,7 @@ const FilmsList = () => {
 
   const sendDeleteRequest = async (selectedVideoId, retry = true) => {
     var result = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/deleteVideo?Id=${selectedVideoId}`,
+      `https://${process.env.REACT_APP_API_ADDRESS}/blobs/deleteVideo?Id=${selectedVideoId}`,
       {
         method: "DELETE",
         credentials: "include",

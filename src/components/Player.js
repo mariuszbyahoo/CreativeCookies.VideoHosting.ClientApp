@@ -33,7 +33,7 @@ const Player = (props) => {
   async function fetchPlayerData() {
     setLoading(true);
     const apiResponse = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/blobs/getMetadata?Id=${params.id}`
+      `https://${process.env.REACT_APP_API_ADDRESS}/blobs/getMetadata?Id=${params.id}`
     );
 
     const blobResponseJson = await apiResponse.json();
@@ -71,7 +71,7 @@ const Player = (props) => {
     const response = await fetch(
       `https://${
         process.env.REACT_APP_API_ADDRESS
-      }/api/sas/thumbnail/${params.id.toUpperCase()}.jpg`
+      }/sas/thumbnail/${params.id.toUpperCase()}.jpg`
     );
     const data = await response.json();
     return data.sasToken;
@@ -82,7 +82,7 @@ const Player = (props) => {
       const response = await fetch(
         `https://${
           process.env.REACT_APP_API_ADDRESS
-        }/api/sas/film/${params.id.toUpperCase()}.mp4`,
+        }/sas/film/${params.id.toUpperCase()}.mp4`,
         {
           method: "GET",
           credentials: "include",

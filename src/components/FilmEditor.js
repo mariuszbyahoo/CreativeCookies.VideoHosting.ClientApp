@@ -46,7 +46,7 @@ const FilmEditor = (props) => {
   }, [params.id]);
   const getMetadata = async () => {
     const response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/getMetadata?id=${params.id}`,
+      `https://${process.env.REACT_APP_API_ADDRESS}/Blobs/getMetadata?id=${params.id}`,
       {
         credentials: "include",
       }
@@ -83,7 +83,7 @@ const FilmEditor = (props) => {
 
   const sendEditRequest = async (bodyContent, retry = true) => {
     const response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs/editMetadata`,
+      `https://${process.env.REACT_APP_API_ADDRESS}/Blobs/editMetadata`,
       {
         method: "PATCH",
         headers: {
