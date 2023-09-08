@@ -23,19 +23,25 @@ const StripeProductsDashboardComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productResponse = await fetchWithCredentials(
-          `${process.env.REACT_APP_API_ADDRESS}/StripeProducts/GetAll`
+        const lookupResponse = await fetchWithCredentials(
+          `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/HasAnyProduct`
         );
-        const productData = await productResponse.json();
+        const isThereAnyProduct = await lookupResponse.json();
+        if (isThereAnyProduct) {
+          const productResponse = await fetchWithCredentials(
+            `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/FetchSubscriptionPlan`
+          );
+          const productData = await productResponse.json();
+          // HACK: Fix this to be corresponding to the latest API changes
+          const pricesResponse = await fetchWithCredentials(
+            `https://${process.env.REACT_APP_API_ADDRESS}/StripePrices/GetAll`
+          );
+          const pricesData = await pricesResponse.json();
 
-        const pricesResponse = await fetchWithCredentials(
-          `${process.env.REACT_APP_API_ADDRESS}/StripePrices/GetAll`
-        );
-        const pricesData = await pricesResponse.json();
-
-        if (productData.length > 0) {
-          setStripeProduct(productData[0]);
-          setStripePrices(pricesData);
+          if (productData.length > 0) {
+            setStripeProduct(productData[0]);
+            setStripePrices(pricesData);
+          }
         }
       } catch (error) {
         console.error("Error fetching Stripe data:", error);

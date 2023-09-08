@@ -22,13 +22,14 @@ const ProductUpsertForm = (props) => {
 
   const handleSaveProduct = async () => {
     try {
-      await fetchWithCredentials(
+      var res = await fetchWithCredentials(
         `${process.env.REACT_APP_API_ADDRESS}/StripeProducts/UsertSubscriptionPlan`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(props.stripeProduct),
         }
       );
@@ -42,7 +43,7 @@ const ProductUpsertForm = (props) => {
     <>
       <h3>Create subscription plan:</h3>
       <form onSubmit={handleSubmit(handleSaveProduct)}>
-        <p className={styles.container}>
+        <div className={styles.container}>
           <TextField
             label="Name"
             variant="standard"
@@ -59,10 +60,14 @@ const ProductUpsertForm = (props) => {
             minRows={3}
           />
           <br />
-          <IconButton color="primary" aria-label="add new product">
+          <IconButton
+            color="primary"
+            aria-label="add new product"
+            type="submit"
+          >
             <AddCircleOutline style={{ fontSize: "48px" }} />
           </IconButton>
-        </p>
+        </div>
       </form>
     </>
   );
