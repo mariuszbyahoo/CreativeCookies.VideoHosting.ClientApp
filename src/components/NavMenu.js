@@ -69,9 +69,11 @@ const NavMenu = () => {
             </span>
             <NavItem className="no-wrap text-green">
               Stripe <CheckCircleOutlineRounded />
-              <IconButton>
-                <SettingsRounded style={{ color: "black" }} />
-              </IconButton>
+              <Link to="/stripeProductsDashboard">
+                <IconButton>
+                  <SettingsRounded style={{ color: "black" }} />
+                </IconButton>
+              </Link>
             </NavItem>
           </>
         );
@@ -107,6 +109,8 @@ const NavMenu = () => {
         break;
     }
   }, [stripeAccountStatus, stripeAccountVerificationPending]);
+
+  const handleRedirect = () => {};
 
   const toggleNavbar = () => {
     setCollapsed(!collapsed);
