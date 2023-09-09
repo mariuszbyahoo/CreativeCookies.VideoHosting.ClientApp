@@ -52,7 +52,6 @@ const PriceCreationForm = ({
         }
       );
       if (res.ok) {
-        // HACK: fire some trigger to reload prices dashboard
       } else {
         // HACK: do some error handling
       }
@@ -71,27 +70,22 @@ const PriceCreationForm = ({
 
   const getMinAmount = () => {
     if (priceCurrency === "pln") {
-      return 11;
+      return 12;
     } else if (priceCurrency === "eur" || priceCurrency === "usd") {
-      return 3;
+      return 4;
     } else {
-      return 3;
+      return 4;
     }
   };
 
   const priceAmountChangeHandler = (e) => {
-    console.log(JSON.stringify(stripeProduct));
+    clearErrors("priceAmount");
     const value = e.target.value;
-    if (value.length > 0 && (value.includes(",") || value.includes("."))) {
-      console.log("decimal number");
-    } else if (value.length > 0 && value > getMinAmount()) {
-      console.log("full number");
-      setPriceAmount(value);
-    } else {
-      // ignore
-    }
+    const numValue = parseInt(value);
+    setPriceAmount(numValue);
   };
   const priceCurrencyChangeHandler = (e) => {
+    clearErrors("priceAmount");
     const newPriceCurrency = e.target.value;
     setPriceCurrency(newPriceCurrency);
     if (priceAmount) {
@@ -111,7 +105,13 @@ const PriceCreationForm = ({
                 <div className="col-auto">
                   <label htmlFor="amount-input">Amount</label>
                   <Input
-                    {...register("priceAmount")}
+                    {...register("priceAmount", {
+                      required: "Amount is required",
+                      min: {
+                        value: getMinAmount(),
+                        message: `Amount not less than ${getMinAmount()}`,
+                      },
+                    })}
                     id="amount-input"
                     type="number"
                     value={priceAmount}
@@ -121,6 +121,11 @@ const PriceCreationForm = ({
                     step="1"
                     className={styles.formInput}
                   />
+                  {errors.priceAmount && (
+                    <div style={{ color: "#b71c1c" }}>
+                      {errors.priceAmount.message}
+                    </div>
+                  )}
                 </div>
                 <div className="col-auto">
                   <label htmlFor="currency-select">Currency</label>
