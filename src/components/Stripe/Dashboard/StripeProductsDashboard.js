@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Modal,
@@ -43,16 +44,7 @@ const StripeProductsDashboardComponent = () => {
             : undefined;
         if (productData) {
           setStripeProduct(productData);
-          const pricesResponse = await fetchWithCredentials(
-            `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/GetAllPrices?productId=${productData.id}`
-          );
-          const pricesList =
-            pricesResponse.status === 200
-              ? await pricesResponse.json()
-              : undefined;
-          if (pricesList) {
-            setStripePrices(pricesList);
-          }
+          await reloadPrices(productData.id);
         } else {
         }
 
@@ -66,12 +58,35 @@ const StripeProductsDashboardComponent = () => {
     fetchData();
   }, [isProductDialogOpened, isPriceDialogOpened]);
 
+  const reloadPrices = async (productId) => {
+    const pricesResponse = await fetchWithCredentials(
+      `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/GetAllPrices?productId=${productId}`
+    );
+    const pricesList =
+      pricesResponse.status === 200 ? await pricesResponse.json() : undefined;
+    if (pricesList) {
+      setStripePrices(pricesList);
+    }
+  };
+
   const openEditDialog = () => {
     setIsProductDialogOpened(true);
   };
 
   const openPriceDialog = () => {
     setIsPriceDialogOpened(true);
+  };
+
+  const toggleActivation = async (priceId) => {
+    setIsLoading(true);
+    await fetchWithCredentials(
+      `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/TogglePriceState?priceId=${priceId}`,
+      {
+        method: "PUT",
+      }
+    );
+    await reloadPrices(stripeProduct.id);
+    setIsLoading(false);
   };
 
   return (
@@ -100,9 +115,9 @@ const StripeProductsDashboardComponent = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Price ID</TableCell>
-                  <TableCell>Is Active</TableCell>
-                  <TableCell>Unit Amount</TableCell>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>State</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -110,15 +125,27 @@ const StripeProductsDashboardComponent = () => {
                   <TableRow key={price.id}>
                     <TableCell>{price.id}</TableCell>
                     <TableCell>
+                      {`${price.currency.toUpperCase()} ${
+                        price.unitAmount / 100
+                      },-`}
+                    </TableCell>
+                    <TableCell>
                       {price.isActive ? (
-                        <CheckCircleOutline className="text-green" />
+                        <>
+                          <CheckCircleOutline className="text-green" />{" "}
+                          <Button onClick={() => toggleActivation(price.id)}>
+                            Deactivate
+                          </Button>
+                        </>
                       ) : (
-                        <Cancel className="text-red" />
+                        <>
+                          <Cancel className="text-red" />
+                          <Button onClick={() => toggleActivation(price.id)}>
+                            Activate
+                          </Button>
+                        </>
                       )}
                     </TableCell>
-                    <TableCell>{`${price.currency.toUpperCase()} ${
-                      price.unitAmount / 100
-                    },-`}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
