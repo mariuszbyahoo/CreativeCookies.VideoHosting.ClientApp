@@ -10,12 +10,13 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import styles from "./ProductUpsertForm.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ProductUpsertForm = ({
   isDialogOpened,
   setIsDialogOpened,
   isProcessingProduct,
+  stripeProduct,
   setStripeProduct,
 }) => {
   const {
@@ -36,9 +37,16 @@ const ProductUpsertForm = ({
     return fetch(url, { ...options, credentials: "include" });
   };
 
+  useEffect(() => {
+    if (stripeProduct) {
+      setProductName(stripeProduct.name);
+      setProductDesctiption(stripeProduct.description);
+    }
+  }, [stripeProduct]);
+
   const handleSaveProduct = async () => {
     try {
-      const requestBody = {
+      let requestBody = {
         name: productName,
         description: productDescription,
       };
@@ -60,6 +68,7 @@ const ProductUpsertForm = ({
         // HACK: Manage other responses.
       }
       setIsDialogOpened(false);
+      clearErrors();
       setProductDesctiption("");
       setProductName("");
     } catch (error) {
@@ -72,7 +81,13 @@ const ProductUpsertForm = ({
     setIsDialogOpened(false);
   };
 
-  const productNameChangeHandler = (e) => setProductName(e.target.value);
+  const productNameChangeHandler = (e) => {
+    if (e.target.value.length > 5) {
+      clearErrors();
+    }
+
+    setProductName(e.target.value);
+  };
   const productDescriptionChangeHandler = (e) =>
     setProductDesctiption(e.target.value);
 
@@ -87,7 +102,7 @@ const ProductUpsertForm = ({
         <DialogContent>
           <form onSubmit={handleSubmit(handleSaveProduct)}>
             <div className={styles.container}>
-              <label for="title-input">Product title</label>
+              <label htmlFor="title-input">Product title</label>
               <Input
                 {...register("productName", {
                   required: "Product name is required",
@@ -110,7 +125,7 @@ const ProductUpsertForm = ({
               {errors.productName && (
                 <p style={{ color: "#b71c1c" }}>{errors.productName.message}</p>
               )}
-              <label for="text-description">Product description</label>
+              <label htmlFor="text-description">Product description</label>
               <TextField
                 id="text-description"
                 variant="standard"

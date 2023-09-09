@@ -13,13 +13,15 @@ import {
 } from "@mui/material";
 import styles from "./StripeProductsDashboard.module.css";
 import ProductUpsertForm from "./ProductUpsertForm";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { AddCircleOutline } from "@mui/icons-material";
 
 const StripeProductsDashboardComponent = () => {
   const [stripeProduct, setStripeProduct] = useState(null);
   const [stripePrices, setStripePrices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDialogOpened, setIsDialogOpened] = useState(false);
+  const [isPriceDialogOpened, setIsPriceDialogOpened] = useState(false);
+  const [isProductDialogOpened, setIsProductDialogOpened] = useState(false);
 
   const fetchWithCredentials = (url, options) => {
     return fetch(url, { ...options, credentials: "include" });
@@ -53,13 +55,38 @@ const StripeProductsDashboardComponent = () => {
     };
     setIsLoading(true);
     fetchData();
-  }, [isDialogOpened]);
+  }, [isProductDialogOpened]);
+
+  const openEditDialog = () => {
+    setIsProductDialogOpened(true);
+  };
+
+  const openPriceDialog = () => {
+    setIsPriceDialogOpened(true);
+  };
 
   return (
-    <div className={styles.container}>
+    <>
       {stripeProduct ? (
         <div>
-          <h4>Manage prices for: {stripeProduct.name}</h4>
+          <div className="container">
+            <div className="row justify-content-center">
+              <div className="col-auto">
+                <h4>{stripeProduct.name}</h4>
+              </div>
+              <div className="col-auto">
+                <IconButton onClick={openEditDialog}>
+                  <BorderColorIcon className={styles.editButton} />
+                </IconButton>
+              </div>
+            </div>
+          </div>
+          <div className={styles.table}>
+            <IconButton color="primary" onClick={openPriceDialog}>
+              <AddCircleOutline style={{ fontSize: "24px" }} />
+            </IconButton>
+            Add new price
+          </div>
           <Table>
             <TableHead>
               <TableRow>
@@ -80,7 +107,7 @@ const StripeProductsDashboardComponent = () => {
           </Table>
         </div>
       ) : (
-        <>
+        <div className={styles.container}>
           {isLoading ? (
             <h1>Loading...</h1>
           ) : (
@@ -90,28 +117,28 @@ const StripeProductsDashboardComponent = () => {
                 Create your first subscription plan to start monetizing your
                 videos
               </p>
-              {!isDialogOpened && (
+              {!isProductDialogOpened && (
                 <IconButton
                   color="primary"
                   aria-label="add new product"
-                  onClick={() => setIsDialogOpened(true)}
+                  onClick={() => setIsProductDialogOpened(true)}
                 >
                   <AddCircleOutline style={{ fontSize: "48px" }} />
                 </IconButton>
               )}
             </>
           )}
-        </>
+        </div>
       )}
       <ProductUpsertForm
         stripeProduct={stripeProduct}
         setStripeProduct={(data) => {
           setStripeProduct(data);
         }}
-        isDialogOpened={isDialogOpened}
-        setIsDialogOpened={setIsDialogOpened}
+        isDialogOpened={isProductDialogOpened}
+        setIsDialogOpened={setIsProductDialogOpened}
       />
-    </div>
+    </>
   );
 };
 

@@ -2,3 +2,10 @@
     text-align: center;
     margin-top: 3vmax;
 }
+  .editButton {
+    color: orange !important;
+  }
+
+  .table {
+    margin-top: 3vmax;
+  }
