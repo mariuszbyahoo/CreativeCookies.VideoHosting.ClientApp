@@ -73,8 +73,8 @@ const FilmUpload = (props) => {
   // function to get SAS token
   const getSASToken = async (blobName, isVideo, apiAddress) => {
     const fetchUrl = isVideo
-      ? `https://${apiAddress}/api/SAS/film-upload/${blobName}`
-      : `https://${apiAddress}/api/SAS/thumbnail-upload/${blobName}`;
+      ? `https://${apiAddress}/SAS/film-upload/${blobName}`
+      : `https://${apiAddress}/SAS/thumbnail-upload/${blobName}`;
     const response = await fetch(fetchUrl, {
       method: "GET",
       credentials: "include",
@@ -254,7 +254,7 @@ const FilmUpload = (props) => {
     };
 
     const response = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/Blobs`,
+      `https://${process.env.REACT_APP_API_ADDRESS}/Blobs`,
       {
         method: "POST",
         headers: {

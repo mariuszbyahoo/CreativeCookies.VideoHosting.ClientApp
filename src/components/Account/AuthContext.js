@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
       try {
         setIsUserMenuLoading(true);
         const response = await fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/isAuthenticated?clientId=${clientId}`,
+          `https://${process.env.REACT_APP_API_ADDRESS}/auth/isAuthenticated?clientId=${clientId}`,
           {
             credentials: "include",
           }
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     setStripeAccountVerificationPending(true);
 
     const connectAccountResponse = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/api/stripeAccounts/IsSetUp`,
+      `https://${process.env.REACT_APP_API_ADDRESS}/stripeAccounts/IsSetUp`,
       {
         credentials: "include",
       }
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }) => {
   ) => {
     try {
       const response = await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/token`,
+        `https://${process.env.REACT_APP_API_ADDRESS}/auth/token`,
         {
           method: "POST",
           headers: {
@@ -236,7 +236,7 @@ export const AuthProvider = ({ children }) => {
       process.env.REACT_APP_CODE_VERIFIER_COOKIE_NAME,
       codeVerifier
     );
-    const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/api/auth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&state=${encodedState}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
+    const loginUrl = `https://${process.env.REACT_APP_API_ADDRESS}/auth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&state=${encodedState}&code_challenge=${codeChallenge}&code_challenge_method=${codeChallengeMethod}`;
 
     window.location.href = loginUrl;
   };

@@ -34,7 +34,7 @@ const UsersList = () => {
   const fetchUsers = async (retry = true) => {
     try {
       let apiResponse = await fetch(
-        `https://${process.env.REACT_APP_API_ADDRESS}/api/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}&role=${selectedRole}`,
+        `https://${process.env.REACT_APP_API_ADDRESS}/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}&role=${selectedRole}`,
         {
           method: "GET",
           headers: {

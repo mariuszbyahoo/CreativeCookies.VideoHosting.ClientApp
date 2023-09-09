@@ -1,0 +1,9 @@
+.container {
+    text-align: center;
+    margin-top: 3vmax;
+}
+
+.formInput {
+    width: 10vmax;
+    margin: 2%;
+}
