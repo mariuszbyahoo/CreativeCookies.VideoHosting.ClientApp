@@ -15,6 +15,7 @@ import styles from "./StripeProductsDashboard.module.css";
 import ProductUpsertForm from "./ProductUpsertForm";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { AddCircleOutline } from "@mui/icons-material";
+import PriceCreationForm from "./PriceCreationForm";
 
 const StripeProductsDashboardComponent = () => {
   const [stripeProduct, setStripeProduct] = useState(null);
@@ -55,7 +56,7 @@ const StripeProductsDashboardComponent = () => {
     };
     setIsLoading(true);
     fetchData();
-  }, [isProductDialogOpened]);
+  }, [isProductDialogOpened, isPriceDialogOpened]);
 
   const openEditDialog = () => {
     setIsProductDialogOpened(true);
@@ -137,6 +138,11 @@ const StripeProductsDashboardComponent = () => {
         }}
         isDialogOpened={isProductDialogOpened}
         setIsDialogOpened={setIsProductDialogOpened}
+      />
+      <PriceCreationForm
+        isPriceDialogOpened={isPriceDialogOpened}
+        setIsPriceDialogOpened={setIsPriceDialogOpened}
+        stripeProduct={stripeProduct}
       />
     </>
   );

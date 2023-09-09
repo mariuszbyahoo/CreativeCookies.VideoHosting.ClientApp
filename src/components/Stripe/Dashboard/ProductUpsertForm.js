@@ -38,6 +38,7 @@ const ProductUpsertForm = ({
   };
 
   useEffect(() => {
+    clearErrors();
     if (stripeProduct) {
       setProductName(stripeProduct.name);
       setProductDesctiption(stripeProduct.description);
@@ -93,7 +94,7 @@ const ProductUpsertForm = ({
 
   const headerText = isProcessingProduct
     ? "Processing product..."
-    : "Create subscription plan:";
+    : "Subscription plan:";
 
   return (
     <>
@@ -120,7 +121,7 @@ const ProductUpsertForm = ({
                 value={productName}
                 onChange={productNameChangeHandler}
                 color="primary"
-                style={{ width: "25vmax", margin: "2%" }}
+                className={styles.formInput}
               />
               {errors.productName && (
                 <p style={{ color: "#b71c1c" }}>{errors.productName.message}</p>
@@ -131,7 +132,7 @@ const ProductUpsertForm = ({
                 variant="standard"
                 color="primary"
                 multiline
-                style={{ width: "25vmax", margin: "2%" }}
+                className={styles.formInput}
                 minRows={3}
                 value={productDescription}
                 onChange={productDescriptionChangeHandler}
