@@ -14,7 +14,11 @@ import {
 import styles from "./StripeProductsDashboard.module.css";
 import ProductUpsertForm from "./ProductUpsertForm";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
-import { AddCircleOutline } from "@mui/icons-material";
+import {
+  AddCircleOutline,
+  Cancel,
+  CheckCircleOutline,
+} from "@mui/icons-material";
 import PriceCreationForm from "./PriceCreationForm";
 
 const StripeProductsDashboardComponent = () => {
@@ -39,16 +43,20 @@ const StripeProductsDashboardComponent = () => {
             : undefined;
         if (productData) {
           setStripeProduct(productData);
+          const pricesResponse = await fetchWithCredentials(
+            `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/GetAllPrices?productId=${productData.id}`
+          );
+          const pricesList =
+            pricesResponse.status === 200
+              ? await pricesResponse.json()
+              : undefined;
+          if (pricesList) {
+            setStripePrices(pricesList);
+          }
         } else {
         }
-        setIsLoading(false);
-        // HACK: Fix this to be corresponding to the latest API changes
-        // const pricesResponse = await fetchWithCredentials(
-        //   `https://${process.env.REACT_APP_API_ADDRESS}/StripePrices/GetAll`
-        // );
-        // const pricesData = await pricesResponse.json();
 
-        //}
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching Stripe data:", error);
         setIsLoading(false);
@@ -88,24 +96,34 @@ const StripeProductsDashboardComponent = () => {
             </IconButton>
             Add new price
           </div>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Price ID</TableCell>
-                <TableCell>Currency</TableCell>
-                <TableCell>Unit Amount</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {stripePrices.map((price) => (
-                <TableRow key={price.id}>
-                  <TableCell>{price.id}</TableCell>
-                  <TableCell>{price.currency}</TableCell>
-                  <TableCell>{price.unitAmount}</TableCell>
+          {stripePrices && (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Price ID</TableCell>
+                  <TableCell>Is Active</TableCell>
+                  <TableCell>Unit Amount</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {stripePrices.map((price) => (
+                  <TableRow key={price.id}>
+                    <TableCell>{price.id}</TableCell>
+                    <TableCell>
+                      {price.isActive ? (
+                        <CheckCircleOutline className="text-green" />
+                      ) : (
+                        <Cancel className="text-red" />
+                      )}
+                    </TableCell>
+                    <TableCell>{`${price.currency.toUpperCase()} ${
+                      price.unitAmount / 100
+                    },-`}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
       ) : (
         <div className={styles.container}>
