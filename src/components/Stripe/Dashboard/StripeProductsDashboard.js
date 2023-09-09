@@ -25,7 +25,8 @@ import PriceCreationForm from "./PriceCreationForm";
 const StripeProductsDashboardComponent = () => {
   const [stripeProduct, setStripeProduct] = useState(null);
   const [stripePrices, setStripePrices] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(true);
+  const [isLoadingPrice, setIsLoadingPrice] = useState(true);
   const [isPriceDialogOpened, setIsPriceDialogOpened] = useState(false);
   const [isProductDialogOpened, setIsProductDialogOpened] = useState(false);
 
@@ -48,17 +49,18 @@ const StripeProductsDashboardComponent = () => {
         } else {
         }
 
-        setIsLoading(false);
+        setIsLoadingProduct(false);
       } catch (error) {
         console.error("Error fetching Stripe data:", error);
-        setIsLoading(false);
+        setIsLoadingProduct(false);
       }
     };
-    setIsLoading(true);
+    setIsLoadingProduct(true);
     fetchData();
   }, [isProductDialogOpened, isPriceDialogOpened]);
 
   const reloadPrices = async (productId) => {
+    setIsLoadingPrice(true);
     const pricesResponse = await fetchWithCredentials(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/GetAllPrices?productId=${productId}`
     );
@@ -67,6 +69,7 @@ const StripeProductsDashboardComponent = () => {
     if (pricesList) {
       setStripePrices(pricesList);
     }
+    setIsLoadingPrice(false);
   };
 
   const openEditDialog = () => {
@@ -78,7 +81,7 @@ const StripeProductsDashboardComponent = () => {
   };
 
   const toggleActivation = async (priceId) => {
-    setIsLoading(true);
+    setIsLoadingProduct(true);
     await fetchWithCredentials(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/TogglePriceState?priceId=${priceId}`,
       {
@@ -86,7 +89,58 @@ const StripeProductsDashboardComponent = () => {
       }
     );
     await reloadPrices(stripeProduct.id);
-    setIsLoading(false);
+    setIsLoadingProduct(false);
+  };
+
+  const getPricesContent = () => {
+    if (isLoadingPrice)
+      return (
+        <div className={styles.container}>
+          <CircularProgress size={100} />
+        </div>
+      );
+    else if (stripePrices)
+      return (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>State</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {stripePrices.map((price) => (
+              <TableRow key={price.id}>
+                <TableCell>{price.id}</TableCell>
+                <TableCell>
+                  {`${price.currency.toUpperCase()} ${
+                    price.unitAmount / 100
+                  },-`}
+                </TableCell>
+                <TableCell>
+                  {price.isActive ? (
+                    <>
+                      <CheckCircleOutline className="text-green" />{" "}
+                      <Button onClick={() => toggleActivation(price.id)}>
+                        Deactivate
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Cancel className="text-red" />
+                      <Button onClick={() => toggleActivation(price.id)}>
+                        Activate
+                      </Button>
+                    </>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    else return <h4>No prices yet</h4>;
   };
 
   return (
@@ -111,50 +165,11 @@ const StripeProductsDashboardComponent = () => {
             </IconButton>
             Add new price
           </div>
-          {stripePrices && (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>State</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {stripePrices.map((price) => (
-                  <TableRow key={price.id}>
-                    <TableCell>{price.id}</TableCell>
-                    <TableCell>
-                      {`${price.currency.toUpperCase()} ${
-                        price.unitAmount / 100
-                      },-`}
-                    </TableCell>
-                    <TableCell>
-                      {price.isActive ? (
-                        <>
-                          <CheckCircleOutline className="text-green" />{" "}
-                          <Button onClick={() => toggleActivation(price.id)}>
-                            Deactivate
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Cancel className="text-red" />
-                          <Button onClick={() => toggleActivation(price.id)}>
-                            Activate
-                          </Button>
-                        </>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          {getPricesContent()}
         </div>
       ) : (
         <div className={styles.container}>
-          {isLoading ? (
+          {isLoadingProduct ? (
             <h1>Loading...</h1>
           ) : (
             <>
