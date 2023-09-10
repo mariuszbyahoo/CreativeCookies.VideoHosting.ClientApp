@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./Account/AuthContext";
 import DOMPurify from "dompurify";
 import { CircularProgress } from "@mui/material";
-
+import ShopIcon from "@mui/icons-material/Shop";
+import { LockOutlined, LockTwoTone } from "@mui/icons-material";
 const allowedTo = "admin,ADMIN,subscriber,SUBSCRIBER";
 
 const Player = (props) => {
@@ -111,11 +112,27 @@ const Player = (props) => {
   const subscribeBox = (
     <div
       className={styles.subscribeBox}
-      onClick={() =>
-        isAuthenticated ? navigate("/subscribe") : login(location.pathname)
-      }
       style={{ backgroundImage: `url(${thumbnailUrl})` }}
-    ></div>
+    >
+      <div
+        className={styles.overlay}
+        onClick={() =>
+          isAuthenticated ? navigate("/subscribe") : login(location.pathname)
+        }
+      >
+        <div className={styles.overlayText}>
+          {isAuthenticated ? (
+            <>
+              <ShopIcon className={styles.largeIcon} />
+            </>
+          ) : (
+            <>
+              <LockOutlined className={styles.largeIcon} />
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 
   const plyrVideo = videoUrl ? (
