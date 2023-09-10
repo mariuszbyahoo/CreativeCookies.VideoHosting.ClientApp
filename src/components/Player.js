@@ -8,6 +8,9 @@ import DOMPurify from "dompurify";
 import { CircularProgress } from "@mui/material";
 import ShopIcon from "@mui/icons-material/Shop";
 import { LockOutlined, LockTwoTone } from "@mui/icons-material";
+
+// HACK: Move this to some other place, like API call "Is user allowed" or so
+// SECURITY HOLE:
 const allowedTo = "admin,ADMIN,subscriber,SUBSCRIBER";
 
 const Player = (props) => {
@@ -22,7 +25,7 @@ const Player = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
-  const { refreshTokens, userRole, isAuthenticated, login } = useAuth();
+  const { refreshTokens, userRole, isAuthenticated, login } = useAuth(); // Hack: get rid of userRole
   const location = useLocation();
 
   if (params.id === ":id") navigate("/films-list");
@@ -79,6 +82,9 @@ const Player = (props) => {
   };
 
   async function fetchSasTokenForVideo(retry = true) {
+    // HACK Re write this function in order to display icons dependent from API's response
+
+    // HACK For now this function is working like that mostly because of the fact, what in case of stac expiration
     try {
       const response = await fetch(
         `https://${
