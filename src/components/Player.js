@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./Account/AuthContext";
 import DOMPurify from "dompurify";
 import { CircularProgress } from "@mui/material";
-
-const allowedTo = "admin,ADMIN,subscriber,SUBSCRIBER";
+import ShopIcon from "@mui/icons-material/Shop";
+import { LockOutlined, LockTwoTone } from "@mui/icons-material";
 
 const Player = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
@@ -50,7 +50,11 @@ const Player = (props) => {
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
-    if (userRole && allowedTo.includes(userRole.toUpperCase())) {
+    if (
+      userRole &&
+      userRole !== "NONSUBSCRIBER" &&
+      userRole !== "nonsubscriber"
+    ) {
       const sasTokenResponse = await fetchSasTokenForVideo();
       setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
     } else {
@@ -91,7 +95,7 @@ const Player = (props) => {
       if (response.ok) {
         const data = await response.json();
         return data.sasToken;
-      } else if (response.status == "401" && retry) {
+      } else if (response.status == 401 && retry) {
         var refreshResponse = await refreshTokens(false);
         if (refreshResponse == "LoginAgain") {
           navigate("/logout");
@@ -111,13 +115,28 @@ const Player = (props) => {
   const subscribeBox = (
     <div
       className={styles.subscribeBox}
-      onClick={() =>
-        isAuthenticated ? navigate("/subscribe") : login(location.pathname)
-      }
       style={{ backgroundImage: `url(${thumbnailUrl})` }}
-    ></div>
+    >
+      <div
+        className={styles.overlay}
+        onClick={() =>
+          isAuthenticated ? navigate("/subscribe") : login(location.pathname)
+        }
+      >
+        <div className={styles.overlayText}>
+          {isAuthenticated ? (
+            <>
+              <ShopIcon className={styles.largeIcon} />
+            </>
+          ) : (
+            <>
+              <LockOutlined className={styles.largeIcon} />
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
-
   const plyrVideo = videoUrl ? (
     <>
       <Plyr
