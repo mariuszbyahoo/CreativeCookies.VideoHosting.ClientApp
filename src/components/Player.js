@@ -9,10 +9,6 @@ import { CircularProgress } from "@mui/material";
 import ShopIcon from "@mui/icons-material/Shop";
 import { LockOutlined, LockTwoTone } from "@mui/icons-material";
 
-// HACK: Move this to some other place, like API call "Is user allowed" or so
-// SECURITY HOLE:
-const allowedTo = "admin,ADMIN,subscriber,SUBSCRIBER";
-
 const Player = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
   const [videoDescription, setVideoDescription] = useState("");
@@ -25,7 +21,7 @@ const Player = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const ref = useRef(null);
-  const { refreshTokens, userRole, isAuthenticated, login } = useAuth(); // Hack: get rid of userRole
+  const { refreshTokens, userRole, isAuthenticated, login } = useAuth();
   const location = useLocation();
 
   if (params.id === ":id") navigate("/films-list");
@@ -54,7 +50,11 @@ const Player = (props) => {
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
-    if (userRole && allowedTo.includes(userRole.toUpperCase())) {
+    if (
+      userRole &&
+      userRole !== "NONSUBSCRIBER" &&
+      userRole !== "nonsubscriber"
+    ) {
       const sasTokenResponse = await fetchSasTokenForVideo();
       setVideoUrl(`${blobResponseJson.blobUrl}?${sasTokenResponse}`);
     } else {
@@ -82,9 +82,6 @@ const Player = (props) => {
   };
 
   async function fetchSasTokenForVideo(retry = true) {
-    // HACK Re write this function in order to display icons dependent from API's response
-
-    // HACK For now this function is working like that mostly because of the fact, what in case of stac expiration
     try {
       const response = await fetch(
         `https://${
@@ -98,7 +95,7 @@ const Player = (props) => {
       if (response.ok) {
         const data = await response.json();
         return data.sasToken;
-      } else if (response.status == "401" && retry) {
+      } else if (response.status == 401 && retry) {
         var refreshResponse = await refreshTokens(false);
         if (refreshResponse == "LoginAgain") {
           navigate("/logout");
@@ -140,7 +137,6 @@ const Player = (props) => {
       </div>
     </div>
   );
-
   const plyrVideo = videoUrl ? (
     <>
       <Plyr
