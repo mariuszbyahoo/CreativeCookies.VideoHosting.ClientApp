@@ -25,19 +25,19 @@ const SubscribeComponent = () => {
         <h3>Subscribe</h3>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Benefit 1
+          Benefit 1 {/* HACK: Implement editability of those  */}
         </p>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Benefit 2
+          Benefit 2 {/* HACK: Implement editability of those  */}
         </p>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Benefit 3
+          Benefit 3 {/* HACK: Implement editability of those  */}
         </p>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Benefit 4
+          Benefit 4 {/* HACK: Implement editability of those  */}
         </p>
         <p className={styles.container}></p>
         {getActionButton()}
