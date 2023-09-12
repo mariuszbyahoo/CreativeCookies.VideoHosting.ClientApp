@@ -11,6 +11,7 @@ import LogoutComponent from "./components/Account/LogoutComponent";
 import UsersList from "./components/UsersList";
 import StripeOnboardingReturn from "./components/Stripe/StripeOnboardingReturn";
 import StripeProductsDashboardComponent from "./components/Stripe//Dashboard/StripeProductsDashboard";
+import SubscribeComponent from "./components/Stripe/Subscribe/SubscribeComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -34,6 +35,19 @@ const AppRoutes = [
         }}
       >
         <Home />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/subscribe",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <SubscribeComponent />
       </ErrorBoundary>
     ),
   },
