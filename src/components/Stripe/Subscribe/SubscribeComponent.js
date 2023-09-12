@@ -1,4 +1,10 @@
-import { Button } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  FormHelperText,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import { useAuth } from "../../Account/AuthContext";
 import styles from "./SubscribeComponent.module.css";
 import { ArrowForwardIos, HowToReg } from "@mui/icons-material";
@@ -8,6 +14,7 @@ import { useEffect, useState } from "react";
 const SubscribeComponent = () => {
   const { isAuthenticated } = useAuth();
   const [priceList, setPriceList] = useState([]);
+  const [selectedPriceId, setSelectedPriceId] = useState("");
 
   const fetchPriceList = async () => {
     const subscriptionResult = await fetch(
@@ -16,6 +23,13 @@ const SubscribeComponent = () => {
     if (subscriptionResult.ok) {
       const receivedSubscription = await subscriptionResult.json();
       setPriceList(receivedSubscription.prices);
+      const plnIndex = receivedSubscription.prices.findIndex(
+        (price) => price.currency === "pln"
+      );
+
+      if (plnIndex !== -1) {
+        setSelectedPriceId(receivedSubscription.prices[plnIndex].id);
+      }
     }
   };
 
@@ -25,7 +39,7 @@ const SubscribeComponent = () => {
 
   const getActionButton = () => {
     return isAuthenticated ? (
-      <Button variant="outlined">
+      <Button variant="outlined" onClick={handleClick}>
         <ShopIcon /> Subscribe
       </Button>
     ) : (
@@ -33,6 +47,25 @@ const SubscribeComponent = () => {
         <HowToReg /> Register
       </Button>
     );
+  };
+
+  const handleClick = async () => {
+    const requestBody = {
+      priceId: selectedPriceId,
+    };
+    const paymentSessionResult = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/StripeCheckout/CreateSession`,
+      {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+        headers: [["content-type", "application/json"]],
+      }
+    );
+
+    if (paymentSessionResult.ok) {
+      const responseBody = await paymentSessionResult.json();
+      window.location.href = responseBody.destinationUrl;
+    }
   };
 
   return (
@@ -56,13 +89,22 @@ const SubscribeComponent = () => {
           Benefit 4 {/* HACK: Implement editability of those  */}
         </p>
         <div className={styles.container}>
-          {priceList &&
-            priceList.map((price) => (
-              <p key={price.id}>
-                {price.id} | {price.isActive ? "active" : "nonactive"} |{" "}
-                {price.currency} | {price.unitAmount}
-              </p>
-            ))}
+          {priceList && (
+            <FormControl>
+              <Select
+                value={selectedPriceId}
+                onChange={(e) => setSelectedPriceId(e.target.value)}
+              >
+                {priceList.map((price) => (
+                  <MenuItem key={price.id} value={price.id}>
+                    {price.unitAmount / 100},- {price.currency.toUpperCase()}{" "}
+                    per month
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>Select your subscription currency</FormHelperText>
+            </FormControl>
+          )}
         </div>
 
         {getActionButton()}
