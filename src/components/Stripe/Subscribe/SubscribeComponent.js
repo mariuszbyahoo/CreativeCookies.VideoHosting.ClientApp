@@ -3,9 +3,25 @@ import { useAuth } from "../../Account/AuthContext";
 import styles from "./SubscribeComponent.module.css";
 import { ArrowForwardIos, HowToReg } from "@mui/icons-material";
 import ShopIcon from "@mui/icons-material/Shop";
+import { useEffect, useState } from "react";
 
 const SubscribeComponent = () => {
   const { isAuthenticated } = useAuth();
+  const [priceList, setPriceList] = useState([]);
+
+  const fetchPriceList = async () => {
+    const subscriptionResult = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/FetchSubscriptionPlan`
+    );
+    if (subscriptionResult.ok) {
+      const receivedSubscription = await subscriptionResult.json();
+      setPriceList(receivedSubscription.prices);
+    }
+  };
+
+  useEffect(() => {
+    fetchPriceList();
+  }, [isAuthenticated]);
 
   const getActionButton = () => {
     return isAuthenticated ? (
@@ -39,7 +55,16 @@ const SubscribeComponent = () => {
           <ArrowForwardIos />
           Benefit 4 {/* HACK: Implement editability of those  */}
         </p>
-        <p className={styles.container}></p>
+        <div className={styles.container}>
+          {priceList &&
+            priceList.map((price) => (
+              <p key={price.id}>
+                {price.id} | {price.isActive ? "active" : "nonactive"} |{" "}
+                {price.currency} | {price.unitAmount}
+              </p>
+            ))}
+        </div>
+
         {getActionButton()}
       </div>
     </>
