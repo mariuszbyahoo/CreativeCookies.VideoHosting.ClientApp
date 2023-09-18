@@ -74,19 +74,11 @@ const SubscribeComponent = () => {
         <h3>Subscribe</h3>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Benefit 1 {/* HACK: Implement editability of those  */}
+          Get access to all videos
         </p>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Benefit 2 {/* HACK: Implement editability of those  */}
-        </p>
-        <p className={styles.container}>
-          <ArrowForwardIos />
-          Benefit 3 {/* HACK: Implement editability of those  */}
-        </p>
-        <p className={styles.container}>
-          <ArrowForwardIos />
-          Benefit 4 {/* HACK: Implement editability of those  */}
+          Start supporting your favourite creator each month
         </p>
         <div className={styles.container}>
           {priceList && (
