@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   FormControl,
   FormHelperText,
   MenuItem,
@@ -15,8 +16,10 @@ const SubscribeComponent = () => {
   const { isAuthenticated } = useAuth();
   const [priceList, setPriceList] = useState([]);
   const [selectedPriceId, setSelectedPriceId] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchPriceList = async () => {
+    setLoading(true);
     const subscriptionResult = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/FetchSubscriptionPlan`
     );
@@ -31,6 +34,7 @@ const SubscribeComponent = () => {
         setSelectedPriceId(receivedSubscription.prices[plnIndex].id);
       }
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -81,7 +85,11 @@ const SubscribeComponent = () => {
           Start supporting your favourite creator each month
         </p>
         <div className={styles.container}>
-          {priceList && (
+          {loading ? (
+            <>
+              <CircularProgress />
+            </>
+          ) : (
             <FormControl>
               <Select
                 value={selectedPriceId}
