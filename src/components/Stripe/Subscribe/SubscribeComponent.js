@@ -63,6 +63,7 @@ const SubscribeComponent = () => {
         method: "POST",
         body: JSON.stringify(requestBody),
         headers: [["content-type", "application/json"]],
+        credentials: "include",
       }
     );
 
