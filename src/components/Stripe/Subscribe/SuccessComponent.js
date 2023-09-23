@@ -29,10 +29,12 @@ const SuccessComponent = () => {
           }
         );
 
-        if (res.status === 200) {
+        if (res.status == 200) {
           const isPaymentPaid = await res.json();
 
           if (isPaymentPaid) {
+            // refreshTokens are being called to early.
+            // fetch account status and if not yet set to subscriber then simply call recurrently
             await refreshTokens(false);
             setContent(
               <>
@@ -48,6 +50,14 @@ const SuccessComponent = () => {
               </>
             );
           }
+        } else if (res.status == 403) {
+          // use has not been authenticated yet - useAuth working
+          setContent(
+            <>
+              <h4>Processing payment</h4>
+              <CircularProgress />
+            </>
+          );
         } else {
           setContent(
             <>
