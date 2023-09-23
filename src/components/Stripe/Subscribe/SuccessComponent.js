@@ -20,7 +20,7 @@ const SuccessComponent = () => {
   const checkSessionStatus = async () => {
     const queryParams = new URLSearchParams(window.location.search);
     const sessionId = queryParams.get("sessionId");
-    if (isAuthenticated && sessionId) {
+    if (sessionId) {
       try {
         const res = await fetch(
           `https://${process.env.REACT_APP_API_ADDRESS}/StripeCheckout/Status?sessionId=${sessionId}`,
@@ -33,15 +33,33 @@ const SuccessComponent = () => {
           const isPaymentPaid = await res.json();
 
           if (isPaymentPaid) {
-            // refreshTokens are being called to early.
-            // fetch account status and if not yet set to subscriber then simply call recurrently
-            await refreshTokens(false);
-            setContent(
-              <>
-                <h4>Payment succeed</h4>
-                <Link to="../films-list">Explore films</Link>
-              </>
+            // How to NOT to call it twice?
+            const subRes = await fetch(
+              `https://${process.env.REACT_APP_API_ADDRESS}/Users/IsASubscriber`,
+              {
+                credentials: "include",
+              }
             );
+            if (res.status == 200) {
+              const isUserASubscriber = await subRes.json();
+              if (isUserASubscriber) {
+                await refreshTokens(false);
+                setContent(
+                  <>
+                    <h4>Payment succeed</h4>
+                    <Link to="../films-list">Explore films</Link>
+                  </>
+                );
+              } else {
+                setTimeout(() => checkSessionStatus(), 2000);
+                setContent(
+                  <>
+                    <h4>Processing payment</h4>
+                    <CircularProgress />
+                  </>
+                );
+              }
+            }
           } else {
             setContent(
               <>
@@ -51,7 +69,6 @@ const SuccessComponent = () => {
             );
           }
         } else if (res.status == 403) {
-          // use has not been authenticated yet - useAuth working
           setContent(
             <>
               <h4>Processing payment</h4>
