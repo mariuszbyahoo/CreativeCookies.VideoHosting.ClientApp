@@ -48,9 +48,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <ProtectedComponent>
-          <SuccessComponent />
-        </ProtectedComponent>
+        <SuccessComponent />
       </ErrorBoundary>
     ),
   },
