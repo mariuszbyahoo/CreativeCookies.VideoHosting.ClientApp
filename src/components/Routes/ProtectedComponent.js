@@ -14,11 +14,15 @@ const ProtectedComponent = ({ accessFor, children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (
-      isAuthenticated &&
-      !accessFor.toUpperCase().includes(userRole.toUpperCase())
-    ) {
-      navigate("/films-list");
+    if (accessFor) {
+      if (
+        isAuthenticated &&
+        !accessFor.toUpperCase().includes(userRole.toUpperCase())
+      ) {
+        navigate("/films-list");
+      }
+    } else {
+      !isAuthenticated && navigate("films-list");
     }
   }, [isAuthenticated, userRole, accessFor, navigate]);
 

@@ -12,6 +12,8 @@ import UsersList from "./components/UsersList";
 import StripeOnboardingReturn from "./components/Stripe/StripeOnboardingReturn";
 import StripeProductsDashboardComponent from "./components/Stripe//Dashboard/StripeProductsDashboard";
 import SubscribeComponent from "./components/Stripe/Subscribe/SubscribeComponent";
+import SuccessComponent from "./components/Stripe/Subscribe/SuccessComponent";
+import CancelComponent from "./components/Stripe/Subscribe/CancelComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -26,7 +28,6 @@ function fallbackRender({ error, resetErrorBoundary }) {
 const AppRoutes = [
   {
     index: true,
-    protected: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -35,6 +36,34 @@ const AppRoutes = [
         }}
       >
         <Home />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/success",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <SuccessComponent />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/cancel",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <ProtectedComponent>
+          <CancelComponent />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },
@@ -53,7 +82,6 @@ const AppRoutes = [
   },
   {
     path: "/stripeOnboardingReturn",
-    protected: true,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -69,7 +97,6 @@ const AppRoutes = [
   },
   {
     path: "/stripeProductsDashboard",
-    protected: true,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -85,7 +112,6 @@ const AppRoutes = [
   },
   {
     path: "/users-list",
-    protected: true,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -101,7 +127,6 @@ const AppRoutes = [
   },
   {
     path: "/films-list",
-    protected: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -115,7 +140,6 @@ const AppRoutes = [
   },
   {
     path: "/player/:id",
-    protected: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -129,7 +153,6 @@ const AppRoutes = [
   },
   {
     path: "/editor/:id",
-    protected: true,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -145,7 +168,6 @@ const AppRoutes = [
   },
   {
     path: "/films-upload",
-    protected: true,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -161,7 +183,6 @@ const AppRoutes = [
   },
   {
     path: "/logout",
-    protected: true,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
@@ -175,7 +196,6 @@ const AppRoutes = [
   },
   {
     path: "signin-oidc",
-    protected: false,
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}
