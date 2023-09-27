@@ -1,9 +1,11 @@
+import { Link } from "react-router-dom";
+
 const CancelComponent = () => {
-  // this component is just to display message and that's it
   return (
-    <>
-      <h1>Cancel component</h1>
-    </>
+    <div style={{ textAlign: "center", marginBlock: "3vmax" }}>
+      <h4>No payment submitted</h4>
+      <Link to="../films-list">Return to films list</Link>
+    </div>
   );
 };
 
