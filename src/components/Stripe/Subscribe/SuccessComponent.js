@@ -14,7 +14,7 @@ const SuccessComponent = () => {
   );
 
   useEffect(() => {
-    checkSessionStatus();
+    userEmail && checkSessionStatus();
   }, [userEmail]);
 
   const checkSessionStatus = async () => {
