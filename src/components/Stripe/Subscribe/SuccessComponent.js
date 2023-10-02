@@ -33,14 +33,13 @@ const SuccessComponent = () => {
           const isPaymentPaid = await res.json();
 
           if (isPaymentPaid) {
-            // How to NOT to call it twice?
             const subRes = await fetch(
               `https://${process.env.REACT_APP_API_ADDRESS}/Users/IsASubscriber`,
               {
                 credentials: "include",
               }
             );
-            if (res.status == 200) {
+            if (subRes.status == 200) {
               const isUserASubscriber = await subRes.json();
               if (isUserASubscriber) {
                 await refreshTokens(false);
