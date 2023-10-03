@@ -182,9 +182,9 @@ const SubscribeComponent = () => {
             <DialogContentText>
               You are placing an order for subscription, with 14 days cooling
               off period applicable. During this period you will have
-              possibility of your subscription cancellation including full cash
-              refund. Therefore, you'll be granted with the right to use those
-              videos starting from:
+              possibility to cancel an order for the subscription including full
+              cash refund. Therefore, you'll be granted with the right to use
+              those videos starting from:
               <div style={{ fontWeight: 700, textAlign: "center" }}>
                 {getCoolingOffPeriodEnd().toLocaleDateString()}
               </div>
