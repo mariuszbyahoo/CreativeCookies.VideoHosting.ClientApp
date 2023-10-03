@@ -2,6 +2,11 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -22,6 +27,7 @@ const SubscribeComponent = () => {
   const [loading, setLoading] = useState(true);
   const [hasDeclinedCoolingOffPeriod, setHasDeclinedCoolingOffPeriod] =
     useState(false); // EU's 14 days cooling off period
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchPriceList = async () => {
     setLoading(true);
@@ -59,11 +65,18 @@ const SubscribeComponent = () => {
   };
 
   const handleDeclinedCoolingOffPeriodChange = (event) => {
-    console.log(`turning checkbox to : ${event.target.checked}`);
     setHasDeclinedCoolingOffPeriod(event.target.checked);
+  };
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
   };
 
   const handleClick = async () => {
+    if (hasDeclinedCoolingOffPeriod) openCheckoutSession();
+    else toggleModal();
+  };
+
+  const openCheckoutSession = async () => {
     const requestBody = {
       priceId: selectedPriceId,
       hasDeclinedCoolingOffPeriod: hasDeclinedCoolingOffPeriod,
@@ -84,17 +97,29 @@ const SubscribeComponent = () => {
     }
   };
 
+  const getCoolingOffPeriodEnd = () => {
+    const now = new Date();
+
+    const nowUtc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+
+    const futureDate = new Date(nowUtc);
+    futureDate.setDate(nowUtc.getDate() + 15);
+    return futureDate;
+  };
+
   return (
     <>
       <div className={styles.container}>
-        <h3>Subscribe</h3>
+        <div className={styles.header}>Subscribe</div>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Get access to all videos
+          <span className={styles.description}>Get access to all videos</span>
         </p>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Start supporting your favourite creator each month
+          <span className={styles.description}>
+            Start supporting your favourite creator each month
+          </span>
         </p>
         <div className={styles.container}>
           {loading ? (
@@ -150,6 +175,41 @@ const SubscribeComponent = () => {
 
         {getActionButton()}
       </div>
+      {isModalOpen && (
+        <Dialog open={isModalOpen} onClose={toggleModal}>
+          <DialogTitle>Confirmation Required</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              You are placing an order for subscription, with 14 days cooling
+              off period applicable. During this period you will have
+              possibility of your subscription cancellation including full cash
+              refund. Therefore, you'll be granted with the right to use those
+              videos starting from:
+              <div style={{ fontWeight: 700, textAlign: "center" }}>
+                {getCoolingOffPeriodEnd().toLocaleDateString()}
+              </div>
+              For more info visit{" "}
+              <a href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees-returns/index_en.htm">
+                European Union's webiste
+              </a>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={toggleModal} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                toggleModal();
+                openCheckoutSession();
+              }}
+              color="secondary"
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </>
   );
 };
