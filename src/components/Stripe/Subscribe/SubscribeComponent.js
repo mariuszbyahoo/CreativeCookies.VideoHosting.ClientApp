@@ -2,11 +2,6 @@ import {
   Button,
   Checkbox,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -18,7 +13,6 @@ import styles from "./SubscribeComponent.module.css";
 import { ArrowForwardIos, HowToReg } from "@mui/icons-material";
 import ShopIcon from "@mui/icons-material/Shop";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 const SubscribeComponent = () => {
   const { isAuthenticated } = useAuth();
@@ -27,7 +21,6 @@ const SubscribeComponent = () => {
   const [loading, setLoading] = useState(true);
   const [hasDeclinedCoolingOffPeriod, setHasDeclinedCoolingOffPeriod] =
     useState(false); // EU's 14 days cooling off period
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchPriceList = async () => {
     setLoading(true);
@@ -67,13 +60,9 @@ const SubscribeComponent = () => {
   const handleDeclinedCoolingOffPeriodChange = (event) => {
     setHasDeclinedCoolingOffPeriod(event.target.checked);
   };
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
 
   const handleClick = async () => {
-    if (hasDeclinedCoolingOffPeriod) openCheckoutSession();
-    else toggleModal();
+    openCheckoutSession();
   };
 
   const openCheckoutSession = async () => {
@@ -95,16 +84,6 @@ const SubscribeComponent = () => {
       const responseBody = await paymentSessionResult.json();
       window.location.href = responseBody.destinationUrl;
     }
-  };
-
-  const getCoolingOffPeriodEnd = () => {
-    const now = new Date();
-
-    const nowUtc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-
-    const futureDate = new Date(nowUtc);
-    futureDate.setDate(nowUtc.getDate() + 15);
-    return futureDate;
   };
 
   return (
@@ -159,11 +138,10 @@ const SubscribeComponent = () => {
                   }
                   label={
                     <div className={styles.checkboxLabel}>
-                      I want to access videos immediately, and declinine the
-                      right to use{" "}
-                      <a href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees-returns/index_en.htm">
-                        EU's 14 days cooling off period
-                      </a>
+                      I wish to gain access to the ordered services immediately
+                      and I waive my right to withdraw from the contract within
+                      14 days. I am aware that I will no longer be able to
+                      exercise my right to withdraw from the contract.
                     </div>
                   }
                   labelPlacement="bottom"
@@ -175,41 +153,6 @@ const SubscribeComponent = () => {
 
         {getActionButton()}
       </div>
-      {isModalOpen && (
-        <Dialog open={isModalOpen} onClose={toggleModal}>
-          <DialogTitle>Confirmation Required</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              You are placing an order for subscription, with 14 days cooling
-              off period applicable. During this period you will have
-              possibility to cancel an order for the subscription including full
-              cash refund. Therefore, you'll be granted with the right to use
-              those videos starting from:
-              <div style={{ fontWeight: 700, textAlign: "center" }}>
-                {getCoolingOffPeriodEnd().toLocaleDateString()}
-              </div>
-              For more info visit{" "}
-              <a href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees-returns/index_en.htm">
-                European Union's webiste
-              </a>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={toggleModal} color="primary">
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                toggleModal();
-                openCheckoutSession();
-              }}
-              color="secondary"
-            >
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
     </>
   );
 };
