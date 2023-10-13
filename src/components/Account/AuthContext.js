@@ -15,6 +15,7 @@ import {
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import moment from "moment";
 
 const AuthContext = createContext();
 
@@ -39,12 +40,17 @@ export const AuthProvider = ({ children }) => {
   const [isUserMenuLoading, setIsUserMenuLoading] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [isAwaitingForSubscription, setIsAwaitingForSubscription] =
+    useState(false); // HACK use this one inside of NavMenu
   const [clientId, setClientId] = useState(process.env.REACT_APP_CLIENT_ID);
   const [stripeAccountStatus, setStripeAccountStatus] = useState({ data: 3 });
   const [
     stripeAccountVerificationPending,
     setStripeAccountVerificationPending,
   ] = useState(false);
+  const [subscriptionStartDateLocal, setSubscriptionStartDateLocal] =
+    useState("");
+  const [subscriptionEndDateLocal, setSubscriptionEndDateLocal] = useState("");
   const navigate = useNavigate();
 
   // Check if the user is authenticated on initial render
@@ -89,7 +95,6 @@ export const AuthProvider = ({ children }) => {
 
   const checkStripeAccountStatus = async (usingRecurency) => {
     setStripeAccountVerificationPending(true);
-
     const connectAccountResponse = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/stripeAccounts/IsSetUp`,
       {
@@ -147,7 +152,11 @@ export const AuthProvider = ({ children }) => {
           process.env.REACT_APP_STATE_COOKIE_NAME
         );
         let returnPath = "/films-list";
-        await checkStripeAccountStatus(role);
+
+        if (role === "admin" || role === "ADMIN")
+          await checkStripeAccountStatus(role);
+        else await setSubscriptionDates();
+
         if (stateCookie) {
           const containsReturnPath = stateCookie.split("|").length > 1;
           if (containsReturnPath) {
@@ -169,6 +178,41 @@ export const AuthProvider = ({ children }) => {
       console.error(`Error while fetching the AccessToken: ${err}`);
     }
     return "";
+  };
+
+  const setSubscriptionDates = async () => {
+    const response = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/Users/SubscriptionDates`,
+      {
+        credentials: "include",
+      }
+    );
+    if (response.ok) {
+      try {
+        const jsonData = await response.json();
+        const utcBeginning = moment.utc(jsonData.startDateUTC);
+        const utcEnd = moment.utc(jsonData.endDateUTC);
+        console.log(`jsonData: ${jsonData}`);
+        console.log(`jsonData.subscriptionStartDate: ${jsonData.startDateUTC}`);
+        console.log(`jsonData.SubscriptionEndDateUTC: ${jsonData.endDateUTC}`);
+        const utcNow = moment.utc();
+        if (utcBeginning.isAfter(utcNow)) {
+          setIsAwaitingForSubscription(true);
+        } else {
+          setIsAwaitingForSubscription(false);
+        }
+        setSubscriptionStartDateLocal(utcBeginning.local());
+        setSubscriptionEndDateLocal(utcEnd.local());
+      } catch (err) {
+        console.error(err);
+      }
+    } else if (response.code === 201) {
+      console.error("no user found with access token");
+      // no user found
+    } else {
+      console.err("An error occured in AuthContext.setSubscripitonDates()");
+      // some error occured
+    }
   };
 
   const refreshTokens = useCallback(async (logsOut = true) => {
@@ -254,6 +298,9 @@ export const AuthProvider = ({ children }) => {
     checkStripeAccountStatus,
     stripeAccountStatus,
     stripeAccountVerificationPending,
+    isAwaitingForSubscription,
+    subscriptionStartDateLocal,
+    subscriptionEndDateLocal,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -31,22 +31,80 @@ const NavMenu = () => {
     isUserMenuLoading,
     stripeAccountStatus,
     stripeAccountVerificationPending,
+    isAwaitingForSubscription,
+    subscriptionStartDateLocal,
+    subscriptionEndDateLocal,
   } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
-  const [paymentNavContent, setPaymentNavContent] = useState(
-    <>
-      <span style={{ fontWeight: 300, fontSize: 9, marginRight: "1%" }} />
-      <NavItem className="text-purple">
-        Stripe <CircularProgress size={10} />
-      </NavItem>
-    </>
-  );
+  const [paymentNavContent, setPaymentNavContent] = useState(<></>);
+
+  //Hack: this first of all should check the user's role
+  // If user role = admin:
+  // run current switch(stripeAccountStatus.data) block
+  // else setPaymentNavContent with it's role, and if role === nonSubscriber
+  // then add button directing to "subscribe"
+  // else if role === Subscriber
+  // then display role "Subscriber" and display subscription dates
 
   useEffect(() => {
+    debugger;
+    if (userRole === "admin" || userRole === "ADMIN") {
+      handleAdminPaymentNav();
+    } else {
+      if (
+        userRole === "Subscriber" ||
+        userRole === "SUBSCRIBER" ||
+        userRole === "subscriber"
+      ) {
+        handleSubscriberPaymentNav();
+      } else if (
+        userRole === "NonSubscriber" ||
+        userRole === "NONSUBSCRIBER" ||
+        userRole === "nonsubscriber"
+      ) {
+        handleNonSubscriberPaymentNav();
+      } else {
+        setPaymentNavContent(<></>);
+      }
+    }
+  }, [userRole, stripeAccountStatus, stripeAccountVerificationPending]);
+
+  const handleSubscriberPaymentNav = () => {
+    setPaymentNavContent(
+      <>
+        <p>
+          Membership renewal at:{" "}
+          {subscriptionStartDateLocal.format("YYYY-MM-DD HH:mm:ss")}
+        </p>
+      </>
+    );
+  };
+
+  const handleNonSubscriberPaymentNav = () => {
+    if (isAwaitingForSubscription) {
+      setPaymentNavContent(
+        <>
+          <p>Access from: {subscriptionStartDateLocal}</p>
+        </>
+      );
+    } else {
+      setPaymentNavContent(
+        <>
+          <p>Subscribe! - link</p>
+        </>
+      );
+    }
+  };
+
+  const handleAdminPaymentNav = () => {
     switch (stripeAccountStatus.data) {
       case 1:
         setPaymentNavContent(
           <>
+            <span style={{ fontWeight: 300, fontSize: 9, marginRight: "1%" }} />
+            <NavItem className="text-purple">
+              Stripe <CircularProgress size={10} />
+            </NavItem>
             <span style={{ fontWeight: 300, fontSize: 9, marginRight: "1%" }}>
               partners with:
             </span>
@@ -108,18 +166,10 @@ const NavMenu = () => {
         );
         break;
     }
-  }, [stripeAccountStatus, stripeAccountVerificationPending]);
-
-  const handleRedirect = () => {};
+  };
 
   const toggleNavbar = () => {
     setCollapsed(!collapsed);
-  };
-
-  const returnPaymentNav = () => {
-    if (userRole === "ADMIN" || userRole === "admin") {
-      return paymentNavContent;
-    }
   };
 
   const accountNav = () => {
@@ -182,7 +232,7 @@ const NavMenu = () => {
         <NavbarBrand tag={Link} to="/">
           MyHub
         </NavbarBrand>
-        {returnPaymentNav()}
+        {paymentNavContent}
         <NavbarToggler onClick={toggleNavbar} className="mr-2" />
         <Collapse
           className="d-sm-inline-flex flex-sm-row-reverse"

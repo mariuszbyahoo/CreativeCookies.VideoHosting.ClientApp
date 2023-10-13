@@ -27,6 +27,7 @@ const Player = (props) => {
   if (params.id === ":id") navigate("/films-list");
 
   useEffect(() => {
+    // use AuthContext's isAwaitingForSubscripiton
     fetchPlayerData();
   }, []);
 
@@ -50,12 +51,6 @@ const Player = (props) => {
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
-    // HACK: Poniższe należy zmienić na jakiś kod który
-    // rozpozna, jeśli role == nonSubscriber to wyśle
-    // request do API czy oczekuje na subskrypcję,
-    // jeśli tak: to doda ThumbnailUrl
-
-    // przechowaj stan zwracany przez API
 
     if (
       userRole &&
