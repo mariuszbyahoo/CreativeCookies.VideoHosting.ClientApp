@@ -67,7 +67,12 @@ const NavMenu = () => {
         setPaymentNavContent(<></>);
       }
     }
-  }, [userRole, stripeAccountStatus, stripeAccountVerificationPending]);
+  }, [
+    userRole,
+    isAwaitingForSubscription,
+    stripeAccountStatus,
+    stripeAccountVerificationPending,
+  ]);
 
   const handleSubscriberPaymentNav = () => {
     setPaymentNavContent(
@@ -84,7 +89,10 @@ const NavMenu = () => {
     if (isAwaitingForSubscription) {
       setPaymentNavContent(
         <>
-          <p>Access from: {subscriptionStartDateLocal}</p>
+          <p>
+            Membership from:{" "}
+            {subscriptionStartDateLocal.format("YYYY-MM-DD HH:mm:ss")}
+          </p>
         </>
       );
     } else {
