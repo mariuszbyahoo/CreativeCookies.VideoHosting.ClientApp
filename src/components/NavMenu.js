@@ -19,9 +19,11 @@ import {
   ErrorOutlineOutlined,
   HighlightOffRounded,
   HourglassBottomRounded,
+  Info,
   KeyboardArrowDownRounded,
   SettingsRounded,
 } from "@mui/icons-material";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const NavMenu = () => {
   const {
@@ -37,17 +39,10 @@ const NavMenu = () => {
   } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
   const [paymentNavContent, setPaymentNavContent] = useState(<></>);
-
-  //Hack: this first of all should check the user's role
-  // If user role = admin:
-  // run current switch(stripeAccountStatus.data) block
-  // else setPaymentNavContent with it's role, and if role === nonSubscriber
-  // then add button directing to "subscribe"
-  // else if role === Subscriber
-  // then display role "Subscriber" and display subscription dates
+  const [dialogMsg, setDialogMsg] = useState("");
+  const [dialogOpened, setDialogOpened] = useState(false);
 
   useEffect(() => {
-    debugger;
     if (userRole === "admin" || userRole === "ADMIN") {
       handleAdminPaymentNav();
     } else {
@@ -75,30 +70,54 @@ const NavMenu = () => {
   ]);
 
   const handleSubscriberPaymentNav = () => {
-    setPaymentNavContent(
-      <>
-        <p>
-          Membership renewal at:{" "}
-          {subscriptionStartDateLocal.format("YYYY-MM-DD HH:mm:ss")}
-        </p>
-      </>
-    );
+    subscriptionStartDateLocal &&
+      setPaymentNavContent(
+        <>
+          <NavItem className="text-green">
+            Membership renewal at:{" "}
+            {subscriptionStartDateLocal.format("DD.MM.YYYY")}
+          </NavItem>
+        </>
+      );
   };
 
   const handleNonSubscriberPaymentNav = () => {
-    if (isAwaitingForSubscription) {
-      setPaymentNavContent(
+    subscriptionStartDateLocal &&
+      setDialogMsg(
         <>
-          <p>
-            Membership from:{" "}
-            {subscriptionStartDateLocal.format("YYYY-MM-DD HH:mm:ss")}
-          </p>
+          Your subscription will be active from:{" "}
+          {subscriptionStartDateLocal.format("DD.MM.YYYY")}, you can cancel this
+          order at any time and receive a costless refund.
+          <br />
+          For more info, visit:
+          <br />
+          <a
+            href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees-returns/index_en.htm"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            EU's website
+          </a>
         </>
       );
+    if (isAwaitingForSubscription) {
+      subscriptionStartDateLocal &&
+        setPaymentNavContent(
+          <>
+            <NavItem>
+              Awaiting access
+              <IconButton onClick={() => setDialogOpened(true)}>
+                <Info style={{ color: "purple" }} />
+              </IconButton>
+            </NavItem>
+          </>
+        );
     } else {
       setPaymentNavContent(
         <>
-          <p>Subscribe! - link</p>
+          <NavItem className="text-purple">
+            <Link to="/subscribe">Subscribe</Link>
+          </NavItem>
         </>
       );
     }
@@ -109,7 +128,6 @@ const NavMenu = () => {
       case 1:
         setPaymentNavContent(
           <>
-            <span style={{ fontWeight: 300, fontSize: 9, marginRight: "1%" }} />
             <NavItem className="text-purple">
               Stripe <CircularProgress size={10} />
             </NavItem>
@@ -231,39 +249,53 @@ const NavMenu = () => {
   };
 
   return (
-    <header>
-      <Navbar
-        className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3"
-        container
-        light
-      >
-        <NavbarBrand tag={Link} to="/">
-          MyHub
-        </NavbarBrand>
-        {paymentNavContent}
-        <NavbarToggler onClick={toggleNavbar} className="mr-2" />
-        <Collapse
-          className="d-sm-inline-flex flex-sm-row-reverse"
-          isOpen={!collapsed}
-          navbar
+    <>
+      <header>
+        <Navbar
+          className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3"
+          container
+          light
         >
-          <ul className="navbar-nav flex-grow">
-            <NavItem>
-              <NavLink tag={Link} className="text-dark" to="/">
-                Home
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} className="text-dark" to="/films-list">
-                Films list
-              </NavLink>
-            </NavItem>
-            {filmUploadComponent()}
-            {accountNav()}
-          </ul>
-        </Collapse>
-      </Navbar>
-    </header>
+          <NavbarBrand tag={Link} to="/">
+            MyHub
+          </NavbarBrand>
+          {paymentNavContent}
+          <NavbarToggler onClick={toggleNavbar} className="mr-2" />
+          <Collapse
+            className="d-sm-inline-flex flex-sm-row-reverse"
+            isOpen={!collapsed}
+            navbar
+          >
+            <ul className="navbar-nav flex-grow">
+              <NavItem>
+                <NavLink tag={Link} className="text-dark" to="/">
+                  Home
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink tag={Link} className="text-dark" to="/films-list">
+                  Films list
+                </NavLink>
+              </NavItem>
+              {filmUploadComponent()}
+              {accountNav()}
+            </ul>
+          </Collapse>
+        </Navbar>
+      </header>
+      <ConfirmationDialog
+        title="Cooling off period"
+        message={dialogMsg}
+        open={dialogOpened}
+        hasCancelOption={true}
+        onConfirm={() => {
+          window.alert("TODO add cancelation procedure");
+        }}
+        onCancel={() => setDialogOpened(false)}
+        confirmBtnMsg="Cancel order"
+        cancelBtnMsg="Close window"
+      ></ConfirmationDialog>
+    </>
   );
 };
 
