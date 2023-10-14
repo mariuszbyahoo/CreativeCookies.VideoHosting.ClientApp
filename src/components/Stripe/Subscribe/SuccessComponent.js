@@ -66,6 +66,7 @@ const SuccessComponent = ({ usingCoolingOffPeriod }) => {
               }
             }
           } else if (isPaymentPaid && usingCoolingOffPeriod) {
+            await refreshTokens(false);
             setContent(
               <>
                 <h4>Payment succeed</h4>
