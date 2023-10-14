@@ -74,6 +74,8 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(data.isAuthenticated);
           if (role === "admin" || role === "ADMIN") {
             await delayedCheckStripeAccountStatus(true);
+          } else if (role) {
+            await setSubscriptionDates();
           }
         }
       } catch (error) {
@@ -155,7 +157,9 @@ export const AuthProvider = ({ children }) => {
 
         if (role === "admin" || role === "ADMIN")
           await checkStripeAccountStatus(role);
-        else await setSubscriptionDates();
+        else if (role) {
+          await setSubscriptionDates();
+        }
 
         if (stateCookie) {
           const containsReturnPath = stateCookie.split("|").length > 1;

@@ -67,6 +67,7 @@ const NavMenu = () => {
     isAwaitingForSubscription,
     stripeAccountStatus,
     stripeAccountVerificationPending,
+    subscriptionStartDateLocal,
   ]);
 
   const handleSubscriberPaymentNav = () => {
@@ -289,6 +290,7 @@ const NavMenu = () => {
         open={dialogOpened}
         hasCancelOption={true}
         onConfirm={() => {
+          // HACK Add cancelation procedure - call API and refresh token
           window.alert("TODO add cancelation procedure");
         }}
         onCancel={() => setDialogOpened(false)}
