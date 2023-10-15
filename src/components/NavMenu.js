@@ -1,19 +1,30 @@
 import React, { useEffect, useState } from "react";
 import {
   Collapse,
+  Navbar,
   NavbarBrand,
   NavbarToggler,
   NavItem,
   NavLink,
 } from "reactstrap";
-import { Navbar } from "reactstrap";
 import { Link } from "react-router-dom";
 import "./NavMenu.css";
 import LoginComponent from "./Account/Login";
 import RegisterComponent from "./Account/Register";
 import LogoutLinkComponent from "./Account/LogoutLink";
 import { useAuth } from "./Account/AuthContext";
-import { CircularProgress, IconButton, Menu, MenuItem } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import {
   CheckCircleOutlineRounded,
   ErrorOutlineOutlined,
@@ -40,8 +51,14 @@ const NavMenu = () => {
   } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
   const [paymentNavContent, setPaymentNavContent] = useState(<></>);
-  const [dialogMsg, setDialogMsg] = useState("");
-  const [dialogOpened, setDialogOpened] = useState(false);
+  const [confirmationDialogMsg, setDialogMsg] = useState("");
+  const [isConfirmationDialogOpened, setIsConfirmationDialogOpened] =
+    useState(false);
+  const [messageDialogText, setMessageDialogText] = useState("");
+  const [messageDialogTitle, setMessageDialogTitle] = useState("");
+  const [isMessageDialogOpened, setIsMessageDialogOpened] = useState(false);
+  const [messageDialogHasCancelOption, setMessageDialogHasCancelOption] =
+    useState(true);
 
   useEffect(() => {
     if (userRole === "admin" || userRole === "ADMIN") {
@@ -70,6 +87,12 @@ const NavMenu = () => {
     stripeAccountVerificationPending,
     subscriptionStartDateLocal,
   ]);
+
+  const closeMessageDialog = () => {
+    setIsMessageDialogOpened(false);
+    setMessageDialogText("");
+    setMessageDialogTitle("");
+  };
 
   const handleSubscriberPaymentNav = () => {
     subscriptionStartDateLocal &&
@@ -108,7 +131,7 @@ const NavMenu = () => {
           <>
             <NavItem>
               Awaiting access
-              <IconButton onClick={() => setDialogOpened(true)}>
+              <IconButton onClick={() => setIsConfirmationDialogOpened(true)}>
                 <Info style={{ color: "purple" }} />
               </IconButton>
             </NavItem>
@@ -196,7 +219,7 @@ const NavMenu = () => {
     }
   };
 
-  const handleDialogConfirm = async () => {
+  const handleConfirmationDialogConfirm = async () => {
     const res = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/Users/OrderCancellation`,
       {
@@ -204,8 +227,15 @@ const NavMenu = () => {
         method: "POST",
       }
     );
-    if (res) refreshTokens(false);
-    else
+    if (res) {
+      setIsConfirmationDialogOpened(false);
+      await refreshTokens(false);
+      setMessageDialogText(
+        "Refund has been initiated, you should receive your funds within 30 days"
+      );
+      setMessageDialogTitle("Order canceled");
+      setIsMessageDialogOpened(true);
+    } else
       console.error(
         `An error occured while sending request to cancel an order for subscription`
       );
@@ -302,16 +332,27 @@ const NavMenu = () => {
       </header>
       <ConfirmationDialog
         title="Cooling off period"
-        message={dialogMsg}
-        open={dialogOpened}
+        message={confirmationDialogMsg}
+        open={isConfirmationDialogOpened}
         hasCancelOption={true}
         onConfirm={() => {
-          handleDialogConfirm();
+          handleConfirmationDialogConfirm();
         }}
-        onCancel={() => setDialogOpened(false)}
+        onCancel={() => setIsConfirmationDialogOpened(false)}
         confirmBtnMsg="Cancel order"
         cancelBtnMsg="Close window"
       ></ConfirmationDialog>
+      <Dialog open={isMessageDialogOpened} onCancel={closeMessageDialog}>
+        <DialogTitle>{messageDialogTitle}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{messageDialogText}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          {messageDialogHasCancelOption && (
+            <Button onClick={closeMessageDialog}>Close</Button>
+          )}
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

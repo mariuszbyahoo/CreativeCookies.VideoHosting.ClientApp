@@ -196,9 +196,6 @@ export const AuthProvider = ({ children }) => {
         const jsonData = await response.json();
         const utcBeginning = moment.utc(jsonData.startDateUTC);
         const utcEnd = moment.utc(jsonData.endDateUTC);
-        console.log(`jsonData: ${jsonData}`);
-        console.log(`jsonData.subscriptionStartDate: ${jsonData.startDateUTC}`);
-        console.log(`jsonData.SubscriptionEndDateUTC: ${jsonData.endDateUTC}`);
         const utcNow = moment.utc();
         if (utcBeginning.isAfter(utcNow)) {
           setIsAwaitingForSubscription(true);
