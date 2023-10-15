@@ -27,6 +27,7 @@ const Player = (props) => {
   if (params.id === ":id") navigate("/films-list");
 
   useEffect(() => {
+    // use AuthContext's isAwaitingForSubscripiton
     fetchPlayerData();
   }, []);
 
@@ -50,6 +51,7 @@ const Player = (props) => {
     setVideoTitle(blobResponseJson.name);
     const sanitizedHTML = DOMPurify.sanitize(blobResponseJson.description);
     setVideoDescription(sanitizedHTML);
+
     if (
       userRole &&
       userRole !== "NONSUBSCRIBER" &&
@@ -119,8 +121,10 @@ const Player = (props) => {
     >
       <div
         className={styles.overlay}
-        onClick={() =>
-          isAuthenticated ? navigate("/subscribe") : login(location.pathname)
+        onClick={
+          () =>
+            isAuthenticated ? navigate("/subscribe") : login(location.pathname)
+          // W zależności od stanu oczekiwania na subskrypcję należy przekierowywać do /subscribe, do loginu, lub nie robić nic
         }
       >
         <div className={styles.overlayText}>
@@ -129,6 +133,7 @@ const Player = (props) => {
               <ShopIcon className={styles.largeIcon} />
             </>
           ) : (
+            // Tutaj: w zależności od stanu oczekiwania na subskrypcję należy kłódkę lub klepsydrę
             <>
               <LockOutlined className={styles.largeIcon} />
             </>

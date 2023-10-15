@@ -4,7 +4,7 @@ import styles from "./SuccessComponent.module.css";
 import { CircularProgress } from "@mui/material";
 import { Link } from "react-router-dom";
 
-const SuccessComponent = () => {
+const SuccessComponent = ({ usingCoolingOffPeriod }) => {
   const { isAuthenticated, userEmail, refreshTokens } = useAuth();
   const [content, setContent] = useState(
     <>
@@ -32,7 +32,7 @@ const SuccessComponent = () => {
         if (res.status == 200) {
           const isPaymentPaid = await res.json();
 
-          if (isPaymentPaid) {
+          if (isPaymentPaid && !usingCoolingOffPeriod) {
             const subRes = await fetch(
               `https://${process.env.REACT_APP_API_ADDRESS}/Users/IsASubscriber`,
               {
@@ -46,6 +46,12 @@ const SuccessComponent = () => {
                 setContent(
                   <>
                     <h4>Payment succeed</h4>
+                    {usingCoolingOffPeriod && (
+                      <p>
+                        Regarding EU's terms for online transactions, you'll be
+                        granted with access after 14 days.
+                      </p>
+                    )}
                     <Link to="../films-list">Explore films</Link>
                   </>
                 );
@@ -59,6 +65,18 @@ const SuccessComponent = () => {
                 );
               }
             }
+          } else if (isPaymentPaid && usingCoolingOffPeriod) {
+            await refreshTokens(false);
+            setContent(
+              <>
+                <h4>Payment succeed</h4>
+                <p>
+                  Regarding EU's terms for online transactions, you'll be
+                  granted with access after 14 days.
+                </p>
+                <Link to="../films-list">Explore films</Link>
+              </>
+            );
           } else {
             setContent(
               <>

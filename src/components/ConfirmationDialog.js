@@ -13,19 +13,27 @@ const ConfirmationDialog = ({
   onConfirm,
   onCancel,
   hasCancelOption,
-}) => (
-  <Dialog open={open} onClose={onCancel}>
-    <DialogTitle>{title}</DialogTitle>
-    <DialogContent>
-      <DialogContentText>{message}</DialogContentText>
-    </DialogContent>
-    <DialogActions>
-      {hasCancelOption && <Button onClick={onCancel}>Cancel</Button>}
-      <Button onClick={onConfirm} color="secondary">
-        Confirm
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+  confirmBtnMsg,
+  cancelBtnMsg,
+}) => {
+  return (
+    <Dialog open={open} onClose={onCancel}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{message}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        {hasCancelOption && (
+          <Button onClick={onCancel}>
+            {cancelBtnMsg ? cancelBtnMsg : "Cancel"}
+          </Button>
+        )}
+        <Button onClick={onConfirm} color="secondary">
+          {confirmBtnMsg ? confirmBtnMsg : "Confirm"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 export default ConfirmationDialog;
