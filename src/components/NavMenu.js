@@ -36,6 +36,7 @@ const NavMenu = () => {
     isAwaitingForSubscription,
     subscriptionStartDateLocal,
     subscriptionEndDateLocal,
+    refreshTokens,
   } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
   const [paymentNavContent, setPaymentNavContent] = useState(<></>);
@@ -88,7 +89,7 @@ const NavMenu = () => {
         <>
           Your subscription will be active from:{" "}
           {subscriptionStartDateLocal.format("DD.MM.YYYY")}, you can cancel this
-          order at any time and receive a costless refund.
+          order till the above date to receive a costless refund.
           <br />
           For more info, visit:
           <br />
@@ -195,6 +196,21 @@ const NavMenu = () => {
     }
   };
 
+  const handleDialogConfirm = async () => {
+    const res = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/Users/OrderCancellation`,
+      {
+        credentials: "include",
+        method: "POST",
+      }
+    );
+    if (res) refreshTokens(false);
+    else
+      console.error(
+        `An error occured while sending request to cancel an order for subscription`
+      );
+  };
+
   const toggleNavbar = () => {
     setCollapsed(!collapsed);
   };
@@ -290,8 +306,7 @@ const NavMenu = () => {
         open={dialogOpened}
         hasCancelOption={true}
         onConfirm={() => {
-          // HACK Add cancelation procedure - call API and refresh token
-          window.alert("TODO add cancelation procedure");
+          handleDialogConfirm();
         }}
         onCancel={() => setDialogOpened(false)}
         confirmBtnMsg="Cancel order"
