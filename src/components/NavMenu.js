@@ -33,14 +33,147 @@ const NavMenu = () => {
     stripeAccountVerificationPending,
   } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
-  const [paymentNavContent, setPaymentNavContent] = useState(
-    <>
-      <span style={{ fontWeight: 300, fontSize: 9, marginRight: "1%" }} />
-      <NavItem className="text-purple">
-        Stripe <CircularProgress size={10} />
-      </NavItem>
-    </>
-  );
+  const [paymentNavContent, setPaymentNavContent] = useState(<></>);
+  const [coolingOffPeriodCancelDialogMsg, setConfirmationDialogMsg] =
+    useState("");
+  const [
+    isCoolingOffPeriodCancelDialogOpened,
+    setCoolingOffPeriodCancelDialogOpened,
+  ] = useState(false);
+  const [isMembershipDialogOpened, setIsMembershipDialogOpened] =
+    useState(false);
+  const [
+    isCoolingOffPeriodMessageDialogOpened,
+    setIsCoolingOffPeriodMessageDialogOpened,
+  ] = useState(false);
+  const [
+    isSubscriptionCanceledDialogOpened,
+    setIsSubscriptionCanceledDialogOpened,
+  ] = useState(false);
+  const [subscriptionCanceledDialogMessage, setSubscriptionCanceledDialogMsg] =
+    useState("");
+
+  useEffect(() => {
+    if (userRole === "admin" || userRole === "ADMIN") {
+      handleAdminPaymentNav();
+    } else {
+      if (
+        userRole === "Subscriber" ||
+        userRole === "SUBSCRIBER" ||
+        userRole === "subscriber"
+      ) {
+        handleSubscriberPaymentNav();
+      } else if (
+        userRole === "NonSubscriber" ||
+        userRole === "NONSUBSCRIBER" ||
+        userRole === "nonsubscriber"
+      ) {
+        handleNonSubscriberPaymentNav();
+      } else {
+        setPaymentNavContent(<></>);
+      }
+    }
+  }, [
+    userRole,
+    isAwaitingForSubscription,
+    stripeAccountStatus,
+    stripeAccountVerificationPending,
+    subscriptionStartDateLocal,
+  ]);
+
+  const closeSubscriptionCanceledDialog = () => {
+    setIsSubscriptionCanceledDialogOpened(false);
+  };
+
+  const closeCoolingOffPeriodMessageDialog = () => {
+    setIsCoolingOffPeriodMessageDialogOpened(false);
+  };
+
+  const openMembershipDialog = () => {
+    setIsMembershipDialogOpened(true);
+  };
+  const closeMembershipDialog = () => {
+    setIsMembershipDialogOpened(false);
+  };
+
+  const cancelSubscription = async () => {
+    closeMembershipDialog();
+
+    const res = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/Users/CancelSubscription`,
+      {
+        credentials: "include",
+        method: "POST",
+      }
+    );
+    if (res.ok) {
+      setSubscriptionCanceledDialogMsg("Subscription canceled successfully");
+      setIsSubscriptionCanceledDialogOpened(true);
+    } else {
+      setSubscriptionCanceledDialogMsg(
+        "Error occured during your subscription cancelation, please contact administrator"
+      );
+      setIsSubscriptionCanceledDialogOpened(true);
+    }
+  };
+
+  const handleSubscriberPaymentNav = () => {
+    subscriptionStartDateLocal &&
+      setPaymentNavContent(
+        <>
+          <NavItem className="text-green">
+            Premium membership{" "}
+            <IconButton onClick={() => openMembershipDialog()}>
+              <SettingsRounded style={{ color: "black" }} />
+            </IconButton>
+          </NavItem>
+        </>
+      );
+  };
+
+  const handleNonSubscriberPaymentNav = () => {
+    subscriptionStartDateLocal &&
+      setConfirmationDialogMsg(
+        <>
+          Your subscription will be active from:{" "}
+          {subscriptionStartDateLocal.format("DD.MM.YYYY")}, you can cancel this
+          order till the above date to receive a costless refund.
+          <br />
+          For more info, visit:
+          <br />
+          <a
+            href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees-returns/index_en.htm"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            EU's website
+          </a>
+        </>
+      );
+    if (isAwaitingForSubscription) {
+      subscriptionStartDateLocal &&
+        setPaymentNavContent(
+          <>
+            <NavItem>
+              Awaiting access
+              <IconButton
+                onClick={() => setCoolingOffPeriodCancelDialogOpened(true)}
+              >
+                <Info style={{ color: "purple" }} />
+              </IconButton>
+            </NavItem>
+          </>
+        );
+    } else {
+      setPaymentNavContent(
+        <>
+          <NavItem className="text-purple">
+            <Link to="/subscribe">Subscribe</Link>
+          </NavItem>
+        </>
+      );
+    }
+  };
 
   useEffect(() => {
     switch (stripeAccountStatus.data) {
@@ -108,9 +241,25 @@ const NavMenu = () => {
         );
         break;
     }
-  }, [stripeAccountStatus, stripeAccountVerificationPending]);
+  };
 
-  const handleRedirect = () => {};
+  const handleCoolingOffPeriodCancelDialogConfirm = async () => {
+    const res = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/Users/OrderCancellation`,
+      {
+        credentials: "include",
+        method: "POST",
+      }
+    );
+    if (res) {
+      setCoolingOffPeriodCancelDialogOpened(false);
+      await refreshTokens(false);
+      setIsCoolingOffPeriodMessageDialogOpened(true);
+    } else
+      console.error(
+        `An error occured while sending request to cancel an order for subscription`
+      );
+  };
 
   const toggleNavbar = () => {
     setCollapsed(!collapsed);
@@ -173,39 +322,100 @@ const NavMenu = () => {
   };
 
   return (
-    <header>
-      <Navbar
-        className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3"
-        container
-        light
-      >
-        <NavbarBrand tag={Link} to="/">
-          MyHub
-        </NavbarBrand>
-        {returnPaymentNav()}
-        <NavbarToggler onClick={toggleNavbar} className="mr-2" />
-        <Collapse
-          className="d-sm-inline-flex flex-sm-row-reverse"
-          isOpen={!collapsed}
-          navbar
+    <>
+      <header>
+        <Navbar
+          className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3"
+          container
+          light
         >
-          <ul className="navbar-nav flex-grow">
-            <NavItem>
-              <NavLink tag={Link} className="text-dark" to="/">
-                Home
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} className="text-dark" to="/films-list">
-                Films list
-              </NavLink>
-            </NavItem>
-            {filmUploadComponent()}
-            {accountNav()}
-          </ul>
-        </Collapse>
-      </Navbar>
-    </header>
+          <NavbarBrand tag={Link} to="/">
+            MyHub
+          </NavbarBrand>
+          {paymentNavContent}
+          <NavbarToggler onClick={toggleNavbar} className="mr-2" />
+          <Collapse
+            className="d-sm-inline-flex flex-sm-row-reverse"
+            isOpen={!collapsed}
+            navbar
+          >
+            <ul className="navbar-nav flex-grow">
+              <NavItem>
+                <NavLink tag={Link} className="text-dark" to="/">
+                  Home
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink tag={Link} className="text-dark" to="/films-list">
+                  Films list
+                </NavLink>
+              </NavItem>
+              {filmUploadComponent()}
+              {accountNav()}
+            </ul>
+          </Collapse>
+        </Navbar>
+      </header>
+
+      <ConfirmationDialog
+        title="Cooling off period"
+        message={coolingOffPeriodCancelDialogMsg}
+        open={isCoolingOffPeriodCancelDialogOpened}
+        hasCancelOption={true}
+        onConfirm={() => {
+          handleCoolingOffPeriodCancelDialogConfirm();
+        }}
+        onCancel={() => setCoolingOffPeriodCancelDialogOpened(false)}
+        confirmBtnMsg="Cancel order"
+        cancelBtnMsg="Close window"
+      ></ConfirmationDialog>
+
+      <Dialog
+        open={isCoolingOffPeriodMessageDialogOpened}
+        onCancel={closeCoolingOffPeriodMessageDialog}
+      >
+        <DialogTitle>Order canceled</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Refund has been initiated, you should receive your funds within 30
+            days
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCoolingOffPeriodMessageDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={isMembershipDialogOpened} onCancel={closeMembershipDialog}>
+        <DialogTitle>Premium member</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            You are a premium member, invoice period ends at:
+            <br />${subscriptionEndDateLocal.format("DD-MM-YYYY HH:mm")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeMembershipDialog}>Close</Button>
+          <Button onClick={cancelSubscription}>Cancel Subscription</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Next dialog to confirm that subscription cancellation was succesfull */}
+
+      <Dialog
+        open={isSubscriptionCanceledDialogOpened}
+        onCancel={closeSubscriptionCanceledDialog}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {subscriptionCanceledDialogMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeSubscriptionCanceledDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
