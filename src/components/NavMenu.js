@@ -1,27 +1,40 @@
 import React, { useEffect, useState } from "react";
 import {
   Collapse,
+  Navbar,
   NavbarBrand,
   NavbarToggler,
   NavItem,
   NavLink,
 } from "reactstrap";
-import { Navbar } from "reactstrap";
 import { Link } from "react-router-dom";
 import "./NavMenu.css";
 import LoginComponent from "./Account/Login";
 import RegisterComponent from "./Account/Register";
 import LogoutLinkComponent from "./Account/LogoutLink";
 import { useAuth } from "./Account/AuthContext";
-import { CircularProgress, IconButton, Menu, MenuItem } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import {
   CheckCircleOutlineRounded,
   ErrorOutlineOutlined,
   HighlightOffRounded,
   HourglassBottomRounded,
+  Info,
   KeyboardArrowDownRounded,
   SettingsRounded,
 } from "@mui/icons-material";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const NavMenu = () => {
   const {
@@ -31,6 +44,10 @@ const NavMenu = () => {
     isUserMenuLoading,
     stripeAccountStatus,
     stripeAccountVerificationPending,
+    isAwaitingForSubscription,
+    subscriptionStartDateLocal,
+    subscriptionEndDateLocal,
+    refreshTokens,
   } = useAuth();
   const [collapsed, setCollapsed] = useState(true);
   const [paymentNavContent, setPaymentNavContent] = useState(<></>);
@@ -175,11 +192,14 @@ const NavMenu = () => {
     }
   };
 
-  useEffect(() => {
+  const handleAdminPaymentNav = () => {
     switch (stripeAccountStatus.data) {
       case 1:
         setPaymentNavContent(
           <>
+            <NavItem className="text-purple">
+              Stripe <CircularProgress size={10} />
+            </NavItem>
             <span style={{ fontWeight: 300, fontSize: 9, marginRight: "1%" }}>
               partners with:
             </span>
@@ -263,12 +283,6 @@ const NavMenu = () => {
 
   const toggleNavbar = () => {
     setCollapsed(!collapsed);
-  };
-
-  const returnPaymentNav = () => {
-    if (userRole === "ADMIN" || userRole === "admin") {
-      return paymentNavContent;
-    }
   };
 
   const accountNav = () => {

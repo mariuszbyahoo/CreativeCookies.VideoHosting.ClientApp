@@ -1,7 +1,9 @@
 import {
   Button,
+  Checkbox,
   CircularProgress,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   MenuItem,
   Select,
@@ -17,6 +19,8 @@ const SubscribeComponent = () => {
   const [priceList, setPriceList] = useState([]);
   const [selectedPriceId, setSelectedPriceId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [hasDeclinedCoolingOffPeriod, setHasDeclinedCoolingOffPeriod] =
+    useState(false); // EU's 14 days cooling off period
 
   const fetchPriceList = async () => {
     setLoading(true);
@@ -53,9 +57,18 @@ const SubscribeComponent = () => {
     );
   };
 
+  const handleDeclinedCoolingOffPeriodChange = (event) => {
+    setHasDeclinedCoolingOffPeriod(event.target.checked);
+  };
+
   const handleClick = async () => {
+    openCheckoutSession();
+  };
+
+  const openCheckoutSession = async () => {
     const requestBody = {
       priceId: selectedPriceId,
+      hasDeclinedCoolingOffPeriod: hasDeclinedCoolingOffPeriod,
     };
     const paymentSessionResult = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeCheckout/CreateSession`,
@@ -76,14 +89,16 @@ const SubscribeComponent = () => {
   return (
     <>
       <div className={styles.container}>
-        <h3>Subscribe</h3>
+        <div className={styles.header}>Subscribe</div>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Get access to all videos
+          <span className={styles.description}>Get access to all videos</span>
         </p>
         <p className={styles.container}>
           <ArrowForwardIos />
-          Start supporting your favourite creator each month
+          <span className={styles.description}>
+            Start supporting your favourite creator each month
+          </span>
         </p>
         <div className={styles.container}>
           {loading ? (
@@ -91,20 +106,48 @@ const SubscribeComponent = () => {
               <CircularProgress />
             </>
           ) : (
-            <FormControl>
-              <Select
-                value={selectedPriceId}
-                onChange={(e) => setSelectedPriceId(e.target.value)}
-              >
-                {priceList.map((price) => (
-                  <MenuItem key={price.id} value={price.id}>
-                    {price.unitAmount / 100},- {price.currency.toUpperCase()}{" "}
-                    per month
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>Select your subscription currency</FormHelperText>
-            </FormControl>
+            <>
+              <div className={styles.container}>
+                <FormControl>
+                  <Select
+                    value={selectedPriceId}
+                    onChange={(e) => setSelectedPriceId(e.target.value)}
+                  >
+                    {priceList.map((price) => (
+                      <MenuItem key={price.id} value={price.id}>
+                        {price.unitAmount / 100},-{" "}
+                        {price.currency.toUpperCase()} per month
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>
+                    Select your subscription currency
+                  </FormHelperText>
+                </FormControl>
+              </div>
+              <div className={styles.container}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={hasDeclinedCoolingOffPeriod}
+                      onChange={handleDeclinedCoolingOffPeriodChange}
+                      name="hasDeclinedCoolingOffPeriod"
+                      inputProps={{ "aria-label": "controlled" }}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <div className={styles.checkboxLabel}>
+                      I wish to gain access to the ordered services immediately
+                      and I waive my right to withdraw from the contract within
+                      14 days. I am aware that I will no longer be able to
+                      exercise my right to withdraw from the contract.
+                    </div>
+                  }
+                  labelPlacement="bottom"
+                />
+              </div>
+            </>
           )}
         </div>
 

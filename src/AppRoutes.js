@@ -48,7 +48,20 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <SuccessComponent />
+        <SuccessComponent usingCoolingOffPeriod={false} />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/ordersuccess",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <SuccessComponent usingCoolingOffPeriod={true} />
       </ErrorBoundary>
     ),
   },
