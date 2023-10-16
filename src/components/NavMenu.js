@@ -117,7 +117,7 @@ const NavMenu = () => {
     closeMembershipDialog();
 
     const res = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/Users/CancelSubscription`,
+      `https://${process.env.REACT_APP_API_ADDRESS}/Users/SubscriptionCancellation`,
       {
         credentials: "include",
         method: "POST",
@@ -405,7 +405,10 @@ const NavMenu = () => {
         <DialogContent>
           <DialogContentText>
             You are a premium member, invoice period ends at:
-            <br />${subscriptionEndDateLocal.format("DD-MM-YYYY HH:mm")}
+            <br />
+            {subscriptionEndDateLocal
+              ? subscriptionEndDateLocal.format("DD-MM-YYYY HH:mm")
+              : "N/A"}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
