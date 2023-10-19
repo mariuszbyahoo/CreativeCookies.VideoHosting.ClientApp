@@ -69,6 +69,10 @@ const NavMenu = () => {
   ] = useState(false);
   const [subscriptionCanceledDialogMessage, setSubscriptionCanceledDialogMsg] =
     useState("");
+  const [
+    isSubscriptionAlreadyCanceledDialogOpened,
+    setIsSubscriptionAlreadyCanceledDialogOpened,
+  ] = useState(false);
 
   useEffect(() => {
     if (userRole === "admin" || userRole === "ADMIN") {
@@ -115,22 +119,27 @@ const NavMenu = () => {
 
   const cancelSubscription = async () => {
     closeMembershipDialog();
-
-    const res = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/Users/SubscriptionCancellation`,
-      {
-        credentials: "include",
-        method: "POST",
-      }
-    );
-    if (res.ok) {
-      setSubscriptionCanceledDialogMsg("Subscription canceled successfully");
-      setIsSubscriptionCanceledDialogOpened(true);
-    } else {
-      setSubscriptionCanceledDialogMsg(
-        "Error occured during your subscription cancelation, please contact administrator"
+    try {
+      const res = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/Users/SubscriptionCancellation`,
+        {
+          credentials: "include",
+          method: "POST",
+        }
       );
-      setIsSubscriptionCanceledDialogOpened(true);
+      if (res.ok) {
+        setSubscriptionCanceledDialogMsg("Subscription canceled successfully");
+        setIsSubscriptionCanceledDialogOpened(true);
+      } else if (res.status === 402) {
+        setIsSubscriptionAlreadyCanceledDialogOpened(true);
+      } else {
+        setSubscriptionCanceledDialogMsg(
+          "Error occured during your subscription cancelation, please contact administrator"
+        );
+        setIsSubscriptionCanceledDialogOpened(true);
+      }
+    } catch (error) {
+      console.error("An error occured, please investigate");
     }
   };
 
@@ -397,6 +406,26 @@ const NavMenu = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeCoolingOffPeriodMessageDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={isSubscriptionAlreadyCanceledDialogOpened}
+        onCancel={() => setIsSubscriptionAlreadyCanceledDialogOpened(false)}
+      >
+        <DialogTitle>Subscription already canceled</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Your subscription has been already canceled, your card won't be
+            charged again.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setIsSubscriptionAlreadyCanceledDialogOpened(false)}
+          >
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
 
