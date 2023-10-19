@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { Card } from "reactstrap";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { Button } from "@mui/material";
-import styles from "./Home.module.css";
-import { useAuth } from "./Account/AuthContext";
+import styles from "./AboutComponent.module.css";
+import { useAuth } from "../Account/AuthContext";
 
-const Home = () => {
+const AboutComponent = () => {
   const { userRole, isAuthenticated } = useAuth();
 
   const editButton = () => {
@@ -43,4 +43,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default AboutComponent;

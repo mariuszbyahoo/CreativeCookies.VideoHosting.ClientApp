@@ -13,7 +13,7 @@ import StripeProductsDashboardComponent from "./components/Stripe//Dashboard/Str
 import SubscribeComponent from "./components/Stripe/Subscribe/SubscribeComponent";
 import SuccessComponent from "./components/Stripe/Subscribe/SuccessComponent";
 import CancelComponent from "./components/Stripe/Subscribe/CancelComponent";
-import Home from "./components/Home";
+import AboutComponent from "./components/About/AboutComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -35,7 +35,7 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <Home />
+        <AboutComponent />
       </ErrorBoundary>
     ),
   },
