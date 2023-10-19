@@ -433,7 +433,7 @@ const NavMenu = () => {
         <DialogTitle>Premium member</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You are a premium member, invoice period ends at:
+            You are a premium member, billing period lasts till:
             <br />
             {subscriptionEndDateLocal
               ? subscriptionEndDateLocal.format("DD-MM-YYYY HH:mm")

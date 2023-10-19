@@ -21,6 +21,7 @@ const SubscribeComponent = () => {
   const [loading, setLoading] = useState(true);
   const [hasDeclinedCoolingOffPeriod, setHasDeclinedCoolingOffPeriod] =
     useState(false); // EU's 14 days cooling off period
+  const [isDialogOpened, setIsDialogOpened] = useState(false);
 
   const fetchPriceList = async () => {
     setLoading(true);
@@ -83,7 +84,15 @@ const SubscribeComponent = () => {
     if (paymentSessionResult.ok) {
       const responseBody = await paymentSessionResult.json();
       window.location.href = responseBody.destinationUrl;
+    } else if (paymentSessionResult.status === 409) {
+      setIsDialogOpened(true);
+    } else {
+      console.error("An unexpected error occured");
     }
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpened(false);
   };
 
   return (
@@ -153,6 +162,20 @@ const SubscribeComponent = () => {
 
         {getActionButton()}
       </div>
+      <Dialog open={isDialogOpened} onCancel={closeDialog}>
+        <DialogTitle>Payment unavailable</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            You have ongoing subscription or you're within 14 days cooling off
+            period for the subscription ordered. If you want order a new
+            subscription you have to cancel this order or just await for the
+            current billing period to pass.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
