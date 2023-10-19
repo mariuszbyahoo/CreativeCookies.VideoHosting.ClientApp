@@ -2,6 +2,11 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -21,6 +26,12 @@ const SubscribeComponent = () => {
   const [loading, setLoading] = useState(true);
   const [hasDeclinedCoolingOffPeriod, setHasDeclinedCoolingOffPeriod] =
     useState(false); // EU's 14 days cooling off period
+  const [
+    isSubscriptionActiveDialogOpened,
+    setIsSubscriptionActiveDialogOpened,
+  ] = useState(false);
+  const [isOrderActiveDialogOpened, setIsOrderActiveDialogOpened] =
+    useState(false);
 
   const fetchPriceList = async () => {
     setLoading(true);
@@ -83,7 +94,21 @@ const SubscribeComponent = () => {
     if (paymentSessionResult.ok) {
       const responseBody = await paymentSessionResult.json();
       window.location.href = responseBody.destinationUrl;
+    } else if (paymentSessionResult.status === 409) {
+      setIsSubscriptionActiveDialogOpened(true);
+    } else if (paymentSessionResult.status === 423) {
+      setIsOrderActiveDialogOpened(true);
+    } else {
+      console.error("An unexpected error occured");
     }
+  };
+
+  const closeSubscriptionActiveDialog = () => {
+    setIsSubscriptionActiveDialogOpened(false);
+  };
+
+  const closeOrderActiveDialog = () => {
+    setIsOrderActiveDialogOpened(false);
   };
 
   return (
@@ -153,6 +178,39 @@ const SubscribeComponent = () => {
 
         {getActionButton()}
       </div>
+      <Dialog
+        open={isSubscriptionActiveDialogOpened}
+        onCancel={closeSubscriptionActiveDialog}
+      >
+        <DialogTitle>Membership active</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Currently you have active membership. First, you've got to cancel
+            the current subscription or if you already done it - then await for
+            the current billing period to pass.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeSubscriptionActiveDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={isOrderActiveDialogOpened}
+        onCancel={closeOrderActiveDialog}
+      >
+        <DialogTitle>Within cooling off period</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Currently you are within cooling off period of your last order for
+            the future subscription, if you want to change your order terms,
+            then you would have to cancel the previous order, and after that
+            you'll be free to add a new order for membership.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeOrderActiveDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
