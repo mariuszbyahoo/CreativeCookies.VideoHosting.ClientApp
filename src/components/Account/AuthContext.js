@@ -211,7 +211,7 @@ export const AuthProvider = ({ children }) => {
       console.error("no user found with access token");
       // no user found
     } else {
-      console.err("An error occured in AuthContext.setSubscripitonDates()");
+      console.error("An error occured in AuthContext.setSubscripitonDates()");
       // some error occured
     }
   };

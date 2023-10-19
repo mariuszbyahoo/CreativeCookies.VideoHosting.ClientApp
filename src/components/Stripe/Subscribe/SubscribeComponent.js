@@ -2,6 +2,11 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -166,10 +171,11 @@ const SubscribeComponent = () => {
         <DialogTitle>Payment unavailable</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You have ongoing subscription or you're within 14 days cooling off
-            period for the subscription ordered. If you want order a new
-            subscription you have to cancel this order or just await for the
-            current billing period to pass.
+            Currently you have active subscription or there's an order for
+            subscription scheduled. If you have an active subscription, then
+            cancel the current subscription, and wait for the billing period to
+            pass. If you had ordered a subscription which will be started in the
+            future, you have to cancel this order first.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
