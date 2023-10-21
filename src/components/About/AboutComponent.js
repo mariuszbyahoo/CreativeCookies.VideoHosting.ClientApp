@@ -22,7 +22,6 @@ const AboutComponent = () => {
       setAboutContent(sanitizedHTML);
     }
     fetchAboutData();
-    debugger;
   }, []);
 
   const editButton = () => {
@@ -61,12 +60,11 @@ const AboutComponent = () => {
             />
           ) : (
             <>
-              <h1>
-                Here's the homepage, a place to insert various stuff inside
-              </h1>
-              <h4 style={{ textAlign: "center" }}>
-                Click <Link to="/films-list">Here</Link> to explore all films
-              </h4>
+              <h4>Here's the about page,</h4>
+              <h7 style={{ textAlign: "center" }}>
+                Login using admin account to add here some brief explanation of
+                your content for new viewers.
+              </h7>
             </>
           )}
         </div>
