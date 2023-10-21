@@ -1,7 +1,6 @@
 import { ErrorBoundary } from "react-error-boundary";
 import FilmsList from "./components/FilmsList";
 import FilmUpload from "./components/FilmUpload";
-import { Home } from "./components/Home";
 import Player from "./components/Player";
 import SignInLandingComponent from "./components/Account/SignInLandingComponent";
 import ProtectedComponent from "./components/Routes/ProtectedComponent";
@@ -14,6 +13,8 @@ import StripeProductsDashboardComponent from "./components/Stripe//Dashboard/Str
 import SubscribeComponent from "./components/Stripe/Subscribe/SubscribeComponent";
 import SuccessComponent from "./components/Stripe/Subscribe/SuccessComponent";
 import CancelComponent from "./components/Stripe/Subscribe/CancelComponent";
+import AboutComponent from "./components/About/AboutComponent";
+import AboutEditorComponent from "./components/About/AboutEditorComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   // Call resetErrorBoundary() to reset the error boundary and retry the render.
@@ -35,7 +36,20 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <Home />
+        <AboutComponent />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/aboutEditor",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <AboutEditorComponent />
       </ErrorBoundary>
     ),
   },

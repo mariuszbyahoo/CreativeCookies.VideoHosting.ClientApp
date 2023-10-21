@@ -365,7 +365,7 @@ const NavMenu = () => {
             <ul className="navbar-nav flex-grow">
               <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/">
-                  Home
+                  About
                 </NavLink>
               </NavItem>
               <NavItem>
