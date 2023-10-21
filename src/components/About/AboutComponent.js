@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "reactstrap";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { Button } from "@mui/material";
@@ -8,12 +8,17 @@ import { useAuth } from "../Account/AuthContext";
 
 const AboutComponent = () => {
   const { userRole, isAuthenticated } = useAuth();
-
+  const navigate = useNavigate();
   const editButton = () => {
     if (isAuthenticated && (userRole === "ADMIN" || userRole === "admin")) {
       return (
         <>
-          <Button className={styles.editButton} onClick={() => {}}>
+          <Button
+            className={styles.editButton}
+            onClick={() => {
+              navigate("/aboutEditor");
+            }}
+          >
             <BorderColorIcon className={styles.editButtonIcon} />
           </Button>
         </>

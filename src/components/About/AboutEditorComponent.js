@@ -13,7 +13,7 @@ import { quillFormats, quillModules } from "../Helpers/quillHelper";
 const AboutEditorComponent = (props) => {
   const [metadata, setMetadata] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  const [videoEditFinished, setVideoEditFinished] = useState(false);
+  const [aboutPageEditFinished, setAboutPageEditFinished] = useState(false);
   const { refreshTokens } = useAuth();
 
   const params = useParams();
@@ -33,7 +33,6 @@ const AboutEditorComponent = (props) => {
   } = useForm({
     defaultValues: {
       description: "",
-      videoTitle: "",
     },
   });
 
@@ -42,72 +41,56 @@ const AboutEditorComponent = (props) => {
   useEffect(() => {
     getMetadata();
   }, [params.id]);
+
   const getMetadata = async () => {
-    // const response = await fetch(
-    //   `https://${process.env.REACT_APP_API_ADDRESS}/Blobs/getMetadata?id=${params.id}`,
-    //   {
-    //     credentials: "include",
-    //   }
-    // );
-    // if (response.ok) {
-    //   const responseData = await response.json();
-    //   setMetadata(responseData);
-    //   setValue("videoTitle", responseData.name || "");
-    //   setValue("description", responseData.description || "");
-    //   setIsLoading(false);
-    // } else {
-    //   navigate("/logout");
-    // }
+    const response = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/About`,
+      {
+        credentials: "include",
+      }
+    );
+    if (response.ok) {
+      const responseData = await response.json();
+      setMetadata(responseData);
+      setValue("description", responseData.description || "");
+      setIsLoading(false);
+    } else {
+      console.log("API returned other response than 200");
+      setIsLoading(false);
+    }
   };
 
   const onSubmit = (data) => {
-    // console.log(data);
-    // editVideoHandler();
+    console.log(data);
+    editDescHandler();
   };
 
-  const videoTitleChangeHandler = (e) => {
-    // setValue("videoTitle", e.target.value);
-  };
-
-  const editVideoHandler = (e) => {
-    // console.log(e);
-    // const updatedMetadata = {
-    //   ...metadata,
-    //   name: watch("videoTitle"),
-    //   description: watch("description"),
-    // };
-    // sendEditRequest(updatedMetadata);
+  const editDescHandler = (e) => {
+    console.log(e);
+    const updatedMetadata = {
+      ...metadata,
+      description: watch("description"),
+    };
+    sendEditRequest(updatedMetadata);
   };
 
   const sendEditRequest = async (bodyContent, retry = true) => {
-    // const response = await fetch(
-    //   `https://${process.env.REACT_APP_API_ADDRESS}/Blobs/editMetadata`,
-    //   {
-    //     method: "PATCH",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(bodyContent),
-    //     credentials: "include",
-    //   }
-    // );
-    // if (response.ok) {
-    //   setVideoEditFinished(true);
-    //   return true;
-    // } else if (
-    //   (response.status == "401" || response.status == "400") &&
-    //   retry
-    // ) {
-    //   var refreshResponse = await refreshTokens(false);
-    //   if (refreshResponse == "LoginAgain") {
-    //     navigate("/logout");
-    //   } else {
-    //     return sendEditRequest(bodyContent, false);
-    //   }
-    // } else {
-    //   console.error(`Received unexpected API response: ${response.status}`);
-    //   navigate("/logout");
-    // }
+    const response = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/About`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bodyContent),
+        credentials: "include",
+      }
+    );
+    if (response.ok) {
+      setAboutPageEditFinished(true);
+    } else {
+      console.error(`Received unexpected API response: ${response.status}`);
+    }
   };
 
   const scrollIntoExplanation = useCallback(() => {
@@ -120,7 +103,6 @@ const AboutEditorComponent = (props) => {
 
   return (
     <>
-      {/* presence of form element causes different behavior from filmDelete flow */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.container}>
           <h3>Edit your About page</h3>
@@ -170,7 +152,7 @@ const AboutEditorComponent = (props) => {
                     if (value.trim().length > 5000) {
                       setError("description", {
                         type: "manual",
-                        message: "Description cannot exceed 5000 characters",
+                        message: "About page cannot exceed 5000 characters",
                       });
                     } else {
                       clearErrors("description");
@@ -199,11 +181,11 @@ const AboutEditorComponent = (props) => {
       </form>
       <ConfirmationDialog
         title="Success"
-        message="Video has been edited succesfully"
-        open={videoEditFinished}
+        message="About page has been updated"
+        open={aboutPageEditFinished}
         hasCancelOption={false}
         onConfirm={() => {
-          navigate(`/player/${params.id}`);
+          navigate("");
         }}
       ></ConfirmationDialog>
     </>
