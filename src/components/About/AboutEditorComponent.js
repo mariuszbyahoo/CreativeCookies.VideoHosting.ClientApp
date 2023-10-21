@@ -14,6 +14,8 @@ const AboutEditorComponent = (props) => {
   const [metadata, setMetadata] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [aboutPageEditFinished, setAboutPageEditFinished] = useState(false);
+  const [confirmationDialogOpened, setConfirmationDialogOpened] =
+    useState(false);
   const { refreshTokens } = useAuth();
 
   const params = useParams();
@@ -32,11 +34,11 @@ const AboutEditorComponent = (props) => {
     clearErrors,
   } = useForm({
     defaultValues: {
-      description: "",
+      innerHTML: "",
     },
   });
 
-  const description = watch("description");
+  const innerHTML = watch("innerHTML");
 
   useEffect(() => {
     getMetadata();
@@ -52,7 +54,7 @@ const AboutEditorComponent = (props) => {
     if (response.ok) {
       const responseData = await response.json();
       setMetadata(responseData);
-      setValue("description", responseData.description || "");
+      setValue("innerHTML", responseData.innerHTML || "");
       setIsLoading(false);
     } else {
       console.log("API returned other response than 200");
@@ -69,7 +71,7 @@ const AboutEditorComponent = (props) => {
     console.log(e);
     const updatedMetadata = {
       ...metadata,
-      description: watch("description"),
+      innerHTML: watch("innerHTML"),
     };
     sendEditRequest(updatedMetadata);
   };
@@ -78,7 +80,7 @@ const AboutEditorComponent = (props) => {
     const response = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/About`,
       {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -88,6 +90,7 @@ const AboutEditorComponent = (props) => {
     );
     if (response.ok) {
       setAboutPageEditFinished(true);
+      setConfirmationDialogOpened(true);
     } else {
       console.error(`Received unexpected API response: ${response.status}`);
     }
@@ -100,6 +103,11 @@ const AboutEditorComponent = (props) => {
       });
     }
   }, []);
+
+  const handleDialogConfirm = () => {
+    setConfirmationDialogOpened(false);
+    navigate("../");
+  };
 
   return (
     <>
@@ -120,11 +128,11 @@ const AboutEditorComponent = (props) => {
           )}
           <div className={`row ${styles["row-margin"]}`}>
             <p>
-              Used description length: {description ? description.length : "0"}{" "}
-              / 5000 characters
+              Used description length: {innerHTML ? innerHTML.length : "0"} /
+              5000 characters
             </p>
             <div className={`row ${styles["row-margin"]}`}>
-              {errors.description && (
+              {errors.innerHTML && (
                 <>
                   <span style={{ color: "#b71c1c" }}>
                     Description cannot exceed 5000 characters.
@@ -139,7 +147,7 @@ const AboutEditorComponent = (props) => {
               </IconButton>
             </p>
             <Controller
-              name="description"
+              name="innerHTML"
               control={control}
               defaultValue=""
               rules={{ maxLength: 5000 }}
@@ -150,14 +158,14 @@ const AboutEditorComponent = (props) => {
                   value={field.value}
                   onChange={(value) => {
                     if (value.trim().length > 5000) {
-                      setError("description", {
+                      setError("innerHTML", {
                         type: "manual",
                         message: "About page cannot exceed 5000 characters",
                       });
                     } else {
-                      clearErrors("description");
+                      clearErrors("innerHTML");
                     }
-                    setValue("description", value, { shouldValidate: true }); // this will trigger validation
+                    setValue("innerHTML", value, { shouldValidate: true }); // this will trigger validation
                   }}
                   modules={quillModules}
                   formats={quillFormats}
@@ -176,16 +184,16 @@ const AboutEditorComponent = (props) => {
             <br />
             Generated HTML code of your video's description looks like this:
           </p>
-          {description && <p className={styles.code}>{description}</p>}
+          {innerHTML && <p className={styles.code}>{innerHTML}</p>}
         </div>
       </form>
       <ConfirmationDialog
         title="Success"
         message="About page has been updated"
-        open={aboutPageEditFinished}
+        open={confirmationDialogOpened}
         hasCancelOption={false}
         onConfirm={() => {
-          navigate("");
+          handleDialogConfirm();
         }}
       ></ConfirmationDialog>
     </>
