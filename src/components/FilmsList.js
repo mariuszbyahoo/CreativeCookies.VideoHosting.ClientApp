@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "./FilmsList.module.css";
 import Mosaic from "./Mosaic";
-import { Button, FormControl, TextField } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  FormControl,
+  TextField,
+} from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -154,7 +159,11 @@ const FilmsList = () => {
 
   let content = <p>Upload a movie to get started!</p>;
   if (loading) {
-    content = <p>Loading...</p>;
+    content = (
+      <p>
+        <CircularProgress />
+      </p>
+    );
   }
   if (error) {
     content = <h4>An error occured, while fetching the API: {error}</h4>;

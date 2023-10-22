@@ -170,7 +170,9 @@ const StripeProductsDashboardComponent = () => {
       ) : (
         <div className={styles.container}>
           {isLoadingProduct ? (
-            <h1>Loading...</h1>
+            <h1>
+              <CircularProgress />
+            </h1>
           ) : (
             <>
               <h3>Subscription plan</h3>

@@ -49,18 +49,10 @@ const SignInLandingComponent = () => {
       </>
     );
   } else {
-    content = (
-      <div
-        className="row"
-        style={{ marginLeft: "auto", marginRight: "auto", width: "40%" }}
-      >
-        <h4>Logging in...</h4>
-        <CircularProgress size={300} />
-      </div>
-    );
+    content = <CircularProgress size={300} />;
   }
 
-  return <div>{content}</div>;
+  return <p style={{ textAlign: "center" }}>{content}</p>;
 };
 
 export default SignInLandingComponent;
