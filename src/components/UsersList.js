@@ -13,7 +13,12 @@ import {
   Input,
   FormControl,
   TextField,
+  DialogContent,
+  CircularProgress,
 } from "@mui/material";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +30,8 @@ const UsersList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
+  const [dialogOpened, setDialogOpened] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   const { refreshTokens } = useAuth();
   const navigate = useNavigate();
@@ -32,6 +39,7 @@ const UsersList = () => {
   const roles = ["Admin", "Subscriber", "NonSubscriber", "any"];
 
   const fetchUsers = async (retry = true) => {
+    setUsersLoading(true);
     try {
       let apiResponse = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}&role=${selectedRole}`,
@@ -58,6 +66,8 @@ const UsersList = () => {
     } catch (error) {
       console.log("error happened: ", error);
       console.log("JSON.stringinfy(error): ", JSON.stringify(error));
+    } finally {
+      setUsersLoading(false);
     }
   };
 
@@ -65,12 +75,16 @@ const UsersList = () => {
     fetchUsers();
   }, [page, pageSize]);
 
-  const handleRoleChange = (event) => {
-    setSelectedRole(event.target.value);
+  const handleDialogOpen = () => {
+    setDialogOpened(true);
   };
 
-  const handleDownload = () => {
-    // TODO
+  const handleDialogClose = () => {
+    setDialogOpened(false);
+  };
+
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
   };
 
   const handleSearchChange = (event) => {
@@ -79,6 +93,70 @@ const UsersList = () => {
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleDownloadJson = async () => {
+    try {
+      setDialogOpened(true);
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/users/GetAllUsersJson`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const blob = new Blob([JSON.stringify(data)], {
+          type: "application/json",
+        });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "users.json";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.log("Download JSON error:", error);
+    } finally {
+      setDialogOpened(false);
+    }
+  };
+
+  const handleDownloadExcel = async () => {
+    try {
+      setDialogOpened(true);
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/users/GetAllUsersExcel`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type":
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "users.xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.log("Download error:", error);
+    } finally {
+      setDialogOpened(false);
+    }
   };
 
   return (
@@ -118,51 +196,86 @@ const UsersList = () => {
           </Button>
         </div>
       </div>
-
-      <br />
-      <span>
-        Page {page} of {totalPages}
-      </span>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ fontSize: "20px" }}>Email</TableCell>
-              <TableCell style={{ fontSize: "20px" }}>Role</TableCell>
-              <TableCell style={{ fontSize: "20px" }}>Is user active</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users &&
-              users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell component="th" scope="row">
-                    {user.userEmail}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.role}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.isActive ? "yes" : "no"}
+      {usersLoading ? (
+        <div>
+          <h4>Loading users</h4>
+          <p style={{ textAlign: "center" }}>
+            <CircularProgress size={100} />
+          </p>
+        </div>
+      ) : (
+        <>
+          <br />
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ fontSize: "20px" }}>Email</TableCell>
+                  <TableCell style={{ fontSize: "20px" }}>Role</TableCell>
+                  <TableCell style={{ fontSize: "20px" }}>
+                    Is user active
                   </TableCell>
                 </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Button onClick={() => handlePageChange(page - 1)} disabled={page <= 1}>
-        Previous Page
-      </Button>
-      <Button
-        onClick={() => handlePageChange(page + 1)}
-        disabled={page >= totalPages}
-      >
-        Next Page
-      </Button>
-      {/* <br />
-      <Button variant="contained" color="primary" onClick={handleDownload}>
-        Download CSV
-      </Button> */}
+              </TableHead>
+              <TableBody>
+                {users &&
+                  users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell component="th" scope="row">
+                        {user.userEmail}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {user.role}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {user.isActive ? "yes" : "no"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page <= 1}
+            style={{ margin: "1%" }}
+          >
+            Previous Page
+          </Button>
+          <Button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page >= totalPages}
+            style={{ margin: "1%" }}
+          >
+            Next Page
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDownloadJson}
+            style={{ margin: "1%" }}
+          >
+            Download JSON
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDownloadExcel}
+            style={{ margin: "1%" }}
+          >
+            Download Excel
+          </Button>
+          <Dialog open={dialogOpened} onClose={handleDialogClose}>
+            <DialogTitle>Please wait, generating file...</DialogTitle>
+            <DialogContent style={{ textAlign: "center" }}>
+              <CircularProgress />
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
     </>
   );
 };
