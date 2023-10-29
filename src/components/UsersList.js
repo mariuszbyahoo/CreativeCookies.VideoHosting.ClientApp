@@ -31,6 +31,7 @@ const UsersList = () => {
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
   const [dialogOpened, setDialogOpened] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   const { refreshTokens } = useAuth();
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ const UsersList = () => {
   const roles = ["Admin", "Subscriber", "NonSubscriber", "any"];
 
   const fetchUsers = async (retry = true) => {
+    setUsersLoading(true);
     try {
       let apiResponse = await fetch(
         `https://${process.env.REACT_APP_API_ADDRESS}/users?pageNumber=${page}&pageSize=${pageSize}&search=${search}&role=${selectedRole}`,
@@ -64,6 +66,8 @@ const UsersList = () => {
     } catch (error) {
       console.log("error happened: ", error);
       console.log("JSON.stringinfy(error): ", JSON.stringify(error));
+    } finally {
+      setUsersLoading(false);
     }
   };
 
@@ -192,74 +196,86 @@ const UsersList = () => {
           </Button>
         </div>
       </div>
-
-      <br />
-      <span>
-        Page {page} of {totalPages}
-      </span>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ fontSize: "20px" }}>Email</TableCell>
-              <TableCell style={{ fontSize: "20px" }}>Role</TableCell>
-              <TableCell style={{ fontSize: "20px" }}>Is user active</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users &&
-              users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell component="th" scope="row">
-                    {user.userEmail}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.role}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {user.isActive ? "yes" : "no"}
+      {usersLoading ? (
+        <div>
+          <h4>Loading users</h4>
+          <p style={{ textAlign: "center" }}>
+            <CircularProgress size={100} />
+          </p>
+        </div>
+      ) : (
+        <>
+          <br />
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ fontSize: "20px" }}>Email</TableCell>
+                  <TableCell style={{ fontSize: "20px" }}>Role</TableCell>
+                  <TableCell style={{ fontSize: "20px" }}>
+                    Is user active
                   </TableCell>
                 </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Button
-        onClick={() => handlePageChange(page - 1)}
-        disabled={page <= 1}
-        style={{ margin: "1%" }}
-      >
-        Previous Page
-      </Button>
-      <Button
-        onClick={() => handlePageChange(page + 1)}
-        disabled={page >= totalPages}
-        style={{ margin: "1%" }}
-      >
-        Next Page
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleDownloadJson}
-        style={{ margin: "1%" }}
-      >
-        Download JSON
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleDownloadExcel}
-        style={{ margin: "1%" }}
-      >
-        Download Excel
-      </Button>
-      <Dialog open={dialogOpened} onClose={handleDialogClose}>
-        <DialogTitle>Please wait, generating file...</DialogTitle>
-        <DialogContent style={{ textAlign: "center" }}>
-          <CircularProgress />
-        </DialogContent>
-      </Dialog>
+              </TableHead>
+              <TableBody>
+                {users &&
+                  users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell component="th" scope="row">
+                        {user.userEmail}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {user.role}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {user.isActive ? "yes" : "no"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page <= 1}
+            style={{ margin: "1%" }}
+          >
+            Previous Page
+          </Button>
+          <Button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page >= totalPages}
+            style={{ margin: "1%" }}
+          >
+            Next Page
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDownloadJson}
+            style={{ margin: "1%" }}
+          >
+            Download JSON
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDownloadExcel}
+            style={{ margin: "1%" }}
+          >
+            Download Excel
+          </Button>
+          <Dialog open={dialogOpened} onClose={handleDialogClose}>
+            <DialogTitle>Please wait, generating file...</DialogTitle>
+            <DialogContent style={{ textAlign: "center" }}>
+              <CircularProgress />
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
     </>
   );
 };
