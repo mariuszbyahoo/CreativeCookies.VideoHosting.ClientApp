@@ -2,6 +2,7 @@ import { Layout } from "./components/Layout";
 import { Route, Routes } from "react-router-dom";
 import AppRoutes from "./AppRoutes";
 import { AuthProvider } from "./components/Account/AuthContext";
+import "./i18n";
 
 function App() {
   return (
