@@ -13,7 +13,12 @@ import {
   Input,
   FormControl,
   TextField,
+  DialogContent,
+  CircularProgress,
 } from "@mui/material";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +30,7 @@ const UsersList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
+  const [dialogOpened, setDialogOpened] = useState(false);
 
   const { refreshTokens } = useAuth();
   const navigate = useNavigate();
@@ -65,12 +71,16 @@ const UsersList = () => {
     fetchUsers();
   }, [page, pageSize]);
 
-  const handleRoleChange = (event) => {
-    setSelectedRole(event.target.value);
+  const handleDialogOpen = () => {
+    setDialogOpened(true);
   };
 
-  const handleDownload = () => {
-    // TODO
+  const handleDialogClose = () => {
+    setDialogOpened(false);
+  };
+
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
   };
 
   const handleSearchChange = (event) => {
@@ -79,6 +89,70 @@ const UsersList = () => {
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleDownloadJson = async () => {
+    try {
+      setDialogOpened(true);
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/users/GetAllUsersJson`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const blob = new Blob([JSON.stringify(data)], {
+          type: "application/json",
+        });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "users.json";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.log("Download JSON error:", error);
+    } finally {
+      setDialogOpened(false);
+    }
+  };
+
+  const handleDownloadExcel = async () => {
+    try {
+      setDialogOpened(true);
+      const response = await fetch(
+        `https://${process.env.REACT_APP_API_ADDRESS}/users/GetAllUsersExcel`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type":
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "users.xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.log("Download error:", error);
+    } finally {
+      setDialogOpened(false);
+    }
   };
 
   return (
@@ -150,19 +224,42 @@ const UsersList = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Button onClick={() => handlePageChange(page - 1)} disabled={page <= 1}>
+      <Button
+        onClick={() => handlePageChange(page - 1)}
+        disabled={page <= 1}
+        style={{ margin: "1%" }}
+      >
         Previous Page
       </Button>
       <Button
         onClick={() => handlePageChange(page + 1)}
         disabled={page >= totalPages}
+        style={{ margin: "1%" }}
       >
         Next Page
       </Button>
-      {/* <br />
-      <Button variant="contained" color="primary" onClick={handleDownload}>
-        Download CSV
-      </Button> */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleDownloadJson}
+        style={{ margin: "1%" }}
+      >
+        Download JSON
+      </Button>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleDownloadExcel}
+        style={{ margin: "1%" }}
+      >
+        Download Excel
+      </Button>
+      <Dialog open={dialogOpened} onClose={handleDialogClose}>
+        <DialogTitle>Please wait, generating file...</DialogTitle>
+        <DialogContent style={{ textAlign: "center" }}>
+          <CircularProgress />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
