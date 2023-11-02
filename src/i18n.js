@@ -107,20 +107,29 @@ const resources = {
       AnErrorOccuredDuringAuthentication:
         "An error occurred during authentication",
       Films: "Films",
-      About: "About",
       FilmUpload: "Film upload",
-      UsersList: "Users",
       OrderCanceled: "Order canceled",
       RefundInitiatedMsg:
         "Refund has been initiated, you should receive your funds within 30 days",
       SubscriptionAlreadyCanceled: "Subscription already canceled",
       SubscriptionAlreadyCanceledMsg:
         "Your subscription has been already canceled, your card won't be charged again.",
-      PremiumMember: "Premium member",
+      Premium: "Premium",
       BillingPeriodTillMsg:
         "You are a premium member, billing period lasts till",
       CancelSubscription: "Cancel subscription",
       CloseWindow: "Close window",
+      Language: "Language",
+      SubscriptionCanceledSuccessfully: "Subscription canceled succesfully",
+      ErrorCancellingSubscription:
+        "Error occured during your subscription cancelation, please contact administrator",
+      NonSubscriberPaymentNavTxt1:
+        "Uzyskasz dostęp do zamówionych treści w dn.",
+      NonSubscriberPaymentNavTxt2:
+        "możesz odstąpić od umowy o subskrypcję do powyższej daty aby uzyskać bezpłatny zwrot",
+      ForMoreInfoVisit: "For more info, visit",
+      EUWebsite: "EU website",
+      AwaitingAccess: "AwaitingAccess",
     },
   },
   pl: {
@@ -226,20 +235,28 @@ const resources = {
       Logout: "Wyloguj",
       AnErrorOccuredDuringAuthentication: "Wystąpił błąd w trakcie logowania",
       Films: "Filmy",
-      About: "O stronie",
-      FilmUpload: "Dodaj film",
-      UsersList: "Użytkownicy",
       OrderCanceled: "Anulowano zamówienie",
       RefundInitiatedMsg:
         "Zlecono zwrot pieniędzy, powinieneś je otrzymać w terminie 30 dni",
       SubscriptionAlreadyCanceled: "Subskrypcja anulowana",
       SubscriptionAlreadyCanceledMsg:
         "Subskrypcja została anulowana, Twoja karta nie zostanie ponownie obciążona",
-      PremiumMember: "Użytkownik Premium",
+      Premium: "Premium",
       BillingPeriodTillMsg:
         "Jesteś użytkownikiem premium, okres rozliczeniowy upływa",
       CancelSubscription: "Anuluj subskrypcję",
       CloseWindow: "Zamknij okno",
+      Language: "Język",
+      SubscriptionCanceledSuccessfully: "Subskrypcja poprawnie anulowana",
+      ErrorCancellingSubscription:
+        "Wystąpił błąd podczas anulowania subskrypcji, proszę skontaktować się z dostawcą",
+      NonSubscriberPaymentNavTxt1:
+        "Uzyskasz dostęp do zamówionych treści w dn.",
+      NonSubscriberPaymentNavTxt2:
+        "możesz odstąpić od umowy o subskrypcję do powyższej daty aby uzyskać bezpłatny zwrot",
+      ForMoreInfoVisit: "Po więcej informacji, odwiedź",
+      EUWebsite: "stronę UE",
+      AwaitingAccess: "Oczekuje na dostęp",
     },
   },
 };
