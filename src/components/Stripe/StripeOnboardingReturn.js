@@ -2,6 +2,7 @@ import { CircularProgress } from "@mui/material";
 import styles from "./StripeOnboardingReturn.module.css";
 import { useEffect, useState } from "react";
 import { useAuth } from "../Account/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const StripeOnboardingReturn = () => {
   const {
@@ -9,6 +10,8 @@ const StripeOnboardingReturn = () => {
     stripeAccountStatus,
     stripeAccountVerificationPending,
   } = useAuth();
+
+  const { t } = useTranslation();
 
   const determineContent = () => {
     switch (stripeAccountStatus.data) {
