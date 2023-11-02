@@ -9,6 +9,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { useAuth } from "./Account/AuthContext";
 import { Controller, useForm } from "react-hook-form";
 import { ArrowDownward } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 const FilmEditor = (props) => {
   const [metadata, setMetadata] = useState(undefined);
@@ -19,6 +20,7 @@ const FilmEditor = (props) => {
   const params = useParams();
   const navigate = useNavigate();
   const explanationRef = useRef(null);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -125,7 +127,7 @@ const FilmEditor = (props) => {
       {/* presence of form element causes different behavior from filmDelete flow */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.container}>
-          <h3>Edit video metadata</h3>
+          <h3>{t("EditVideoMetadata")}</h3>
           {isLoading ? (
             <CircularProgress />
           ) : (
@@ -135,21 +137,21 @@ const FilmEditor = (props) => {
               endIcon={<EditIcon />}
               style={{ marginTop: "1%", width: "25%" }}
             >
-              Edit
+              {t("EditingFilm")}
             </Button>
           )}
           <div className={`row ${styles["row-margin"]}`}>
             <label htmlFor="title-input">Title</label>
             <Input
               {...register("videoTitle", {
-                required: "Title is required",
+                required: t("TitleIsRequired"),
                 minLength: {
                   value: 3,
-                  message: "Title cannot be shorter than 3 characters",
+                  message: t("TitleMustBeAtLeast3Characters"),
                 },
                 maxLength: {
                   value: 50,
-                  message: "Title cannot be longer than 50 characters",
+                  message: t("TitleCannotExceed50Characters"),
                 },
               })}
               id="title-input"
@@ -169,20 +171,20 @@ const FilmEditor = (props) => {
           </div>
           <div className={`row ${styles["row-margin"]}`}>
             <p>
-              Used description length: {description ? description.length : "0"}{" "}
-              / 5000 characters
+              {t("UsedDescriptionLength")}:{" "}
+              {description ? description.length : "0"} / 5000 {t("Characters")}
             </p>
             <div className={`row ${styles["row-margin"]}`}>
               {errors.description && (
                 <>
                   <span style={{ color: "#b71c1c" }}>
-                    Description cannot exceed 5000 characters.
+                    {t("DescriptionCannotExceed5000Characters")}.
                   </span>
                 </>
               )}
             </div>
             <p>
-              How is description counted?
+              {t("HowIsDescriptionCounted")}?
               <IconButton variant="contained" onClick={scrollIntoExplanation}>
                 <ArrowDownward />
               </IconButton>
@@ -201,7 +203,7 @@ const FilmEditor = (props) => {
                     if (value.trim().length > 5000) {
                       setError("description", {
                         type: "manual",
-                        message: "Description cannot exceed 5000 characters",
+                        message: t("DescriptionCannotExceed5000Characters"),
                       });
                     } else {
                       clearErrors("description");
@@ -216,21 +218,20 @@ const FilmEditor = (props) => {
           </div>
         </div>
         <div style={{ textAlign: "center", marginTop: "5%" }}>
-          <h4 ref={explanationRef}>Description length's explanation</h4>
+          <h4 ref={explanationRef}>{t("DescriptionLengthExplanation")}</h4>
           <p>
-            Description is being translated from the editor above into an HTML
-            code, so any stylings will enlarge the amount of used characters.
+            {t("DescriptionLengthExplanationTxt1")}.
             <br />
-            <strong>Max length of a description is 5000 characters</strong>
+            <strong>{t("DescriptionLengthExplanationTxt2")}</strong>
             <br />
-            Generated HTML code of your video's description looks like this:
+            {t("DescriptionLengthExplanationTxt3")}:
           </p>
           {description && <p className={styles.code}>{description}</p>}
         </div>
       </form>
       <ConfirmationDialog
-        title="Success"
-        message="Video has been edited succesfully"
+        title={t("Success")}
+        message={t("VideoEditedSuccesfully")}
         open={videoEditFinished}
         hasCancelOption={false}
         onConfirm={() => {

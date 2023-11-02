@@ -42,6 +42,7 @@ const resources = {
         "Unexpected error occured, please contact support",
       Error: "Error",
       VideoUploadedSuccesfully: "Video uploaded succesfully",
+      VideoEditedSuccesfully: "Video has been edited succesfully",
       Success: "Success",
       SavingVideoMetadata: "Saving video metadata",
       UploadingVideo: "Uploading video",
@@ -59,6 +60,8 @@ const resources = {
         "Are you sure you want to delete this video",
       TokenExpired: "Token has expired",
       LoginAgain: "Please Log in again",
+      EditingFilm: "Edit film",
+      EditVideoMetadata: "Edit video metadata",
     },
   },
   pl: {
@@ -101,6 +104,7 @@ const resources = {
         "Wystąpił niespodziewany błąd, skontaktuj się z dostawcą",
       Error: "Błąd",
       VideoUploadedSuccesfully: "Poprawnie wysłano film",
+      VideoEditedSuccesfully: "Poprawnie zedytowano film",
       Success: "Sukces",
       SavingVideoMetadata: "Zapisywanie metadata filmu",
       UploadingVideo: "Wysyłanie filmu",
@@ -117,6 +121,8 @@ const resources = {
       AreYouSureWantToDeleteThisVideo: "Czy na pewno chcesz usunąć ten film",
       TokenExpired: "Twój Token wygasł",
       LoginAgain: "Proszę zalogować się ponownie",
+      EditingFilm: "Edycja filmu",
+      EditVideoMetadata: "Edycja metadata filmu",
     },
   },
 };
