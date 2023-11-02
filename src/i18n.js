@@ -62,6 +62,8 @@ const resources = {
       LoginAgain: "Please Log in again",
       EditingFilm: "Edit film",
       EditVideoMetadata: "Edit video metadata",
+      Cancel: "Cancel",
+      Confirm: "Potwierdź",
     },
   },
   pl: {
@@ -123,6 +125,8 @@ const resources = {
       LoginAgain: "Proszę zalogować się ponownie",
       EditingFilm: "Edycja filmu",
       EditVideoMetadata: "Edycja metadata filmu",
+      Cancel: "Anuluj",
+      Confirm: "Potwierdź",
     },
   },
 };
