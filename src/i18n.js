@@ -51,6 +51,14 @@ const resources = {
       OnlyJPGFilesAreAllowed: "Only .jpg files are allowed",
       ValidationError: "Validation error",
       OnlyMP4FilesAreAllowed: "Only .mp4 files are allowed",
+      UploadFilmToGetStarted: "Upload a movie to get started",
+      ErrorOccuredWhileFetchingFromAPI:
+        "An error occured while fetching data from API",
+      LoadMore: "Load more",
+      AreYouSureWantToDeleteThisVideo:
+        "Are you sure you want to delete this video",
+      TokenExpired: "Token has expired",
+      LoginAgain: "Please Log in again",
     },
   },
   pl: {
@@ -102,6 +110,13 @@ const resources = {
       OnlyJPGFilesAreAllowed: "Dopuszczalne są tylko pliki .jpg",
       ValidationError: "Błąd walidacji",
       OnlyMP4FilesAreAllowed: "Dopuszczalne są tylko pliki .mp4",
+      UploadFilmToGetStarted: "Dodaj film aby rozpocząć",
+      ErrorOccuredWhileFetchingFromAPI:
+        "Wystąpił błąd podczas zaciągania filmów z API",
+      LoadMore: "Załaduj więcej",
+      AreYouSureWantToDeleteThisVideo: "Czy na pewno chcesz usunąć ten film",
+      TokenExpired: "Twój Token wygasł",
+      LoginAgain: "Proszę zalogować się ponownie",
     },
   },
 };

@@ -13,6 +13,7 @@ import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const FilmsList = () => {
   const [videoMetadatas, setVideoMetadatas] = useState([]);
@@ -26,6 +27,8 @@ const FilmsList = () => {
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [error, setError] = useState();
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   const { refreshTokens } = useAuth();
 
@@ -157,7 +160,7 @@ const FilmsList = () => {
     }
   };
 
-  let content = <p>Upload a movie to get started!</p>;
+  let content = <p>{t("UploadFilmToGetStarted")}!</p>;
   if (loading) {
     content = (
       <p>
@@ -166,7 +169,11 @@ const FilmsList = () => {
     );
   }
   if (error) {
-    content = <h4>An error occured, while fetching the API: {error}</h4>;
+    content = (
+      <h4>
+        {t("ErrorOccuredWhileFetchingFromAPI")}: {error}
+      </h4>
+    );
   }
 
   if (videoMetadatas.length > 0) {
@@ -185,9 +192,13 @@ const FilmsList = () => {
 
   let loadBtn = hasMore && (
     <Button variant="outlined" onClick={loadMoreHandler}>
-      Load more
+      {t("LoadMore")}
     </Button>
   );
+
+  const deleteConfirmationMsg = `${t("AreYouSureWantToDeleteThisVideo")}?`;
+  const tokenExpiredMsg = t("TokenExpired");
+  const loginAgainMsg = t("LoginAgain");
 
   return (
     <div className={styles.container}>
@@ -213,15 +224,15 @@ const FilmsList = () => {
       <ConfirmationDialog
         open={confirmDialogIsOpened}
         title="Delete Video"
-        message="Are you sure you want to delete this video?"
+        message={deleteConfirmationMsg}
         hasCancelOption={true}
         onConfirm={confirmDeleteHandler}
         onCancel={closeDeleteDialog}
       />
       <ConfirmationDialog
         open={authDialogIsOpened}
-        title="Tokens expired"
-        message="Please login again"
+        title={tokenExpiredMsg}
+        message={loginAgainMsg}
         hasCancelOption={false}
         onConfirm={() => {
           setAuthDialogIsOpened(false);
