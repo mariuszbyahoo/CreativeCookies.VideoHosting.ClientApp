@@ -203,7 +203,7 @@ const FilmsList = () => {
       <div className="row">
         <FormControl variant="standard">
           <TextField
-            label="Search"
+            label={t("Search")}
             id="filter-search"
             onChange={filterInputChangeHandler}
             variant="filled"

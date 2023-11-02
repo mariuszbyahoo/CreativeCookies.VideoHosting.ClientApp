@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import AppRoutes from "../../AppRoutes";
+import { useTranslation } from "react-i18next";
 
 /**
  * Logout link component to insert in the top navigation bar
@@ -11,6 +12,8 @@ const LogoutLinkComponent = (props) => {
   const { logout } = useAuth();
   const location = useLocation();
   const routes = AppRoutes;
+
+  const { t } = useTranslation();
 
   /**
    * Depending on the location.pathname calls logout() function with an
@@ -52,7 +55,7 @@ const LogoutLinkComponent = (props) => {
         className={props.className}
         // onClick={handleLogout}
       >
-        Logout
+        {t("Logout")}
       </a>
     </>
   );

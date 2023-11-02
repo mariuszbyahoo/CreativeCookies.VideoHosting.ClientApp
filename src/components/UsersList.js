@@ -22,6 +22,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { Search } from "@mui/icons-material";
 import { useAuth } from "./Account/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -37,6 +38,8 @@ const UsersList = () => {
   const navigate = useNavigate();
 
   const roles = ["Admin", "Subscriber", "NonSubscriber", "any"];
+
+  const { t } = useTranslation();
 
   const fetchUsers = async (retry = true) => {
     setUsersLoading(true);
@@ -165,7 +168,7 @@ const UsersList = () => {
         <div className="col-7">
           <FormControl variant="standard" style={{ minWidth: "100%" }}>
             <TextField
-              label="Search"
+              label={t("Search")}
               id="filter-search"
               onChange={handleSearchChange}
               value={search}
@@ -198,7 +201,7 @@ const UsersList = () => {
       </div>
       {usersLoading ? (
         <div>
-          <h4>Loading users</h4>
+          <h4>{t("LoadingUsers")}</h4>
           <p style={{ textAlign: "center" }}>
             <CircularProgress size={100} />
           </p>
@@ -207,7 +210,7 @@ const UsersList = () => {
         <>
           <br />
           <span>
-            Page {page} of {totalPages}
+            {t("Page")} {page} {t("Of")} {totalPages}
           </span>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -216,7 +219,7 @@ const UsersList = () => {
                   <TableCell style={{ fontSize: "20px" }}>Email</TableCell>
                   <TableCell style={{ fontSize: "20px" }}>Role</TableCell>
                   <TableCell style={{ fontSize: "20px" }}>
-                    Is user active
+                    {t("IsUserActive")}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -231,7 +234,7 @@ const UsersList = () => {
                         {user.role}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {user.isActive ? "yes" : "no"}
+                        {user.isActive ? t("Yes") : t("No")}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -243,14 +246,14 @@ const UsersList = () => {
             disabled={page <= 1}
             style={{ margin: "1%" }}
           >
-            Previous Page
+            {t("PreviousPage")}
           </Button>
           <Button
             onClick={() => handlePageChange(page + 1)}
             disabled={page >= totalPages}
             style={{ margin: "1%" }}
           >
-            Next Page
+            {t("NextPage")}
           </Button>
           <Button
             variant="contained"
@@ -258,7 +261,7 @@ const UsersList = () => {
             onClick={handleDownloadJson}
             style={{ margin: "1%" }}
           >
-            Download JSON
+            {t("DownloadJSON")}
           </Button>
           <Button
             variant="contained"
@@ -266,10 +269,10 @@ const UsersList = () => {
             onClick={handleDownloadExcel}
             style={{ margin: "1%" }}
           >
-            Download Excel
+            {t("DownloadExcel")}
           </Button>
           <Dialog open={dialogOpened} onClose={handleDialogClose}>
-            <DialogTitle>Please wait, generating file...</DialogTitle>
+            <DialogTitle>{t("PleaseWaitGeneratingFile")}...</DialogTitle>
             <DialogContent style={{ textAlign: "center" }}>
               <CircularProgress />
             </DialogContent>
