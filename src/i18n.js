@@ -64,6 +64,15 @@ const resources = {
       EditVideoMetadata: "Edit video metadata",
       Cancel: "Cancel",
       Confirm: "Potwierdź",
+      SomethingWentWrong: "Something went wrong",
+      PleaseContactSupportStripeError:
+        "Unfortunately, something went wrong with the synchronization between MyHub and Stripe. Please contact support.",
+      ProceedTo: "Proceed to",
+      SubscriptionsDashboard: "subscriptions dashboard",
+      AndCreateANewOne: "and create your first one.",
+      VerifyingOnboardingStatus: "Verifying onboarding status, please wait",
+      VerificationShouldTake5Minutes:
+        "Verification of recently submitted account should take no more than 5 minutes",
     },
   },
   pl: {
@@ -127,6 +136,15 @@ const resources = {
       EditVideoMetadata: "Edycja metadata filmu",
       Cancel: "Anuluj",
       Confirm: "Potwierdź",
+      SomethingWentWrong: "Coś poszło nie tak",
+      PleaseContactSupportStripeError:
+        "Niestety, coś poszło nie tak z synchronizacją pomiędzy MyHub a Stripe, prosze skontaktować się z dostawcą.",
+      ProceedTo: "Przejdź do",
+      SubscriptionsDashboard: "panelu subskrypcji",
+      VerifyingOnboardingStatus:
+        "Weryfikuję status onboardingu Stripe, proszę czekać",
+      VerificationShouldTake5Minutes:
+        "Weryfikacja dopiero co wysłanych informacji powinna zająć nie więcej niż 5 minut",
     },
   },
 };
