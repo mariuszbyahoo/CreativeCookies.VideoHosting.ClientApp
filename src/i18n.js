@@ -90,6 +90,7 @@ const resources = {
         "Currently you are within cooling off period of your last order for the future subscription, if you want to change your order terms, then you would have to cancel the previous order, and after that you'll be free to add a new order for membership.",
       WithinCoolingOffPeriod: "Within cooling off period",
       Register: "Register",
+      DeleteVideo: "Delete video",
     },
   },
   pl: {
@@ -179,6 +180,7 @@ const resources = {
         "Obecnie jesteś w trakcie okresu pozwalającego na wypowiedzenie umowy ostatniego zamówienia, jeśli chcesz zmienić warunki, najpierw anuluj poprzednie zamówienie, a potem będziesz mógł stworzyć nowe na innych warunkach",
       WithinCoolingOffPeriod: "W trakcie okresu oczekiwania",
       Register: "Zarejestruj",
+      DeleteVideo: "Usuń film",
     },
   },
 };

@@ -197,8 +197,6 @@ const FilmsList = () => {
   );
 
   const deleteConfirmationMsg = `${t("AreYouSureWantToDeleteThisVideo")}?`;
-  const tokenExpiredMsg = t("TokenExpired");
-  const loginAgainMsg = t("LoginAgain");
 
   return (
     <div className={styles.container}>
@@ -223,7 +221,7 @@ const FilmsList = () => {
       {loadBtn}
       <ConfirmationDialog
         open={confirmDialogIsOpened}
-        title="Delete Video"
+        title={t("DeleteVideo")}
         message={deleteConfirmationMsg}
         hasCancelOption={true}
         onConfirm={confirmDeleteHandler}
@@ -231,8 +229,8 @@ const FilmsList = () => {
       />
       <ConfirmationDialog
         open={authDialogIsOpened}
-        title={tokenExpiredMsg}
-        message={loginAgainMsg}
+        title={t("TokenExpired")}
+        message={t("LoginAgain")}
         hasCancelOption={false}
         onConfirm={() => {
           setAuthDialogIsOpened(false);
