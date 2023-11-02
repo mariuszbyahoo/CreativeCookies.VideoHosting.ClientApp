@@ -107,9 +107,7 @@ const resources = {
       AnErrorOccuredDuringAuthentication:
         "An error occurred during authentication",
       Films: "Films",
-      About: "About",
       FilmUpload: "Film upload",
-      UsersList: "Users",
       OrderCanceled: "Order canceled",
       RefundInitiatedMsg:
         "Refund has been initiated, you should receive your funds within 30 days",
@@ -237,9 +235,6 @@ const resources = {
       Logout: "Wyloguj",
       AnErrorOccuredDuringAuthentication: "Wystąpił błąd w trakcie logowania",
       Films: "Filmy",
-      About: "O stronie",
-      FilmUpload: "Dodaj film",
-      UsersList: "Użytkownicy",
       OrderCanceled: "Anulowano zamówienie",
       RefundInitiatedMsg:
         "Zlecono zwrot pieniędzy, powinieneś je otrzymać w terminie 30 dni",

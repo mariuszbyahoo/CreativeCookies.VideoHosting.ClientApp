@@ -369,7 +369,7 @@ const NavMenu = () => {
             MyHub
           </NavbarBrand>
           {paymentNavContent}
-          <NavItem>
+          <NavItem style={{ marginInline: "1em" }}>
             <FormControl
               className="language-select"
               style={{ minWidth: 120, margin: "auto 0" }}
