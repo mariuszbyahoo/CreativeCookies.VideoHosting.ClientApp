@@ -4,6 +4,7 @@ import { CircularProgress } from "@mui/material";
 import ConfirmationDialog from "../ConfirmationDialog";
 import { useNavigate } from "react-router-dom";
 import { Error } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 /**
  * This component serves as a session expiration page.
@@ -14,7 +15,7 @@ const LogoutComponent = () => {
   const [dialogIsOpened, setDialogIsOpened] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   useEffect(() => {
     setIsLoggingOut(true);
 
@@ -45,8 +46,8 @@ const LogoutComponent = () => {
       </div>
       <ConfirmationDialog
         open={dialogIsOpened}
-        title="Your session have expired"
-        message="Please login again"
+        title={t("YourSessionExpired")}
+        message={t("PleaseLoginAgain")}
         hasCancelOption={false}
         onConfirm={() => {
           logout("/");

@@ -2,6 +2,7 @@ import { CircularProgress } from "@mui/material";
 import styles from "./StripeOnboardingReturn.module.css";
 import { useEffect, useState } from "react";
 import { useAuth } from "../Account/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const StripeOnboardingReturn = () => {
   const {
@@ -10,17 +11,16 @@ const StripeOnboardingReturn = () => {
     stripeAccountVerificationPending,
   } = useAuth();
 
+  const { t } = useTranslation();
+
   const determineContent = () => {
     switch (stripeAccountStatus.data) {
       case 0:
         if (!stripeAccountVerificationPending) {
           return (
             <>
-              <h3>Something went wrong</h3>
-              <h5>
-                Unfortunately, something went wrong with the synchronization
-                between MyHub and Stripe. Please contact support.
-              </h5>
+              <h3>{t("SomethingWentWrong")}</h3>
+              <h5>{t("PleaseContactSupportStripeError")}</h5>
             </>
           );
         }
@@ -32,10 +32,10 @@ const StripeOnboardingReturn = () => {
       case 2:
         return (
           <>
-            <h3>Success</h3>
+            <h3>{t("Success")}</h3>
             <h5>
-              Proceed to <strong>subscriptions dashboard</strong> and create
-              your first one.
+              {t("ProceedTo")} <strong>{t("SubscriptionsDashboard")}</strong>{" "}
+              {t("AndCreateANewOne")}
             </h5>
           </>
         );
@@ -43,11 +43,8 @@ const StripeOnboardingReturn = () => {
       case 3:
         return (
           <>
-            <h4>Verifying onboarding status, please wait</h4>
-            <p>
-              Verification of recently submitted account should take no more
-              than 5 minutes.
-            </p>
+            <h4>{t("VerifyingOnboardingStatus")}</h4>
+            <p>{t("VerificationShouldTake5Minutes")}.</p>
             <div className={styles.container}>
               <CircularProgress size={350} />
             </div>

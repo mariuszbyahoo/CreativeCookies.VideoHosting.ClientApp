@@ -35,6 +35,7 @@ import {
   SettingsRounded,
 } from "@mui/icons-material";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { useTranslation } from "react-i18next";
 
 const NavMenu = () => {
   const {
@@ -73,6 +74,8 @@ const NavMenu = () => {
     isSubscriptionAlreadyCanceledDialogOpened,
     setIsSubscriptionAlreadyCanceledDialogOpened,
   ] = useState(false);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (userRole === "admin" || userRole === "ADMIN") {
@@ -148,7 +151,7 @@ const NavMenu = () => {
       setPaymentNavContent(
         <>
           <NavItem className="text-green">
-            Premium membership{" "}
+            {t("PremiumMember")}{" "}
             <IconButton onClick={() => openMembershipDialog()}>
               <SettingsRounded style={{ color: "black" }} />
             </IconButton>
@@ -332,12 +335,12 @@ const NavMenu = () => {
         <>
           <NavItem>
             <NavLink tag={Link} className="text-dark" to="/films-upload">
-              Film upload
+              {t("FilmUpload")}
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink tag={Link} className="text-dark" to="/users-list">
-              Users list
+              {t("UsersList")}
             </NavLink>
           </NavItem>
         </>
@@ -365,12 +368,12 @@ const NavMenu = () => {
             <ul className="navbar-nav flex-grow">
               <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/">
-                  About
+                  {t("About")}
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/films-list">
-                  Films list
+                  {t("Films")}
                 </NavLink>
               </NavItem>
               {filmUploadComponent()}
@@ -397,15 +400,14 @@ const NavMenu = () => {
         open={isCoolingOffPeriodMessageDialogOpened}
         onCancel={closeCoolingOffPeriodMessageDialog}
       >
-        <DialogTitle>Order canceled</DialogTitle>
+        <DialogTitle>{t("OrderCanceled")}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Refund has been initiated, you should receive your funds within 30
-            days
-          </DialogContentText>
+          <DialogContentText>{t("RefundInitiatedMsg")}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeCoolingOffPeriodMessageDialog}>Close</Button>
+          <Button onClick={closeCoolingOffPeriodMessageDialog}>
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -413,27 +415,26 @@ const NavMenu = () => {
         open={isSubscriptionAlreadyCanceledDialogOpened}
         onCancel={() => setIsSubscriptionAlreadyCanceledDialogOpened(false)}
       >
-        <DialogTitle>Subscription already canceled</DialogTitle>
+        <DialogTitle>{t("SubscriptionAlreadyCanceled")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Your subscription has been already canceled, your card won't be
-            charged again.
+            {t("SubscriptionAlreadyCanceledMsg")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => setIsSubscriptionAlreadyCanceledDialogOpened(false)}
           >
-            Close
+            {t("Close")}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={isMembershipDialogOpened} onCancel={closeMembershipDialog}>
-        <DialogTitle>Premium member</DialogTitle>
+        <DialogTitle>{t("PremiumMember")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You are a premium member, billing period lasts till:
+            {t("BillingPeriodTillMsg")}:
             <br />
             {subscriptionEndDateLocal
               ? subscriptionEndDateLocal.format("DD-MM-YYYY HH:mm")
@@ -441,8 +442,10 @@ const NavMenu = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeMembershipDialog}>Close</Button>
-          <Button onClick={cancelSubscription}>Cancel Subscription</Button>
+          <Button onClick={closeMembershipDialog}>{t("CloseWindow")}</Button>
+          <Button onClick={cancelSubscription}>
+            {t("CancelSubscription")}
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -458,7 +461,9 @@ const NavMenu = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeSubscriptionCanceledDialog}>Close</Button>
+          <Button onClick={closeSubscriptionCanceledDialog}>
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

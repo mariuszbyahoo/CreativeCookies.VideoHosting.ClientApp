@@ -21,6 +21,7 @@ import { quillModules, quillFormats } from "./Helpers/quillHelper";
 import { Controller, useForm } from "react-hook-form";
 import { useAuth } from "./Account/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const FilmUpload = (props) => {
   const [videoTitle, setVideoTitle] = useState("");
@@ -38,6 +39,7 @@ const FilmUpload = (props) => {
   const [isConfirmationDialogOpened, setIsConfirmaitonDialogOpened] =
     useState(false);
   const { refreshTokens } = useAuth();
+  const { t } = useTranslation();
   const explanationRef = useRef(null);
   const navigate = useNavigate();
 
@@ -195,8 +197,8 @@ const FilmUpload = (props) => {
         setVideo(e.target.files[0]);
       } else {
         setVideo(undefined);
-        setConfirmationDialogTitle("Validation error");
-        setConfirmationDialogMessage("Only .mp4 files are allowed");
+        setConfirmationDialogTitle(t("ValidationError"));
+        setConfirmationDialogMessage(t("OnlyMP4FilesAreAllowed"));
         setIsConfirmaitonDialogOpened(true);
       }
     }
@@ -208,8 +210,8 @@ const FilmUpload = (props) => {
         setThumbnail(e.target.files[0]);
       } else {
         setThumbnail(undefined);
-        setConfirmationDialogTitle("Validation error");
-        setConfirmationDialogMessage("Only .jpg files are allowed");
+        setConfirmationDialogTitle(t("ValidationError"));
+        setConfirmationDialogMessage(t("OnlyJPGFilesAreAllowed"));
         setIsConfirmaitonDialogOpened(true);
       }
     }
@@ -271,14 +273,14 @@ const FilmUpload = (props) => {
   };
   const onSubmit = async (data) => {
     if (!video) {
-      setConfirmationDialogTitle("Error");
-      setConfirmationDialogMessage("Video is required to select");
+      setConfirmationDialogTitle(t("Error"));
+      setConfirmationDialogMessage(t("VideoFileIsRequiredToSelect"));
       setIsConfirmaitonDialogOpened(true);
       return;
     }
     if (!thumbnail) {
-      setConfirmationDialogTitle("Error");
-      setConfirmationDialogMessage("Thumbnail image is required to select");
+      setConfirmationDialogTitle(t("Error"));
+      setConfirmationDialogMessage(t("ThumbnailImageIsRequiredToSelect"));
       setIsConfirmaitonDialogOpened(true);
       return;
     }
@@ -286,7 +288,7 @@ const FilmUpload = (props) => {
   };
   const uploadVideoHandler = async () => {
     try {
-      setProgressDialogTitle("Preparing to upload...");
+      setProgressDialogTitle(`${t("PreparingToUpload")}...`);
       setUploadProgress(0);
       setIsProgressDialogOpened(true);
       if (thumbnail) {
@@ -296,18 +298,16 @@ const FilmUpload = (props) => {
       setProgressDialogTitle("Uploading video");
       await uploadVideo(videoBlobName);
       setUploadProgress(0);
-      setProgressDialogTitle("Saving video metadata");
+      setProgressDialogTitle(t("SavingVideoMetadata"));
       await postMetadata(videoGuid, videoBlobName, videoDuration);
       setUploadProgress(1);
-      setConfirmationDialogTitle("Success!");
-      setConfirmationDialogMessage("Video uploaded successfully");
+      setConfirmationDialogTitle(`${t("Success")}!`);
+      setConfirmationDialogMessage(t("VideoUploadedSuccesfully"));
       setIsConfirmaitonDialogOpened(true);
       return true;
     } catch (error) {
-      setConfirmationDialogTitle("Error!");
-      setConfirmationDialogMessage(
-        "Unexpected error occured, please contact support"
-      );
+      setConfirmationDialogTitle(t("Error"));
+      setConfirmationDialogMessage(t("UnexpectedErrorOccured"));
       setIsConfirmaitonDialogOpened(true);
       console.error(error);
       return false;
@@ -321,38 +321,38 @@ const FilmUpload = (props) => {
   };
 
   let videoInputDescription = video
-    ? `Selected file: ${video.name}`
-    : "Please select video";
+    ? `${t("SelectedFile")}: ${video.name}`
+    : t("PleaseSelectVideo");
 
   let thumbnailInputDescription = thumbnail
-    ? `Selected file: ${thumbnail.name}`
-    : "Please select thumbnail";
+    ? `${t("SelectedFile")}: ${thumbnail.name}`
+    : t("PleaseSelectThumbnail");
 
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.container}>
-          <h3 style={{ marginBottom: "5%" }}>Upload a new video</h3>
+          <h3 style={{ marginBottom: "5%" }}>{t("UploadANewVideo")}</h3>
           <Button
             variant="contained"
             endIcon={<UploadFile />}
             type="submit"
             style={{ marginBlock: "1%", width: "50%" }}
           >
-            Upload
+            {t("Upload")}
           </Button>
           <div className={`row ${styles["row-margin"]}`}>
-            <label htmlFor="title-input">Title</label>
+            <label htmlFor="title-input">{t("Title")}</label>
             <Input
               {...register("videoTitle", {
-                required: "Title is required",
+                required: t("TitleIsRequired"),
                 minLength: {
                   value: 3,
-                  message: "Title must be at least 3 characters",
+                  message: t("TitleMustBeAtLeast3Characters"),
                 },
                 maxLength: {
                   value: 50,
-                  message: "Title cannot exceed 50 characters",
+                  message: t("TitleCannotExceed50Characters"),
                 },
               })}
               id="title-input"
@@ -374,12 +374,9 @@ const FilmUpload = (props) => {
                   className={styles["custom-file-upload"]}
                 >
                   <Search />
-                  Select mp4 file
+                  {t("SelectMP4File")}
                 </label>
                 <Input
-                  // {...register("video", {
-                  //   validate: (value) => !value && "Video is required",
-                  // })}
                   id="select-film"
                   type="file"
                   onChange={videoChangeHandler}
@@ -403,12 +400,9 @@ const FilmUpload = (props) => {
                   className={styles["custom-file-upload"]}
                 >
                   <InsertPhoto />
-                  Select thumbnail file
+                  {t("SelectJPGFile")}
                 </label>
                 <Input
-                  // {...register("thumbnail", {
-                  //   validate: (value) => !value && "Thumbnail is required",
-                  // })}
                   id="select-thumbnail"
                   type="file"
                   onChange={thumbnailChangeHandler}
@@ -427,20 +421,21 @@ const FilmUpload = (props) => {
             </div>
             <div className={`row ${styles["row-margin"]}`}>
               <p>
-                Used description length:{" "}
-                {description ? description.length : "0"} / 5000 characters
+                {t("UsedDescriptionLength")}:{" "}
+                {description ? description.length : "0"} / 5000{" "}
+                {t("Characters")}
               </p>
               <div className={`row ${styles["row-margin"]}`}>
                 {errors.description && (
                   <>
                     <span style={{ color: "#b71c1c" }}>
-                      Description cannot exceed 5000 characters.
+                      {t("DescriptionCannotExceed5000Characters")}.
                     </span>
                   </>
                 )}
               </div>
               <p>
-                How is description counted?
+                {t("HowIsDescriptionCounted")}?
                 <IconButton variant="contained" onClick={scrollIntoExplanation}>
                   <ArrowDownward />
                 </IconButton>
@@ -458,7 +453,7 @@ const FilmUpload = (props) => {
                       if (value.trim().length > 5000) {
                         setError("description", {
                           type: "manual",
-                          message: "Description cannot exceed 5000 characters",
+                          message: t("DescriptionCannotExceed5000Characters"),
                         });
                       } else {
                         clearErrors("description");
@@ -475,14 +470,13 @@ const FilmUpload = (props) => {
         </div>
       </form>
       <div style={{ textAlign: "center", marginTop: "5%" }}>
-        <h4 ref={explanationRef}>Description length's explanation</h4>
+        <h4 ref={explanationRef}>{t("DescriptionLengthExplanation")}</h4>
         <p>
-          Description is being translated from the editor above into an HTML
-          code, so any stylings will enlarge the amount of used characters.
+          {t("DescriptionLengthExplanationTxt1")}
           <br />
-          <strong>Max length of a description is 5000 characters</strong>
+          <strong> {t("DescriptionLengthExplanationTxt2")}</strong>
           <br />
-          Generated HTML code of your video's description looks like this:
+          {t("DescriptionLengthExplanationTxt3")}:
         </p>
         {description && <p className={styles.code}>{description}</p>}
       </div>

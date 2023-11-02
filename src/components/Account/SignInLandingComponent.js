@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { getAuthCookie, isStateValid } from "./authHelper";
 import { CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const SignInLandingComponent = () => {
   const { requestAccessToken, login } = useAuth();
@@ -10,6 +11,8 @@ const SignInLandingComponent = () => {
   );
   const [error, setError] = useState(null);
   const [errorDescription, setErrorDescription] = useState(null);
+
+  const { t } = useTranslation();
 
   const isStateValid = (stateFromParams, stateFromCookies) => {
     const areTheyEqual = stateFromParams === stateFromCookies;
@@ -42,9 +45,9 @@ const SignInLandingComponent = () => {
   if (error) {
     content = (
       <>
-        <h4>An error occurred during authentication:</h4>
+        <h4>{t("AnErrorOccuredDuringAuthentication")}:</h4>
         <p>
-          <strong>Error:</strong> {error}
+          <strong>{t("Error")}:</strong> {error}
         </p>
       </>
     );

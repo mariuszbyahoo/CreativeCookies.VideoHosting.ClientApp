@@ -5,6 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
+import { useTranslation } from "react-i18next";
 
 const ConfirmationDialog = ({
   open,
@@ -16,6 +17,8 @@ const ConfirmationDialog = ({
   confirmBtnMsg,
   cancelBtnMsg,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onClose={onCancel}>
       <DialogTitle>{title}</DialogTitle>
@@ -25,11 +28,11 @@ const ConfirmationDialog = ({
       <DialogActions>
         {hasCancelOption && (
           <Button onClick={onCancel}>
-            {cancelBtnMsg ? cancelBtnMsg : "Cancel"}
+            {cancelBtnMsg ? t(cancelBtnMsg) : t("Cancel")}
           </Button>
         )}
         <Button onClick={onConfirm} color="secondary">
-          {confirmBtnMsg ? confirmBtnMsg : "Confirm"}
+          {confirmBtnMsg ? t(confirmBtnMsg) : t("Confirm")}
         </Button>
       </DialogActions>
     </Dialog>
