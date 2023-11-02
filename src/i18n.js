@@ -73,6 +73,8 @@ const resources = {
       VerifyingOnboardingStatus: "Verifying onboarding status, please wait",
       VerificationShouldTake5Minutes:
         "Verification of recently submitted account should take no more than 5 minutes",
+      NoPaymentSubmitted: "No payment submitted",
+      ReturnToFilmsList: "Return to films list",
     },
   },
   pl: {
@@ -145,6 +147,8 @@ const resources = {
         "Weryfikuję status onboardingu Stripe, proszę czekać",
       VerificationShouldTake5Minutes:
         "Weryfikacja dopiero co wysłanych informacji powinna zająć nie więcej niż 5 minut",
+      NoPaymentSubmitted: "Nie dokonano płatności",
+      ReturnToFilmsList: "Powróć na listę filmów",
     },
   },
 };
