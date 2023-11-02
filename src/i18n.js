@@ -64,6 +64,7 @@ const resources = {
       EditVideoMetadata: "Edit video metadata",
       Cancel: "Cancel",
       Confirm: "Potwierdź",
+      Close: "Close",
       SomethingWentWrong: "Something went wrong",
       PleaseContactSupportStripeError:
         "Unfortunately, something went wrong with the synchronization between MyHub and Stripe. Please contact support.",
@@ -75,6 +76,20 @@ const resources = {
         "Verification of recently submitted account should take no more than 5 minutes",
       NoPaymentSubmitted: "No payment submitted",
       ReturnToFilmsList: "Return to films list",
+      GetAccessToAllVideos: "Get access to all videos",
+      Subscribe: "Subscribe",
+      StartSupportingCreator:
+        "Start supporting your favourite creator each month",
+      SelectSubscriptionCurrency: "Select your subscription currency",
+      WaiveRightToWithdrawFromContract:
+        "I wish to gain access to the ordered services immediately and I waive my right to withdraw from the contract within 14 days. I am aware that I will no longer be able to exercise my right to withdraw from the contract.",
+      MembershipActive: "Membership active",
+      MembershipActiveDesc:
+        "Currently you have active membership. First, you've got to cancel the current subscription or if you already done it - then await for the current billing period to pass before continuing.",
+      CurrentlyWithinCoolingOffPeriod:
+        "Currently you are within cooling off period of your last order for the future subscription, if you want to change your order terms, then you would have to cancel the previous order, and after that you'll be free to add a new order for membership.",
+      WithinCoolingOffPeriod: "Within cooling off period",
+      Register: "Register",
     },
   },
   pl: {
@@ -138,6 +153,7 @@ const resources = {
       EditVideoMetadata: "Edycja metadata filmu",
       Cancel: "Anuluj",
       Confirm: "Potwierdź",
+      Close: "Zamknij",
       SomethingWentWrong: "Coś poszło nie tak",
       PleaseContactSupportStripeError:
         "Niestety, coś poszło nie tak z synchronizacją pomiędzy MyHub a Stripe, prosze skontaktować się z dostawcą.",
@@ -149,6 +165,20 @@ const resources = {
         "Weryfikacja dopiero co wysłanych informacji powinna zająć nie więcej niż 5 minut",
       NoPaymentSubmitted: "Nie dokonano płatności",
       ReturnToFilmsList: "Powróć na listę filmów",
+      Subscribe: "Subskrybuj",
+      GetAccessToAllVideos: "Uzyskaj dostęp do wszystkich filmów",
+      StartSupportingCreator:
+        "Zacznij wspierać ulubionego Twórcę każdego miesiąca",
+      SelectSubscriptionCurrency: "Wybierz walutę subskrypcji",
+      WaiveRightToWithdrawFromContract:
+        "Chcę otrzymać dostęp do zamówionych usług już teraz i rezygnuję z prawa do odstąpienia od umowy w terminie 14 dni. Mam świadomość, że nie będę mógł już skorzystać z prawa do odstąpienia od umowy.",
+      MembershipActive: "Aktywne członkostwo",
+      MembershipActiveDesc:
+        "Obecnie jesteś aktywnym członkiem. Wpierw, anuluj swoją subskrypcję lub jeśli już to zrobiłeś - odczekaj do końca okresu rozliczeniowego aby kontynuować.",
+      CurrentlyWithinCoolingOffPeriod:
+        "Obecnie jesteś w trakcie okresu pozwalającego na wypowiedzenie umowy ostatniego zamówienia, jeśli chcesz zmienić warunki, najpierw anuluj poprzednie zamówienie, a potem będziesz mógł stworzyć nowe na innych warunkach",
+      WithinCoolingOffPeriod: "W trakcie okresu oczekiwania",
+      Register: "Zarejestruj",
     },
   },
 };

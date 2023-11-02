@@ -18,6 +18,7 @@ import styles from "./SubscribeComponent.module.css";
 import { ArrowForwardIos, HowToReg } from "@mui/icons-material";
 import ShopIcon from "@mui/icons-material/Shop";
 import { useEffect, useState } from "react";
+import { t } from "i18next";
 
 const SubscribeComponent = () => {
   const { isAuthenticated } = useAuth();
@@ -59,11 +60,11 @@ const SubscribeComponent = () => {
   const getActionButton = () => {
     return isAuthenticated ? (
       <Button variant="outlined" onClick={handleClick}>
-        <ShopIcon /> Subscribe
+        <ShopIcon /> {t("Subscribe")}
       </Button>
     ) : (
       <Button variant="outlined">
-        <HowToReg /> Register
+        <HowToReg /> {t("Register")}
       </Button>
     );
   };
@@ -114,15 +115,17 @@ const SubscribeComponent = () => {
   return (
     <>
       <div className={styles.container}>
-        <div className={styles.header}>Subscribe</div>
+        <div className={styles.header}>{t("Subscribe")}</div>
         <p className={styles.container}>
           <ArrowForwardIos />
-          <span className={styles.description}>Get access to all videos</span>
+          <span className={styles.description}>
+            {t("GetAccessToAllVideos")}
+          </span>
         </p>
         <p className={styles.container}>
           <ArrowForwardIos />
           <span className={styles.description}>
-            Start supporting your favourite creator each month
+            {t("StartSupportingCreator")}
           </span>
         </p>
         <div className={styles.container}>
@@ -146,7 +149,7 @@ const SubscribeComponent = () => {
                     ))}
                   </Select>
                   <FormHelperText>
-                    Select your subscription currency
+                    {t("SelectSubscriptionCurrency")}
                   </FormHelperText>
                 </FormControl>
               </div>
@@ -163,10 +166,7 @@ const SubscribeComponent = () => {
                   }
                   label={
                     <div className={styles.checkboxLabel}>
-                      I wish to gain access to the ordered services immediately
-                      and I waive my right to withdraw from the contract within
-                      14 days. I am aware that I will no longer be able to
-                      exercise my right to withdraw from the contract.
+                      {t("WaiveRightToWithdrawFromContract")}
                     </div>
                   }
                   labelPlacement="bottom"
@@ -182,33 +182,26 @@ const SubscribeComponent = () => {
         open={isSubscriptionActiveDialogOpened}
         onCancel={closeSubscriptionActiveDialog}
       >
-        <DialogTitle>Membership active</DialogTitle>
+        <DialogTitle>{t("MembershipActive")}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Currently you have active membership. First, you've got to cancel
-            the current subscription or if you already done it - then await for
-            the current billing period to pass.
-          </DialogContentText>
+          <DialogContentText>{t("MembershipActiveDesc")}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeSubscriptionActiveDialog}>Close</Button>
+          <Button onClick={closeSubscriptionActiveDialog}>{t("Close")}</Button>
         </DialogActions>
       </Dialog>
       <Dialog
         open={isOrderActiveDialogOpened}
         onCancel={closeOrderActiveDialog}
       >
-        <DialogTitle>Within cooling off period</DialogTitle>
+        <DialogTitle>{t("WithinCoolingOffPeriod")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Currently you are within cooling off period of your last order for
-            the future subscription, if you want to change your order terms,
-            then you would have to cancel the previous order, and after that
-            you'll be free to add a new order for membership.
+            {t("CurrentlyWithinCoolingOffPeriod")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeOrderActiveDialog}>Close</Button>
+          <Button onClick={closeOrderActiveDialog}>{t("Close")}</Button>
         </DialogActions>
       </Dialog>
     </>
