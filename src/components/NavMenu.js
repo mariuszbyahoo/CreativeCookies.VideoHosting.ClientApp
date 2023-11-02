@@ -21,9 +21,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
   Menu,
   MenuItem,
+  Select,
 } from "@mui/material";
 import {
   CheckCircleOutlineRounded,
@@ -36,6 +39,7 @@ import {
 } from "@mui/icons-material";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 const NavMenu = () => {
   const {
@@ -74,6 +78,14 @@ const NavMenu = () => {
     isSubscriptionAlreadyCanceledDialogOpened,
     setIsSubscriptionAlreadyCanceledDialogOpened,
   ] = useState(false);
+
+  const [language, setLanguage] = useState("pl"); // Default language
+
+  const changeLanguage = (event) => {
+    let newLanguage = event.target.value;
+    i18n.changeLanguage(newLanguage);
+    setLanguage(newLanguage);
+  };
 
   const { t } = useTranslation();
 
@@ -131,14 +143,12 @@ const NavMenu = () => {
         }
       );
       if (res.ok) {
-        setSubscriptionCanceledDialogMsg("Subscription canceled successfully");
+        setSubscriptionCanceledDialogMsg(t("SubscriptionCanceledSuccessfully"));
         setIsSubscriptionCanceledDialogOpened(true);
       } else if (res.status === 402) {
         setIsSubscriptionAlreadyCanceledDialogOpened(true);
       } else {
-        setSubscriptionCanceledDialogMsg(
-          "Error occured during your subscription cancelation, please contact administrator"
-        );
+        setSubscriptionCanceledDialogMsg(t("ErrorCancellingSubscription"));
         setIsSubscriptionCanceledDialogOpened(true);
       }
     } catch (error) {
@@ -151,10 +161,10 @@ const NavMenu = () => {
       setPaymentNavContent(
         <>
           <NavItem className="text-green">
-            {t("PremiumMember")}{" "}
-            <IconButton onClick={() => openMembershipDialog()}>
+            <Button onClick={() => openMembershipDialog()}>
+              {t("Premium")}
               <SettingsRounded style={{ color: "black" }} />
-            </IconButton>
+            </Button>
           </NavItem>
         </>
       );
@@ -164,18 +174,18 @@ const NavMenu = () => {
     subscriptionStartDateLocal &&
       setConfirmationDialogMsg(
         <>
-          Your subscription will be active from:{" "}
-          {subscriptionStartDateLocal.format("DD.MM.YYYY")}, you can cancel this
-          order till the above date to receive a costless refund.
+          {t("NonSubscriberPaymentNavTxt1")}:{" "}
+          {subscriptionStartDateLocal.format("DD.MM.YYYY")},{" "}
+          {t("NonSubscriberPaymentNavTxt2")}.
           <br />
-          For more info, visit:
+          {t("ForMoreInfoVisit")}:
           <br />
           <a
             href="https://europa.eu/youreurope/citizens/consumers/shopping/guarantees-returns/index_en.htm"
             target="_blank"
             rel="noopener noreferrer"
           >
-            EU's website
+            {t("EUWebsite")}
           </a>
         </>
       );
@@ -184,7 +194,7 @@ const NavMenu = () => {
         setPaymentNavContent(
           <>
             <NavItem>
-              Awaiting access
+              {t("AwaitingAccess")}
               <IconButton
                 onClick={() => setCoolingOffPeriodCancelDialogOpened(true)}
               >
@@ -197,7 +207,7 @@ const NavMenu = () => {
       setPaymentNavContent(
         <>
           <NavItem className="text-purple">
-            <Link to="/subscribe">Subscribe</Link>
+            <Link to="/subscribe">{t("Subscribe")}</Link>
           </NavItem>
         </>
       );
@@ -359,6 +369,39 @@ const NavMenu = () => {
             MyHub
           </NavbarBrand>
           {paymentNavContent}
+          <NavItem>
+            <FormControl
+              className="language-select"
+              style={{ minWidth: 120, margin: "auto 0" }}
+            >
+              <InputLabel
+                id="language-selector-label"
+                style={{ lineHeight: "1em" }}
+              >
+                {t("Language")}
+              </InputLabel>
+              <Select
+                labelId="language-selector-label"
+                id="language-selector"
+                label={t("Language")}
+                value={language}
+                onChange={changeLanguage}
+                style={{
+                  height: "2em",
+                  paddingTop: "1px",
+                  paddingBottom: "1px",
+                }}
+                MenuProps={{
+                  style: {
+                    maxHeight: 300,
+                  },
+                }}
+              >
+                <MenuItem value="en">English</MenuItem>
+                <MenuItem value="pl">Polski</MenuItem>
+              </Select>
+            </FormControl>
+          </NavItem>
           <NavbarToggler onClick={toggleNavbar} className="mr-2" />
           <Collapse
             className="d-sm-inline-flex flex-sm-row-reverse"
@@ -431,7 +474,7 @@ const NavMenu = () => {
       </Dialog>
 
       <Dialog open={isMembershipDialogOpened} onCancel={closeMembershipDialog}>
-        <DialogTitle>{t("PremiumMember")}</DialogTitle>
+        <DialogTitle>{t("Premium")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t("BillingPeriodTillMsg")}:
@@ -448,9 +491,6 @@ const NavMenu = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Next dialog to confirm that subscription cancellation was succesfull */}
-
       <Dialog
         open={isSubscriptionCanceledDialogOpened}
         onCancel={closeSubscriptionCanceledDialog}

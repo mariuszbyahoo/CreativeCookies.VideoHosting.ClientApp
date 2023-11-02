@@ -116,11 +116,22 @@ const resources = {
       SubscriptionAlreadyCanceled: "Subscription already canceled",
       SubscriptionAlreadyCanceledMsg:
         "Your subscription has been already canceled, your card won't be charged again.",
-      PremiumMember: "Premium member",
+      Premium: "Premium",
       BillingPeriodTillMsg:
         "You are a premium member, billing period lasts till",
       CancelSubscription: "Cancel subscription",
       CloseWindow: "Close window",
+      Language: "Language",
+      SubscriptionCanceledSuccessfully: "Subscription canceled succesfully",
+      ErrorCancellingSubscription:
+        "Error occured during your subscription cancelation, please contact administrator",
+      NonSubscriberPaymentNavTxt1:
+        "Uzyskasz dostęp do zamówionych treści w dn.",
+      NonSubscriberPaymentNavTxt2:
+        "możesz odstąpić od umowy o subskrypcję do powyższej daty aby uzyskać bezpłatny zwrot",
+      ForMoreInfoVisit: "For more info, visit",
+      EUWebsite: "EU website",
+      AwaitingAccess: "AwaitingAccess",
     },
   },
   pl: {
@@ -235,11 +246,22 @@ const resources = {
       SubscriptionAlreadyCanceled: "Subskrypcja anulowana",
       SubscriptionAlreadyCanceledMsg:
         "Subskrypcja została anulowana, Twoja karta nie zostanie ponownie obciążona",
-      PremiumMember: "Użytkownik Premium",
+      Premium: "Premium",
       BillingPeriodTillMsg:
         "Jesteś użytkownikiem premium, okres rozliczeniowy upływa",
       CancelSubscription: "Anuluj subskrypcję",
       CloseWindow: "Zamknij okno",
+      Language: "Język",
+      SubscriptionCanceledSuccessfully: "Subskrypcja poprawnie anulowana",
+      ErrorCancellingSubscription:
+        "Wystąpił błąd podczas anulowania subskrypcji, proszę skontaktować się z dostawcą",
+      NonSubscriberPaymentNavTxt1:
+        "Uzyskasz dostęp do zamówionych treści w dn.",
+      NonSubscriberPaymentNavTxt2:
+        "możesz odstąpić od umowy o subskrypcję do powyższej daty aby uzyskać bezpłatny zwrot",
+      ForMoreInfoVisit: "Po więcej informacji, odwiedź",
+      EUWebsite: "stronę UE",
+      AwaitingAccess: "Oczekuje na dostęp",
     },
   },
 };
