@@ -369,7 +369,7 @@ const NavMenu = () => {
             MyHub
           </NavbarBrand>
           {paymentNavContent}
-          <NavItem style={{ marginInline: "1em" }}>
+          {/* <NavItem style={{ marginInline: "1em" }}>
             <FormControl
               className="language-select"
               style={{ minWidth: 120, margin: "auto 0" }}
@@ -401,7 +401,7 @@ const NavMenu = () => {
                 <MenuItem value="pl">Polski</MenuItem>
               </Select>
             </FormControl>
-          </NavItem>
+          </NavItem> */}
           <NavbarToggler onClick={toggleNavbar} className="mr-2" />
           <Collapse
             className="d-sm-inline-flex flex-sm-row-reverse"
