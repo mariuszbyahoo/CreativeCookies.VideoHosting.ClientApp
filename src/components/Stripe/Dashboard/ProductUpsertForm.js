@@ -11,6 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 import styles from "./ProductUpsertForm.module.css";
 import { useEffect, useState } from "react";
+import { t } from "i18next";
 
 const ProductUpsertForm = ({
   isDialogOpened,
@@ -93,8 +94,8 @@ const ProductUpsertForm = ({
     setProductDesctiption(e.target.value);
 
   const headerText = isProcessingProduct
-    ? "Processing product..."
-    : "Subscription plan:";
+    ? t("ProcessingProduct")
+    : t("SubscriptionPlan");
 
   return (
     <>
@@ -103,17 +104,17 @@ const ProductUpsertForm = ({
         <DialogContent>
           <form onSubmit={handleSubmit(handleSaveProduct)}>
             <div className={styles.container}>
-              <label htmlFor="title-input">Product title</label>
+              <label htmlFor="title-input">{t("ProductTitle")}</label>
               <Input
                 {...register("productName", {
-                  required: "Product name is required",
+                  required: t("ProductNameRequired"),
                   minLength: {
                     value: 5,
-                    message: "Product name must be at least 5 characters",
+                    message: t("ProductNameAtLeast5Chars"),
                   },
                   maxLength: {
                     value: 50,
-                    message: "Product name cannot exceed 50 characters",
+                    message: t("ProductNameAtMost50Chars"),
                   },
                 })}
                 id="title-input"
@@ -126,7 +127,9 @@ const ProductUpsertForm = ({
               {errors.productName && (
                 <p style={{ color: "#b71c1c" }}>{errors.productName.message}</p>
               )}
-              <label htmlFor="text-description">Product description</label>
+              <label htmlFor="text-description">
+                {t("ProductDescription")}
+              </label>
               <TextField
                 id="text-description"
                 variant="standard"

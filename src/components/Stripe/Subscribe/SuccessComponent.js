@@ -3,12 +3,13 @@ import { useAuth } from "../../Account/AuthContext";
 import styles from "./SuccessComponent.module.css";
 import { CircularProgress } from "@mui/material";
 import { Link } from "react-router-dom";
+import { t } from "i18next";
 
 const SuccessComponent = ({ usingCoolingOffPeriod }) => {
   const { isAuthenticated, userEmail, refreshTokens } = useAuth();
   const [content, setContent] = useState(
     <>
-      <h4>Processing payment</h4>
+      <h4>{t("ProcessingPayment")}</h4>
       <CircularProgress />
     </>
   );
@@ -46,20 +47,15 @@ const SuccessComponent = ({ usingCoolingOffPeriod }) => {
                 setContent(
                   <>
                     <h4>Payment succeed</h4>
-                    {usingCoolingOffPeriod && (
-                      <p>
-                        Regarding EU's terms for online transactions, you'll be
-                        granted with access after 14 days.
-                      </p>
-                    )}
-                    <Link to="../films-list">Explore films</Link>
+                    {usingCoolingOffPeriod && <p>{t("GrantingAfter14Days")}</p>}
+                    <Link to="../films-list">{t("ExploreFilms")}</Link>
                   </>
                 );
               } else {
                 setTimeout(() => checkSessionStatus(), 2000);
                 setContent(
                   <>
-                    <h4>Processing payment</h4>
+                    <h4>{t("ProcessingPayment")}</h4>
                     <CircularProgress />
                   </>
                 );
@@ -69,34 +65,31 @@ const SuccessComponent = ({ usingCoolingOffPeriod }) => {
             await refreshTokens(false);
             setContent(
               <>
-                <h4>Payment succeed</h4>
-                <p>
-                  Regarding EU's terms for online transactions, you'll be
-                  granted with access after 14 days.
-                </p>
-                <Link to="../films-list">Explore films</Link>
+                <h4>{t("PaymentSucceed")}</h4>
+                <p>{t("GrantingAfter14Days")}</p>
+                <Link to="../films-list">{t("ExploreFilms")}</Link>
               </>
             );
           } else {
             setContent(
               <>
-                <h4>Payment failed</h4>
-                <Link to="../films-list">Return to films list</Link>
+                <h4>{t("PaymentFailed")}</h4>
+                <Link to="../films-list">{t("ReturnToFilmsList")}</Link>
               </>
             );
           }
         } else if (res.status == 403) {
           setContent(
             <>
-              <h4>Processing payment</h4>
+              <h4>{t("ProcessingPayment")}</h4>
               <CircularProgress />
             </>
           );
         } else {
           setContent(
             <>
-              <h4>Payment failed</h4>
-              <Link to="../films-list">Return to films list</Link>
+              <h4>{t("PaymentFailed")}</h4>
+              <Link to="../films-list">{t("ReturnToFilmsList")}</Link>
             </>
           );
           const errorMessage = await res.text();
@@ -105,8 +98,8 @@ const SuccessComponent = ({ usingCoolingOffPeriod }) => {
       } catch (error) {
         setContent(
           <>
-            <h4>Payment failed</h4>
-            <Link to="../films-list">Return to films list</Link>
+            <h4>{t("PaymentFailed")}</h4>
+            <Link to="../films-list">{t("ReturnToFilmsList")}</Link>
           </>
         );
         console.error(`Fetch error: ${error}`);
@@ -114,8 +107,8 @@ const SuccessComponent = ({ usingCoolingOffPeriod }) => {
     } else {
       setContent(
         <>
-          <h4>No payment sent</h4>
-          <Link to="../films-list">Return to the films list</Link>
+          <h4>{t("NoPaymentSubmitted")}</h4>
+          <Link to="../films-list">{t("ReturnToFilmsList")}</Link>
         </>
       );
     }

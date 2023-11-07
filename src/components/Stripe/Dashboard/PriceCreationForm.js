@@ -11,6 +11,7 @@ import styles from "./PriceCreationForm.module.css";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { AddCircleOutline } from "@mui/icons-material";
+import { t } from "i18next";
 
 const PriceCreationForm = ({
   isPriceDialogOpened,
@@ -97,7 +98,7 @@ const PriceCreationForm = ({
   return (
     <>
       <Dialog open={isPriceDialogOpened} onClose={handleClose}>
-        <DialogTitle>Add price</DialogTitle>
+        <DialogTitle>{t("AddANewPrice")}</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit(handleSavePrice)}>
             <div className={styles.container}>
@@ -106,10 +107,10 @@ const PriceCreationForm = ({
                   <label htmlFor="amount-input">Amount</label>
                   <Input
                     {...register("priceAmount", {
-                      required: "Amount is required",
+                      required: t("AmountIsRequired"),
                       min: {
                         value: getMinAmount(),
-                        message: `Amount not less than ${getMinAmount()}`,
+                        message: `${t("AmountNotLessThan")} ${getMinAmount()}`,
                       },
                     })}
                     id="amount-input"
@@ -128,7 +129,7 @@ const PriceCreationForm = ({
                   )}
                 </div>
                 <div className="col-auto">
-                  <label htmlFor="currency-select">Currency</label>
+                  <label htmlFor="currency-select">{t("Currency")}</label>
                   <Select
                     {...register("priceCurrency")}
                     id="currency-select"
