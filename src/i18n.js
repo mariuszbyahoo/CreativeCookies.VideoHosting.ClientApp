@@ -133,7 +133,7 @@ const resources = {
       ProcessingPayment: "Processing payment",
       GrantingAfter14Days:
         "Referring to the regulations, you will gain access to the page content after the lapse of the 14-day period allowing for the withdrawal from the contract.",
-      ExploreFilms: "Przeglądaj filmy",
+      ExploreFilms: "Explore films",
       PaymentFailed: "Payment failed",
       PaymentSucceed: "Payment succeeded",
       Price: "Price",
