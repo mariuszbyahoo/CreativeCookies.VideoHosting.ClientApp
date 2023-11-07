@@ -21,6 +21,7 @@ import {
   CheckCircleOutline,
 } from "@mui/icons-material";
 import PriceCreationForm from "./PriceCreationForm";
+import { t } from "i18next";
 
 const StripeProductsDashboardComponent = () => {
   const [stripeProduct, setStripeProduct] = useState(null);
@@ -105,8 +106,8 @@ const StripeProductsDashboardComponent = () => {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>State</TableCell>
+              <TableCell>{t("Price")}</TableCell>
+              <TableCell>{t("State")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -123,14 +124,14 @@ const StripeProductsDashboardComponent = () => {
                     <>
                       <CheckCircleOutline className="text-green" />{" "}
                       <Button onClick={() => toggleActivation(price.id)}>
-                        Deactivate
+                        {t("Deactivate")}
                       </Button>
                     </>
                   ) : (
                     <>
                       <Cancel className="text-red" />
                       <Button onClick={() => toggleActivation(price.id)}>
-                        Activate
+                        {t("Activate")}
                       </Button>
                     </>
                   )}
@@ -140,7 +141,7 @@ const StripeProductsDashboardComponent = () => {
           </TableBody>
         </Table>
       );
-    else return <h4>No prices yet</h4>;
+    else return <h4>{t("NoPricesYet")}</h4>;
   };
 
   return (
@@ -163,7 +164,7 @@ const StripeProductsDashboardComponent = () => {
             <IconButton color="primary" onClick={openPriceDialog}>
               <AddCircleOutline style={{ fontSize: "24px" }} />
             </IconButton>
-            Add new price
+            {t("AddANewPrice")}
           </div>
           {getPricesContent()}
         </div>
@@ -175,11 +176,8 @@ const StripeProductsDashboardComponent = () => {
             </h1>
           ) : (
             <>
-              <h3>Subscription plan</h3>
-              <p>
-                Create your first subscription plan to start monetizing your
-                videos
-              </p>
+              <h3>{t("SubscriptionPlan")}</h3>
+              <p>{t("CreateYourFirstPlan")}</p>
               {!isProductDialogOpened && (
                 <IconButton
                   color="primary"
