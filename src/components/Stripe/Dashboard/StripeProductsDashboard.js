@@ -21,6 +21,7 @@ import {
   CheckCircleOutline,
 } from "@mui/icons-material";
 import PriceCreationForm from "./PriceCreationForm";
+import { useForm, Controller } from "react-hook-form";
 import { t } from "i18next";
 
 const StripeProductsDashboardComponent = () => {
@@ -30,13 +31,30 @@ const StripeProductsDashboardComponent = () => {
   const [isLoadingPrice, setIsLoadingPrice] = useState(true);
   const [isPriceDialogOpened, setIsPriceDialogOpened] = useState(false);
   const [isProductDialogOpened, setIsProductDialogOpened] = useState(false);
-
+  const [merchantAddressData, setMerchantAddressData] = useState(undefined);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const fetchWithCredentials = (url, options) => {
     return fetch(url, { ...options, credentials: "include" });
   };
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // HACK: Add condition to add merchant's address before allowing to edit anything else
+        debugger;
+        const merchantAddressResponse = await fetchWithCredentials(
+          `https://${process.env.REACT_APP_API_ADDRESS}/Merchant`
+        );
+        const merchantAddressData =
+          merchantAddressResponse.status === 200
+            ? await merchantAddressResponse.json()
+            : undefined;
+
+        setMerchantAddressData(merchantAddressData);
+
         const productResponse = await fetchWithCredentials(
           `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/FetchSubscriptionPlan`
         );
@@ -91,6 +109,228 @@ const StripeProductsDashboardComponent = () => {
     );
     await reloadPrices(stripeProduct.id);
     setIsLoadingProduct(false);
+  };
+
+  const onSubmit = async (submitFormData) => {};
+
+  const getMerchantAddressContent = () => {
+    if (isLoadingPrice) {
+      return <></>;
+    } else {
+      return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className={styles.container}>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <Controller
+                  name="firstName"
+                  control={control}
+                  rules={{
+                    required: "First name is required",
+                    minLength: {
+                      value: 3,
+                      message: "First name must be at least 3 characters long",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z\s]{3,}$/,
+                      message: "Invalid first name",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="FirstName"
+                      error={!!errors.firstName}
+                      helperText={
+                        errors.firstName ? errors.firstName.message : ""
+                      }
+                    />
+                  )}
+                />
+              </div>
+              <div className={styles.field}>
+                <Controller
+                  name="companyTaxId"
+                  control={control}
+                  defaultValue={merchantAddressData.companyTaxId}
+                  rules={{
+                    required: "Tax id is required",
+                    minLength: {
+                      value: 3,
+                      message: "",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z0-9\s]+$/,
+                      message: "Invalid last name",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Company Tax Id"
+                      error={!!errors.companyTaxId}
+                      helperText={
+                        errors.companyTaxId ? errors.companyTaxId.message : ""
+                      }
+                    />
+                  )}
+                />
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <Controller
+                  name="street"
+                  control={control}
+                  defaultValue={merchantAddressData.street}
+                  rules={{
+                    required: "Street is required",
+                    minLength: {
+                      value: 3,
+                      message: "Street must be at least 3 characters long",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z0-9\s]+$/,
+                      message: "Invalid street name",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Street"
+                      error={!!errors.street}
+                      helperText={errors.street ? errors.street.message : ""}
+                    />
+                  )}
+                />
+              </div>
+              <div className={styles.field}>
+                <Controller
+                  name="houseNo"
+                  defaultValue={merchantAddressData.houseNo}
+                  control={control}
+                  rules={{
+                    required: "House number is required",
+                    pattern: {
+                      value: /^[0-9]+[A-Za-z]?\/?[0-9]*[A-Za-z]?$/,
+                      message: "Invalid house number",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="House number"
+                      error={!!errors.houseNo}
+                      helperText={errors.houseNo ? errors.houseNo.message : ""}
+                    />
+                  )}
+                />
+              </div>
+              <div className={styles.field}>
+                <Controller
+                  name="appartmentNo"
+                  control={control}
+                  defaultValue={merchantAddressData.appartmentNo}
+                  rules={{
+                    min: {
+                      value: 1,
+                      message: "Apartment number must be greater than zero",
+                    },
+                    pattern: {
+                      value: /^(?!0+$)\d+$/,
+                      message:
+                        "Invalid apartment number. Only numbers greater than zero are allowed.",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Appartment number"
+                      error={!!errors.appartmentNo}
+                      type="number"
+                      InputProps={{ inputProps: { min: 1 } }}
+                      helperText={
+                        errors.appartmentNo ? errors.appartmentNo.message : ""
+                      }
+                    />
+                  )}
+                />
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <Controller
+                  name="postCode"
+                  control={control}
+                  defaultValue={merchantAddressData.postCode}
+                  rules={{
+                    required: "Post code is required",
+                    pattern: {
+                      value: /^\d{2}-\d{3}$/,
+                      message: "Post code must be in the format XX-XXX",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Post code"
+                      error={!!errors.postCode}
+                      helperText={
+                        errors.postCode ? errors.postCode.message : ""
+                      }
+                    />
+                  )}
+                />
+              </div>
+              <div className={styles.field}>
+                <Controller
+                  name="city"
+                  control={control}
+                  defaultValue={merchantAddressData.city}
+                  rules={{
+                    required: "City is required",
+                    minLength: {
+                      value: 3,
+                      message: "City name must be at least 3 characters long",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z\s]{3,}$/,
+                      message: "Invalid city name",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="City"
+                      error={!!errors.city}
+                      helperText={errors.city ? errors.city.message : ""}
+                    />
+                  )}
+                />
+              </div>
+              <div className={styles.field}>
+                <Controller
+                  name="Country"
+                  control={control}
+                  rules={{ required: "Country is required" }}
+                  defaultValue="Polska"
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      disabled={true}
+                      label="Country"
+                      error={!!errors.country}
+                      helperText={errors.country ? errors.country.message : ""}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+          <Button type="submit">{t("SaveCompanyData")}</Button>
+        </form>
+      );
+    }
   };
 
   const getPricesContent = () => {
