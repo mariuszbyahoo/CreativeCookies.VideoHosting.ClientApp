@@ -41,8 +41,24 @@ const SubscribeComponent = () => {
     formState: { errors },
   } = useForm();
 
-  const fetchPriceList = async () => {
+  const [userNeedsAddress, setUserNeedsAddress] = useState(true);
+
+  const fetchPageData = async () => {
     setLoading(true);
+    let usersAddress = null;
+    const addressResponse = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/Address`,
+      {
+        method: "GET",
+        headers: [["content-type", "application/json"]],
+        credentials: "include",
+      }
+    );
+    if (addressResponse.status === 200)
+      usersAddress = await addressResponse.json();
+
+    setUserNeedsAddress(usersAddress == null);
+
     const subscriptionResult = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/FetchSubscriptionPlan`
     );
@@ -61,241 +77,278 @@ const SubscribeComponent = () => {
   };
 
   useEffect(() => {
-    fetchPriceList();
+    fetchPageData();
   }, [isAuthenticated]);
 
-  const getActionButton = () => {
+  const getActionButton = (userNeedsAddress) => {
     const colClassName = `${styles.addressContainer} col`;
 
-    return isAuthenticated ? (
-      <div className={styles.container}>
-        <p style={{ fontWeight: 700 }}>Add invoice address:</p>
-        <form onSubmit={handleSubmit(onSubmit)}>
+    if (isAuthenticated) {
+      if (userNeedsAddress) {
+        return (
           <div className={styles.container}>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <Controller
-                  name="firstName"
-                  control={control}
-                  rules={{
-                    required: "First name is required",
-                    minLength: {
-                      value: 3,
-                      message: "First name must be at least 3 characters long",
-                    },
-                    pattern: {
-                      value: /^[A-Za-z\s]{3,}$/,
-                      message: "Invalid first name",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="FirstName"
-                      error={!!errors.firstName}
-                      helperText={
-                        errors.firstName ? errors.firstName.message : ""
-                      }
+            <p style={{ fontWeight: 700 }}>Add invoice address:</p>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className={styles.container}>
+                <div className={styles.row}>
+                  <div className={styles.field}>
+                    <Controller
+                      name="firstName"
+                      control={control}
+                      rules={{
+                        required: "First name is required",
+                        minLength: {
+                          value: 3,
+                          message:
+                            "First name must be at least 3 characters long",
+                        },
+                        pattern: {
+                          value: /^[A-Za-z\s]{3,}$/,
+                          message: "Invalid first name",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="FirstName"
+                          error={!!errors.firstName}
+                          helperText={
+                            errors.firstName ? errors.firstName.message : ""
+                          }
+                        />
+                      )}
                     />
-                  )}
-                />
-              </div>
-              <div className={styles.field}>
-                <Controller
-                  name="lastName"
-                  control={control}
-                  rules={{
-                    required: "Last name is required",
-                    minLength: {
-                      value: 3,
-                      message: "Last name must be at least 3 characters long",
-                    },
-                    pattern: {
-                      value: /^[A-Za-z\s]{3,}$/,
-                      message: "Invalid last name",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="LastName"
-                      error={!!errors.lastName}
-                      helperText={
-                        errors.lastName ? errors.lastName.message : ""
-                      }
+                  </div>
+                  <div className={styles.field}>
+                    <Controller
+                      name="lastName"
+                      control={control}
+                      rules={{
+                        required: "Last name is required",
+                        minLength: {
+                          value: 3,
+                          message:
+                            "Last name must be at least 3 characters long",
+                        },
+                        pattern: {
+                          value: /^[A-Za-z\s]{3,}$/,
+                          message: "Invalid last name",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="LastName"
+                          error={!!errors.lastName}
+                          helperText={
+                            errors.lastName ? errors.lastName.message : ""
+                          }
+                        />
+                      )}
                     />
-                  )}
-                />
-              </div>
-            </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <Controller
-                  name="street"
-                  control={control}
-                  rules={{
-                    required: "Street is required",
-                    minLength: {
-                      value: 3,
-                      message: "Street must be at least 3 characters long",
-                    },
-                    pattern: {
-                      value: /^[A-Za-z0-9\s]+$/,
-                      message: "Invalid street name",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Street"
-                      error={!!errors.street}
-                      helperText={errors.street ? errors.street.message : ""}
+                  </div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.field}>
+                    <Controller
+                      name="street"
+                      control={control}
+                      rules={{
+                        required: "Street is required",
+                        minLength: {
+                          value: 3,
+                          message: "Street must be at least 3 characters long",
+                        },
+                        pattern: {
+                          value: /^[A-Za-z0-9\s]+$/,
+                          message: "Invalid street name",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Street"
+                          error={!!errors.street}
+                          helperText={
+                            errors.street ? errors.street.message : ""
+                          }
+                        />
+                      )}
                     />
-                  )}
-                />
-              </div>
-              <div className={styles.field}>
-                <Controller
-                  name="houseNo"
-                  control={control}
-                  rules={{
-                    required: "House number is required",
-                    pattern: {
-                      value: /^[0-9]+[A-Za-z]?\/?[0-9]*[A-Za-z]?$/,
-                      message: "Invalid house number",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="House number"
-                      error={!!errors.houseNo}
-                      helperText={errors.houseNo ? errors.houseNo.message : ""}
+                  </div>
+                  <div className={styles.field}>
+                    <Controller
+                      name="houseNo"
+                      control={control}
+                      rules={{
+                        required: "House number is required",
+                        pattern: {
+                          value: /^[0-9]+[A-Za-z]?\/?[0-9]*[A-Za-z]?$/,
+                          message: "Invalid house number",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="House number"
+                          error={!!errors.houseNo}
+                          helperText={
+                            errors.houseNo ? errors.houseNo.message : ""
+                          }
+                        />
+                      )}
                     />
-                  )}
-                />
-              </div>
-              <div className={styles.field}>
-                <Controller
-                  name="appartmentNo"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Appartment number"
-                      error={!!errors.appartmentNo}
-                      helperText={
-                        errors.appartmentNo ? errors.appartmentNo.message : ""
-                      }
+                  </div>
+                  <div className={styles.field}>
+                    <Controller
+                      name="appartmentNo"
+                      control={control}
+                      rules={{
+                        min: {
+                          value: 1,
+                          message: "Apartment number must be greater than zero",
+                        },
+                        pattern: {
+                          value: /^(?!0+$)\d+$/,
+                          message:
+                            "Invalid apartment number. Only numbers greater than zero are allowed.",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Appartment number"
+                          error={!!errors.appartmentNo}
+                          type="number"
+                          InputProps={{ inputProps: { min: 1 } }}
+                          helperText={
+                            errors.appartmentNo
+                              ? errors.appartmentNo.message
+                              : ""
+                          }
+                        />
+                      )}
                     />
-                  )}
-                />
-              </div>
-            </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <Controller
-                  name="postCode"
-                  control={control}
-                  rules={{
-                    required: "Post code is required",
-                    pattern: {
-                      value: /^\d{2}-\d{3}$/,
-                      message: "Post code must be in the format XX-XXX",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Post code"
-                      error={!!errors.postCode}
-                      helperText={
-                        errors.postCode ? errors.postCode.message : ""
-                      }
+                  </div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.field}>
+                    <Controller
+                      name="postCode"
+                      control={control}
+                      rules={{
+                        required: "Post code is required",
+                        pattern: {
+                          value: /^\d{2}-\d{3}$/,
+                          message: "Post code must be in the format XX-XXX",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Post code"
+                          error={!!errors.postCode}
+                          helperText={
+                            errors.postCode ? errors.postCode.message : ""
+                          }
+                        />
+                      )}
                     />
-                  )}
-                />
-              </div>
-              <div className={styles.field}>
-                <Controller
-                  name="city"
-                  control={control}
-                  rules={{
-                    required: "City is required",
-                    minLength: {
-                      value: 3,
-                      message: "City name must be at least 3 characters long",
-                    },
-                    pattern: {
-                      value: /^[A-Za-z\s]{3,}$/,
-                      message: "Invalid city name",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="City"
-                      error={!!errors.city}
-                      helperText={errors.city ? errors.city.message : ""}
+                  </div>
+                  <div className={styles.field}>
+                    <Controller
+                      name="city"
+                      control={control}
+                      rules={{
+                        required: "City is required",
+                        minLength: {
+                          value: 3,
+                          message:
+                            "City name must be at least 3 characters long",
+                        },
+                        pattern: {
+                          value: /^[A-Za-z\s]{3,}$/,
+                          message: "Invalid city name",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="City"
+                          error={!!errors.city}
+                          helperText={errors.city ? errors.city.message : ""}
+                        />
+                      )}
                     />
-                  )}
-                />
-              </div>
-              <div className={styles.field}>
-                <Controller
-                  name="Country"
-                  control={control}
-                  rules={{ required: "Country is required" }}
-                  defaultValue="Polska"
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      disabled={true}
-                      label="Country"
-                      error={!!errors.country}
-                      helperText={errors.country ? errors.country.message : ""}
+                  </div>
+                  <div className={styles.field}>
+                    <Controller
+                      name="Country"
+                      control={control}
+                      rules={{ required: "Country is required" }}
+                      defaultValue="Polska"
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          disabled={true}
+                          label="Country"
+                          error={!!errors.country}
+                          helperText={
+                            errors.country ? errors.country.message : ""
+                          }
+                        />
+                      )}
                     />
-                  )}
-                />
+                  </div>
+                </div>
               </div>
-            </div>
+              <p>
+                Above address will be used only for invoicing purposes and the
+                tax identification
+              </p>
+              <Button type="submit">
+                <ShopIcon /> {t("Subscribe")}
+              </Button>
+            </form>
           </div>
-          <p>
-            Above address will be used only for invoicing purposes and the tax
-            identification
-          </p>
-          <Button type="submit">
+        );
+      } else {
+        return (
+          <Button variant="outlined" onClick={handleClick}>
             <ShopIcon /> {t("Subscribe")}
           </Button>
-        </form>
-        {/* <Button variant="outlined" onClick={handleClick}>
-          <ShopIcon /> {t("Subscribe")}
-        </Button> */}
-      </div>
-    ) : (
-      <Button variant="outlined">
-        <HowToReg /> {t("Register")}
-      </Button>
-    );
+        );
+      }
+    } else {
+      return (
+        <Button variant="outlined">
+          <HowToReg /> {t("Register")}
+        </Button>
+      );
+    }
   };
 
   const handleDeclinedCoolingOffPeriodChange = (event) => {
     setHasDeclinedCoolingOffPeriod(event.target.checked);
   };
   const onSubmit = async (addressData) => {
-    debugger;
-    // Data contains your form fields
+    addressData.appartmentNo = addressData.appartmentNo
+      ? parseInt(addressData.appartmentNo, 10)
+      : null; // Convert to integer or null
     const requestBody = {
       address: addressData,
       priceId: selectedPriceId,
       hasDeclinedCoolingOffPeriod: hasDeclinedCoolingOffPeriod,
     };
-    // ... send data to your API
     openCheckoutSession(requestBody);
   };
-  // const handleClick = async () => {
-  //   openCheckoutSession();
-  // };
+  const handleClick = async () => {
+    const requestBody = {
+      priceId: selectedPriceId,
+      hasDeclinedCoolingOffPeriod: hasDeclinedCoolingOffPeriod,
+    };
+    openCheckoutSession(requestBody);
+  };
 
   const openCheckoutSession = async (requestBody) => {
     const paymentSessionResult = await fetch(
@@ -392,7 +445,7 @@ const SubscribeComponent = () => {
           )}
         </div>
 
-        {getActionButton()}
+        {loading ? <CircularProgress /> : getActionButton(userNeedsAddress)}
       </div>
       <Dialog
         open={isSubscriptionActiveDialogOpened}
