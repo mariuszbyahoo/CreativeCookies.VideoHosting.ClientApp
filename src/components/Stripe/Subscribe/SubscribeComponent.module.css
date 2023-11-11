@@ -10,6 +10,12 @@
     justify-content: center;
   }
 
+  .divider {
+    width: 100%;
+    margin-top:1vmax;
+    margin-bottom:1vmax;
+  }
+
   .row {
     display: flex;
     width: 100%;
