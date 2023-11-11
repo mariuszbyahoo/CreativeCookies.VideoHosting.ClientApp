@@ -1,6 +1,6 @@
 .container {
     text-align: center;
-    margin-block: 3vmax;
+    margin: 1vmax;
 }
 
 .checkboxContainer {
@@ -8,6 +8,35 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+
+  .row {
+    display: flex;
+    width: 100%;
+  }
+  
+.field {
+  margin: 0.5rem 0; /* Add some space between fields */
+}
+  
+  /* On larger screens, we use a row with wrapped items */
+  @media (min-width: 768px) {
+    .row {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1vmax; /* Adjust the gap as needed */
+    }
+  }
+
+  @media (max-width: 768px) {
+    .row {
+      flex-direction: column;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1vmax; /* Adjust the gap as needed */
+    }
+
   }
   
   .checkboxLabel {
