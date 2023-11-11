@@ -77,7 +77,17 @@ const SubscribeComponent = () => {
                 <Controller
                   name="firstName"
                   control={control}
-                  rules={{ required: "First name is required" }}
+                  rules={{
+                    required: "First name is required",
+                    minLength: {
+                      value: 3,
+                      message: "First name must be at least 3 characters long",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z\s]{3,}$/,
+                      message: "Invalid first name",
+                    },
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -94,7 +104,17 @@ const SubscribeComponent = () => {
                 <Controller
                   name="lastName"
                   control={control}
-                  rules={{ required: "Last name is required" }}
+                  rules={{
+                    required: "Last name is required",
+                    minLength: {
+                      value: 3,
+                      message: "Last name must be at least 3 characters long",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z\s]{3,}$/,
+                      message: "Invalid last name",
+                    },
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -113,7 +133,17 @@ const SubscribeComponent = () => {
                 <Controller
                   name="street"
                   control={control}
-                  rules={{ required: "Street is required" }}
+                  rules={{
+                    required: "Street is required",
+                    minLength: {
+                      value: 3,
+                      message: "Street must be at least 3 characters long",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z0-9\s]+$/,
+                      message: "Invalid street name",
+                    },
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -128,7 +158,13 @@ const SubscribeComponent = () => {
                 <Controller
                   name="houseNo"
                   control={control}
-                  rules={{ required: "House number is required" }}
+                  rules={{
+                    required: "House number is required",
+                    pattern: {
+                      value: /^[0-9]+[A-Za-z]?\/?[0-9]*[A-Za-z]?$/,
+                      message: "Invalid house number",
+                    },
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -161,7 +197,13 @@ const SubscribeComponent = () => {
                 <Controller
                   name="postCode"
                   control={control}
-                  rules={{ required: "Post code is required" }}
+                  rules={{
+                    required: "Post code is required",
+                    pattern: {
+                      value: /^\d{2}-\d{3}$/,
+                      message: "Post code must be in the format XX-XXX",
+                    },
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -178,7 +220,17 @@ const SubscribeComponent = () => {
                 <Controller
                   name="city"
                   control={control}
-                  rules={{ required: "City is required" }}
+                  rules={{
+                    required: "City is required",
+                    minLength: {
+                      value: 3,
+                      message: "City name must be at least 3 characters long",
+                    },
+                    pattern: {
+                      value: /^[A-Za-z\s]{3,}$/,
+                      message: "Invalid city name",
+                    },
+                  }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -194,14 +246,14 @@ const SubscribeComponent = () => {
                   name="Country"
                   control={control}
                   rules={{ required: "Country is required" }}
+                  defaultValue="Polska"
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      disabled="disabled"
+                      disabled={true}
                       label="Country"
                       error={!!errors.country}
                       helperText={errors.country ? errors.country.message : ""}
-                      value="Polska"
                     />
                   )}
                 />
@@ -231,6 +283,7 @@ const SubscribeComponent = () => {
     setHasDeclinedCoolingOffPeriod(event.target.checked);
   };
   const onSubmit = async (addressData) => {
+    debugger;
     // Data contains your form fields
     const requestBody = {
       address: addressData,
