@@ -427,7 +427,7 @@ const NavMenu = () => {
       </header>
 
       <ConfirmationDialog
-        title="Cooling off period"
+        title={t("CoolingOffPeriod")}
         message={coolingOffPeriodCancelDialogMsg}
         open={isCoolingOffPeriodCancelDialogOpened}
         hasCancelOption={true}
@@ -435,8 +435,8 @@ const NavMenu = () => {
           handleCoolingOffPeriodCancelDialogConfirm();
         }}
         onCancel={() => setCoolingOffPeriodCancelDialogOpened(false)}
-        confirmBtnMsg="Cancel order"
-        cancelBtnMsg="Close window"
+        confirmBtnMsg={t("WithdrawContract")}
+        cancelBtnMsg={t("CloseWindow")}
       ></ConfirmationDialog>
 
       <Dialog
