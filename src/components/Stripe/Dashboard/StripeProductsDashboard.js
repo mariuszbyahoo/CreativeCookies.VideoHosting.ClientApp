@@ -115,6 +115,14 @@ const StripeProductsDashboardComponent = () => {
   };
 
   const onSubmit = async (submitFormData) => {
+    if (
+      submitFormData.appartmentNo === "" ||
+      isNaN(submitFormData.appartmentNo)
+    ) {
+      submitFormData.appartmentNo = null;
+    } else {
+      submitFormData.appartmentNo = parseInt(submitFormData.appartmentNo, 10);
+    }
     const merchantAddressResponse = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/Merchant`,
       {
@@ -149,7 +157,9 @@ const StripeProductsDashboardComponent = () => {
                   <Controller
                     name="companyName"
                     control={control}
-                    defaultValue={merchantAddressData.companyName}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.companyName : ""
+                    }
                     rules={{
                       required: "Company name is required",
                       minLength: {
@@ -174,7 +184,11 @@ const StripeProductsDashboardComponent = () => {
                   <Controller
                     name="companyTaxId"
                     control={control}
-                    defaultValue={merchantAddressData.companyTaxId}
+                    defaultValue={
+                      merchantAddressData
+                        ? merchantAddressData.companyTaxId
+                        : ""
+                    }
                     rules={{
                       required: "Tax id is required",
                       minLength: {
@@ -204,7 +218,9 @@ const StripeProductsDashboardComponent = () => {
                   <Controller
                     name="street"
                     control={control}
-                    defaultValue={merchantAddressData.street}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.street : ""
+                    }
                     rules={{
                       required: "Street is required",
                       minLength: {
@@ -229,7 +245,9 @@ const StripeProductsDashboardComponent = () => {
                 <div className={styles.field}>
                   <Controller
                     name="houseNo"
-                    defaultValue={merchantAddressData.houseNo}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.houseNo : ""
+                    }
                     control={control}
                     rules={{
                       required: "House number is required",
@@ -254,7 +272,11 @@ const StripeProductsDashboardComponent = () => {
                   <Controller
                     name="appartmentNo"
                     control={control}
-                    defaultValue={merchantAddressData.appartmentNo}
+                    defaultValue={
+                      merchantAddressData
+                        ? merchantAddressData.appartmentNo
+                        : ""
+                    }
                     rules={{
                       min: {
                         value: 1,
@@ -286,7 +308,9 @@ const StripeProductsDashboardComponent = () => {
                   <Controller
                     name="postCode"
                     control={control}
-                    defaultValue={merchantAddressData.postCode}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.postCode : ""
+                    }
                     rules={{
                       required: "Post code is required",
                       pattern: {
@@ -310,7 +334,9 @@ const StripeProductsDashboardComponent = () => {
                   <Controller
                     name="city"
                     control={control}
-                    defaultValue={merchantAddressData.city}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.city : ""
+                    }
                     rules={{
                       required: "City is required",
                       minLength: {
