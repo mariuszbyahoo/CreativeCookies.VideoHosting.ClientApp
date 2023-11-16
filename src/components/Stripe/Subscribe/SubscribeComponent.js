@@ -85,7 +85,7 @@ const SubscribeComponent = () => {
     if (isAuthenticated) {
       return (
         <div className={styles.container}>
-          <p style={{ fontWeight: 700 }}>Add invoice address:</p>
+          <p style={{ fontWeight: 700 }}>{t("InvoiceAddressMsg")}:</p>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className={styles.container}>
               <div className={styles.row}>
@@ -95,21 +95,20 @@ const SubscribeComponent = () => {
                     control={control}
                     defaultValue={userAddress && userAddress.firstName}
                     rules={{
-                      required: "First name is required",
+                      required: t("FirstNameRequired"),
                       minLength: {
                         value: 3,
-                        message:
-                          "First name must be at least 3 characters long",
+                        message: t("FirstNameAtLeast3Chars"),
                       },
                       pattern: {
                         value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
-                        message: "Invalid first name",
+                        message: t("InvalidFirstName"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="FirstName"
+                        label={t("FirstName")}
                         error={!!errors.firstName}
                         helperText={
                           errors.firstName ? errors.firstName.message : ""
@@ -124,20 +123,20 @@ const SubscribeComponent = () => {
                     defaultValue={userAddress && userAddress.lastName}
                     control={control}
                     rules={{
-                      required: "Last name is required",
+                      required: t("LastNameRequired"),
                       minLength: {
                         value: 3,
-                        message: "Last name must be at least 3 characters long",
+                        message: t("LastNameAtLeast3Chars"),
                       },
                       pattern: {
                         value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
-                        message: "Invalid last name",
+                        message: t("InvalidLastName"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="LastName"
+                        label={t("LastName")}
                         error={!!errors.lastName}
                         helperText={
                           errors.lastName ? errors.lastName.message : ""
@@ -154,20 +153,20 @@ const SubscribeComponent = () => {
                     defaultValue={userAddress && userAddress.street}
                     control={control}
                     rules={{
-                      required: "Street is required",
+                      required: t("StreetIsRequired"),
                       minLength: {
                         value: 3,
-                        message: "Street must be at least 3 characters long",
+                        message: t("StreetAtLeast3CharsLong"),
                       },
                       pattern: {
                         value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
-                        message: "Invalid street name",
+                        message: t("InvalidStreetName"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Street"
+                        label={t("Street")}
                         error={!!errors.street}
                         helperText={errors.street ? errors.street.message : ""}
                       />
@@ -180,16 +179,16 @@ const SubscribeComponent = () => {
                     defaultValue={userAddress && userAddress.houseNo}
                     control={control}
                     rules={{
-                      required: "House number is required",
+                      required: t("HouseNumberIsRequired"),
                       pattern: {
                         value: /^[0-9]+[A-Za-z]?\/?[0-9]*[A-Za-z]?$/,
-                        message: "Invalid house number",
+                        message: t("InvalidHouseNumber"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="House number"
+                        label={t("HouseNumber")}
                         error={!!errors.houseNo}
                         helperText={
                           errors.houseNo ? errors.houseNo.message : ""
@@ -206,18 +205,17 @@ const SubscribeComponent = () => {
                     rules={{
                       min: {
                         value: 1,
-                        message: "Apartment number must be greater than zero",
+                        message: t("AppartmentNumberReqErrorMsg"),
                       },
                       pattern: {
                         value: /^(?!0+$)\d+$/,
-                        message:
-                          "Invalid apartment number. Only numbers greater than zero are allowed.",
+                        message: t("AppartmentNumberReqErrorMsg"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Appartment number"
+                        label={t("AppartmentNumber")}
                         error={!!errors.appartmentNo}
                         type="number"
                         InputProps={{ inputProps: { min: 1 } }}
@@ -236,16 +234,16 @@ const SubscribeComponent = () => {
                     defaultValue={userAddress && userAddress.postCode}
                     control={control}
                     rules={{
-                      required: "Post code is required",
+                      required: t("PostCodeReq"),
                       pattern: {
                         value: /^\d{2}-\d{3}$/,
-                        message: "Post code must be in the format XX-XXX",
+                        message: t("PostCodeFormat"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Post code"
+                        label={t("PostCode")}
                         error={!!errors.postCode}
                         helperText={
                           errors.postCode ? errors.postCode.message : ""
@@ -260,20 +258,20 @@ const SubscribeComponent = () => {
                     defaultValue={userAddress && userAddress.city}
                     control={control}
                     rules={{
-                      required: "City is required",
+                      required: t("CityIsReq"),
                       minLength: {
                         value: 3,
-                        message: "City name must be at least 3 characters long",
+                        message: t("CityLengthMsg"),
                       },
                       pattern: {
                         value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
-                        message: "Invalid city name",
+                        message: t("CityFormat"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="City"
+                        label={t("City")}
                         error={!!errors.city}
                         helperText={errors.city ? errors.city.message : ""}
                       />
@@ -284,13 +282,13 @@ const SubscribeComponent = () => {
                   <Controller
                     name="Country"
                     control={control}
-                    rules={{ required: "Country is required" }}
+                    rules={{ required: t("CountryReq") }}
                     defaultValue="Polska"
                     render={({ field }) => (
                       <TextField
                         {...field}
                         disabled={true}
-                        label="Country"
+                        label={t("Country")}
                         error={!!errors.country}
                         helperText={
                           errors.country ? errors.country.message : ""
@@ -301,10 +299,7 @@ const SubscribeComponent = () => {
                 </div>
               </div>
             </div>
-            <p>
-              Above address will be used only for invoicing purposes and the tax
-              identification
-            </p>
+            <p>{t("AddressMsg")}</p>
             <Button type="submit">
               <ShopIcon /> {t("Subscribe")}
             </Button>
@@ -443,7 +438,7 @@ const SubscribeComponent = () => {
           )}
         </div>
 
-        {loading ? <CircularProgress /> : getActionButton()}
+        {loading ? <></> : getActionButton()}
       </div>
       <Dialog
         open={isSubscriptionActiveDialogOpened}
