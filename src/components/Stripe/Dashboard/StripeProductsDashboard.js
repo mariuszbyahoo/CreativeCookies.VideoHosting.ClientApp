@@ -254,7 +254,7 @@ const StripeProductsDashboardComponent = () => {
                         message: t("StreetAtLeast3CharsLong"),
                       },
                       pattern: {
-                        value: /^[A-Za-z0-9\s]+$/,
+                        value: /^[A-Za-z0-9\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]+$/,
                         message: t("InvalidStreetName"),
                       },
                     }}
@@ -369,7 +369,7 @@ const StripeProductsDashboardComponent = () => {
                         message: t("CityLengthMsg"),
                       },
                       pattern: {
-                        value: /^[A-Za-z\s]{3,}$/,
+                        value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
                         message: t("CityFormat"),
                       },
                     }}
