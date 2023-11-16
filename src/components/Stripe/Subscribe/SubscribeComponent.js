@@ -475,7 +475,7 @@ const SubscribeComponent = () => {
           <DialogContentText>{t("UnexpectedErrorOccured")}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeOrderActiveDialog}>{t("Close")}</Button>
+          <Button onClick={closeUnexpectedErrorOccured}>{t("Close")}</Button>
         </DialogActions>
       </Dialog>
     </>
