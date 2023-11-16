@@ -103,7 +103,7 @@ const SubscribeComponent = () => {
                             "First name must be at least 3 characters long",
                         },
                         pattern: {
-                          value: /^[A-Za-z\s]{3,}$/,
+                          value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
                           message: "Invalid first name",
                         },
                       }}
@@ -131,7 +131,7 @@ const SubscribeComponent = () => {
                             "Last name must be at least 3 characters long",
                         },
                         pattern: {
-                          value: /^[A-Za-z\s]{3,}$/,
+                          value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
                           message: "Invalid last name",
                         },
                       }}
@@ -160,7 +160,7 @@ const SubscribeComponent = () => {
                           message: "Street must be at least 3 characters long",
                         },
                         pattern: {
-                          value: /^[A-Za-z0-9\s]+$/,
+                          value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
                           message: "Invalid street name",
                         },
                       }}
@@ -267,7 +267,7 @@ const SubscribeComponent = () => {
                             "City name must be at least 3 characters long",
                         },
                         pattern: {
-                          value: /^[A-Za-z\s]{3,}$/,
+                          value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
                           message: "Invalid city name",
                         },
                       }}
