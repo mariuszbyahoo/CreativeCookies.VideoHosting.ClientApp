@@ -61,10 +61,10 @@ const AboutComponent = () => {
           ) : (
             <>
               <h4>Here's the about page,</h4>
-              <h7 style={{ textAlign: "center" }}>
+              <p style={{ textAlign: "center" }}>
                 Login using admin account to add here some brief explanation of
                 your content for new viewers.
-              </h7>
+              </p>
             </>
           )}
         </div>

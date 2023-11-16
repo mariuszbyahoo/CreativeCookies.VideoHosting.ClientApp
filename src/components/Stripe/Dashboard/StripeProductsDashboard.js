@@ -36,6 +36,8 @@ const StripeProductsDashboardComponent = () => {
   const [merchantAddressData, setMerchantAddressData] = useState(undefined);
   const [merchantAddressSubmitted, setMerchantAddressSubmitted] =
     useState(false);
+  const [merchantAddressNotAltered, setMerchantAddressNotAltered] =
+    useState(false);
   const {
     control,
     handleSubmit,
@@ -48,7 +50,6 @@ const StripeProductsDashboardComponent = () => {
     const fetchData = async () => {
       try {
         // HACK: Add condition to add merchant's address before allowing to edit anything else
-        debugger;
         const merchantAddressResponse = await fetchWithCredentials(
           `https://${process.env.REACT_APP_API_ADDRESS}/Merchant`
         );
@@ -133,10 +134,12 @@ const StripeProductsDashboardComponent = () => {
         credentials: "include",
       }
     );
+    debugger;
     if (merchantAddressResponse.status === 200) {
       const wasSubmittedSuccesfully =
         (await merchantAddressResponse.json()) === 1;
       if (wasSubmittedSuccesfully) setMerchantAddressSubmitted(true);
+      else setMerchantAddressNotAltered(true);
     }
   };
 
@@ -146,7 +149,7 @@ const StripeProductsDashboardComponent = () => {
     } else {
       return (
         <>
-          <h4>Review your company's address, and the Tax related data:</h4>
+          <h4>{t("CompanyAddressDesc")}:</h4>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className={styles.container}>
               <div className={styles.row}>
@@ -158,17 +161,16 @@ const StripeProductsDashboardComponent = () => {
                       merchantAddressData ? merchantAddressData.companyName : ""
                     }
                     rules={{
-                      required: "Company name is required",
+                      required: t("CompanyNameIsRequired"),
                       minLength: {
                         value: 3,
-                        message:
-                          "Company name must be at least 3 characters long",
+                        message: t("CompanyNameNotLessThan3Chars"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Company name"
+                        label={t("CompanyName")}
                         error={!!errors.companyName}
                         helperText={
                           errors.companyName ? errors.companyName.message : ""
@@ -187,20 +189,20 @@ const StripeProductsDashboardComponent = () => {
                         : ""
                     }
                     rules={{
-                      required: "Tax id is required",
+                      required: t("TaxIdRequired"),
                       minLength: {
                         value: 3,
-                        message: "",
+                        message: t("TaxIdNotLessThan3Chars"),
                       },
                       pattern: {
                         value: /^[A-Za-z0-9\s]+$/,
-                        message: "Invalid last name",
+                        message: t("InvalidLastName"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Company Tax Id"
+                        label={t("CompanyTaxId")}
                         error={!!errors.companyTaxId}
                         helperText={
                           errors.companyTaxId ? errors.companyTaxId.message : ""
@@ -228,7 +230,7 @@ const StripeProductsDashboardComponent = () => {
                           onChange={(e) => onChange(e.target.checked)}
                           color="primary"
                         />
-                        <label>IsCompanyVATExempt</label>
+                        <label>{t("IsCompanyVATExempt")}</label>
                         {error && (
                           <p className={styles.errorText}>{error.message}</p>
                         )}
@@ -246,20 +248,20 @@ const StripeProductsDashboardComponent = () => {
                       merchantAddressData ? merchantAddressData.street : ""
                     }
                     rules={{
-                      required: "Street is required",
+                      required: t("StreetIsRequired"),
                       minLength: {
                         value: 3,
-                        message: "Street must be at least 3 characters long",
+                        message: t("StreetAtLeast3CharsLong"),
                       },
                       pattern: {
                         value: /^[A-Za-z0-9\s]+$/,
-                        message: "Invalid street name",
+                        message: t("InvalidStreetName"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Street"
+                        label={t("Street")}
                         error={!!errors.street}
                         helperText={errors.street ? errors.street.message : ""}
                       />
@@ -274,16 +276,16 @@ const StripeProductsDashboardComponent = () => {
                     }
                     control={control}
                     rules={{
-                      required: "House number is required",
+                      required: t("HouseNumberIsRequired"),
                       pattern: {
                         value: /^[0-9]+[A-Za-z]?\/?[0-9]*[A-Za-z]?$/,
-                        message: "Invalid house number",
+                        message: t("InvalidHouseNumber"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="House number"
+                        label={t("HouseNumber")}
                         error={!!errors.houseNo}
                         helperText={
                           errors.houseNo ? errors.houseNo.message : ""
@@ -304,18 +306,17 @@ const StripeProductsDashboardComponent = () => {
                     rules={{
                       min: {
                         value: 1,
-                        message: "Apartment number must be greater than zero",
+                        message: t("AppartmentNumberReqErrorMsg"),
                       },
                       pattern: {
                         value: /^(?!0+$)\d+$/,
-                        message:
-                          "Invalid apartment number. Only numbers greater than zero are allowed.",
+                        message: t("AppartmentNumberLghErrorMsg"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Appartment number"
+                        label={t("AppartmentNumber")}
                         error={!!errors.appartmentNo}
                         type="number"
                         InputProps={{ inputProps: { min: 1 } }}
@@ -336,16 +337,16 @@ const StripeProductsDashboardComponent = () => {
                       merchantAddressData ? merchantAddressData.postCode : ""
                     }
                     rules={{
-                      required: "Post code is required",
+                      required: t("PostCodeReq"),
                       pattern: {
                         value: /^\d{2}-\d{3}$/,
-                        message: "Post code must be in the format XX-XXX",
+                        message: t("PostCodeFormat"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Post code"
+                        label={t("PostCode")}
                         error={!!errors.postCode}
                         helperText={
                           errors.postCode ? errors.postCode.message : ""
@@ -362,20 +363,20 @@ const StripeProductsDashboardComponent = () => {
                       merchantAddressData ? merchantAddressData.city : ""
                     }
                     rules={{
-                      required: "City is required",
+                      required: t("CityIsReq"),
                       minLength: {
                         value: 3,
-                        message: "City name must be at least 3 characters long",
+                        message: t("CityLengthMsg"),
                       },
                       pattern: {
                         value: /^[A-Za-z\s]{3,}$/,
-                        message: "Invalid city name",
+                        message: t("CityFormat"),
                       },
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="City"
+                        label={t("City")}
                         error={!!errors.city}
                         helperText={errors.city ? errors.city.message : ""}
                       />
@@ -386,13 +387,13 @@ const StripeProductsDashboardComponent = () => {
                   <Controller
                     name="Country"
                     control={control}
-                    rules={{ required: "Country is required" }}
+                    rules={{ required: t("CountryReq") }}
                     defaultValue="Polska"
                     render={({ field }) => (
                       <TextField
                         {...field}
                         disabled={true}
-                        label="Country"
+                        label={t("Country")}
                         error={!!errors.country}
                         helperText={
                           errors.country ? errors.country.message : ""
@@ -530,6 +531,15 @@ const StripeProductsDashboardComponent = () => {
         hasCancelOption={false}
         onConfirm={() => {
           setMerchantAddressSubmitted(false);
+        }}
+      ></ConfirmationDialog>
+      <ConfirmationDialog
+        title={t("DataUnchanged")}
+        message={t("MerchantAddressHasNotBeenAltered")}
+        open={merchantAddressNotAltered}
+        hasCancelOption={false}
+        onConfirm={() => {
+          setMerchantAddressNotAltered(false);
         }}
       ></ConfirmationDialog>
     </div>
