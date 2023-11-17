@@ -10,6 +10,11 @@
     z-index: 1;
 }
 
+.container {
+  text-align: center;
+  margin-top: 1vmax;
+}
+
 .editButtonIcon {
     font-size: xx-large !important;
   }

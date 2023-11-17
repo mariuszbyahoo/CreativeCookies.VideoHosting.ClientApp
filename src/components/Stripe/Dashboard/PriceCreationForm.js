@@ -140,8 +140,8 @@ const PriceCreationForm = ({
                     className={styles.formInput}
                   >
                     <MenuItem value="pln">PLN</MenuItem>
-                    <MenuItem value="eur">EUR</MenuItem>
-                    <MenuItem value="usd">USD</MenuItem>
+                    {/* <MenuItem value="eur">EUR</MenuItem>
+                    <MenuItem value="usd">USD</MenuItem> */}
                   </Select>
                 </div>
               </div>

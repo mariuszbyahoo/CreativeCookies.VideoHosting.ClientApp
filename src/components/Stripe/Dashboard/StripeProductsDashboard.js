@@ -11,6 +11,7 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Switch,
 } from "@mui/material";
 import styles from "./StripeProductsDashboard.module.css";
 import ProductUpsertForm from "./ProductUpsertForm";
@@ -21,7 +22,9 @@ import {
   CheckCircleOutline,
 } from "@mui/icons-material";
 import PriceCreationForm from "./PriceCreationForm";
+import { useForm, Controller } from "react-hook-form";
 import { t } from "i18next";
+import ConfirmationDialog from "../../ConfirmationDialog";
 
 const StripeProductsDashboardComponent = () => {
   const [stripeProduct, setStripeProduct] = useState(null);
@@ -30,13 +33,33 @@ const StripeProductsDashboardComponent = () => {
   const [isLoadingPrice, setIsLoadingPrice] = useState(true);
   const [isPriceDialogOpened, setIsPriceDialogOpened] = useState(false);
   const [isProductDialogOpened, setIsProductDialogOpened] = useState(false);
-
+  const [merchantAddressData, setMerchantAddressData] = useState(undefined);
+  const [merchantAddressSubmitted, setMerchantAddressSubmitted] =
+    useState(false);
+  const [merchantAddressNotAltered, setMerchantAddressNotAltered] =
+    useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const fetchWithCredentials = (url, options) => {
     return fetch(url, { ...options, credentials: "include" });
   };
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // HACK: Add condition to add merchant's address before allowing to edit anything else
+        const merchantAddressResponse = await fetchWithCredentials(
+          `https://${process.env.REACT_APP_API_ADDRESS}/Merchant`
+        );
+        const merchantAddressData =
+          merchantAddressResponse.status === 200
+            ? await merchantAddressResponse.json()
+            : undefined;
+
+        setMerchantAddressData(merchantAddressData);
+
         const productResponse = await fetchWithCredentials(
           `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/FetchSubscriptionPlan`
         );
@@ -93,6 +116,301 @@ const StripeProductsDashboardComponent = () => {
     setIsLoadingProduct(false);
   };
 
+  const onSubmit = async (submitFormData) => {
+    if (
+      submitFormData.appartmentNo === "" ||
+      isNaN(submitFormData.appartmentNo)
+    ) {
+      submitFormData.appartmentNo = null;
+    } else {
+      submitFormData.appartmentNo = parseInt(submitFormData.appartmentNo, 10);
+    }
+    const merchantAddressResponse = await fetch(
+      `https://${process.env.REACT_APP_API_ADDRESS}/Merchant`,
+      {
+        method: "PUT",
+        body: JSON.stringify(submitFormData),
+        headers: [["content-type", "application/json"]],
+        credentials: "include",
+      }
+    );
+    debugger;
+    if (merchantAddressResponse.status === 200) {
+      const wasSubmittedSuccesfully =
+        (await merchantAddressResponse.json()) === 1;
+      if (wasSubmittedSuccesfully) setMerchantAddressSubmitted(true);
+      else setMerchantAddressNotAltered(true);
+    }
+  };
+
+  const getMerchantAddressContent = () => {
+    if (isLoadingPrice) {
+      return <></>;
+    } else {
+      return (
+        <>
+          <h4>{t("CompanyAddressDesc")}:</h4>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className={styles.container}>
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <Controller
+                    name="companyName"
+                    control={control}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.companyName : ""
+                    }
+                    rules={{
+                      required: t("CompanyNameIsRequired"),
+                      minLength: {
+                        value: 3,
+                        message: t("CompanyNameNotLessThan3Chars"),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label={t("CompanyName")}
+                        error={!!errors.companyName}
+                        helperText={
+                          errors.companyName ? errors.companyName.message : ""
+                        }
+                      />
+                    )}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <Controller
+                    name="companyTaxId"
+                    control={control}
+                    defaultValue={
+                      merchantAddressData
+                        ? merchantAddressData.companyTaxId
+                        : ""
+                    }
+                    rules={{
+                      required: t("TaxIdRequired"),
+                      minLength: {
+                        value: 3,
+                        message: t("TaxIdNotLessThan3Chars"),
+                      },
+                      pattern: {
+                        value: /^[A-Za-z0-9\s]+$/,
+                        message: t("InvalidLastName"),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label={t("CompanyTaxId")}
+                        error={!!errors.companyTaxId}
+                        helperText={
+                          errors.companyTaxId ? errors.companyTaxId.message : ""
+                        }
+                      />
+                    )}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <Controller
+                    name="isVATExempt"
+                    control={control}
+                    defaultValue={
+                      merchantAddressData
+                        ? merchantAddressData.isVATExempt
+                        : false
+                    }
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error },
+                    }) => (
+                      <>
+                        <Switch
+                          checked={value}
+                          onChange={(e) => onChange(e.target.checked)}
+                          color="primary"
+                        />
+                        <label>{t("IsCompanyVATExempt")}</label>
+                        {error && (
+                          <p className={styles.errorText}>{error.message}</p>
+                        )}
+                      </>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <Controller
+                    name="street"
+                    control={control}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.street : ""
+                    }
+                    rules={{
+                      required: t("StreetIsRequired"),
+                      minLength: {
+                        value: 3,
+                        message: t("StreetAtLeast3CharsLong"),
+                      },
+                      pattern: {
+                        value: /^[A-Za-z0-9\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]+$/,
+                        message: t("InvalidStreetName"),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label={t("Street")}
+                        error={!!errors.street}
+                        helperText={errors.street ? errors.street.message : ""}
+                      />
+                    )}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <Controller
+                    name="houseNo"
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.houseNo : ""
+                    }
+                    control={control}
+                    rules={{
+                      required: t("HouseNumberIsRequired"),
+                      pattern: {
+                        value: /^[0-9]+[A-Za-z]?\/?[0-9]*[A-Za-z]?$/,
+                        message: t("InvalidHouseNumber"),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label={t("HouseNumber")}
+                        error={!!errors.houseNo}
+                        helperText={
+                          errors.houseNo ? errors.houseNo.message : ""
+                        }
+                      />
+                    )}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <Controller
+                    name="appartmentNo"
+                    control={control}
+                    defaultValue={
+                      merchantAddressData
+                        ? merchantAddressData.appartmentNo
+                        : ""
+                    }
+                    rules={{
+                      min: {
+                        value: 1,
+                        message: t("AppartmentNumberReqErrorMsg"),
+                      },
+                      pattern: {
+                        value: /^(?!0+$)\d+$/,
+                        message: t("AppartmentNumberLghErrorMsg"),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label={t("AppartmentNumber")}
+                        error={!!errors.appartmentNo}
+                        type="number"
+                        InputProps={{ inputProps: { min: 1 } }}
+                        helperText={
+                          errors.appartmentNo ? errors.appartmentNo.message : ""
+                        }
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <Controller
+                    name="postCode"
+                    control={control}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.postCode : ""
+                    }
+                    rules={{
+                      required: t("PostCodeReq"),
+                      pattern: {
+                        value: /^\d{2}-\d{3}$/,
+                        message: t("PostCodeFormat"),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label={t("PostCode")}
+                        error={!!errors.postCode}
+                        helperText={
+                          errors.postCode ? errors.postCode.message : ""
+                        }
+                      />
+                    )}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <Controller
+                    name="city"
+                    control={control}
+                    defaultValue={
+                      merchantAddressData ? merchantAddressData.city : ""
+                    }
+                    rules={{
+                      required: t("CityIsReq"),
+                      minLength: {
+                        value: 3,
+                        message: t("CityLengthMsg"),
+                      },
+                      pattern: {
+                        value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
+                        message: t("CityFormat"),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label={t("City")}
+                        error={!!errors.city}
+                        helperText={errors.city ? errors.city.message : ""}
+                      />
+                    )}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <Controller
+                    name="Country"
+                    control={control}
+                    rules={{ required: t("CountryReq") }}
+                    defaultValue="Polska"
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        disabled={true}
+                        label={t("Country")}
+                        error={!!errors.country}
+                        helperText={
+                          errors.country ? errors.country.message : ""
+                        }
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+            <Button type="submit">{t("SaveCompanyData")}</Button>
+          </form>
+        </>
+      );
+    }
+  };
+
   const getPricesContent = () => {
     if (isLoadingPrice)
       return (
@@ -145,7 +463,9 @@ const StripeProductsDashboardComponent = () => {
   };
 
   return (
-    <>
+    <div className={styles.container}>
+      {getMerchantAddressContent()}
+      <hr className={styles.divider} />
       {stripeProduct ? (
         <div>
           <div className="container">
@@ -204,7 +524,25 @@ const StripeProductsDashboardComponent = () => {
         setIsPriceDialogOpened={setIsPriceDialogOpened}
         stripeProduct={stripeProduct}
       />
-    </>
+      <ConfirmationDialog
+        title={t("Success")}
+        message={t("MerchantAddressUpserted")}
+        open={merchantAddressSubmitted}
+        hasCancelOption={false}
+        onConfirm={() => {
+          setMerchantAddressSubmitted(false);
+        }}
+      ></ConfirmationDialog>
+      <ConfirmationDialog
+        title={t("DataUnchanged")}
+        message={t("MerchantAddressHasNotBeenAltered")}
+        open={merchantAddressNotAltered}
+        hasCancelOption={false}
+        onConfirm={() => {
+          setMerchantAddressNotAltered(false);
+        }}
+      ></ConfirmationDialog>
+    </div>
   );
 };
 
