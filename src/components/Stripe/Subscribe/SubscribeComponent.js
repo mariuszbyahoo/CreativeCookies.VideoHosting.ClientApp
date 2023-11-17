@@ -54,9 +54,10 @@ const SubscribeComponent = () => {
         credentials: "include",
       }
     );
-    var addressVal = await addressResponse.json();
-
-    if (addressResponse.status === 200) setUserAddress(addressVal);
+    if (addressResponse.status === 200) {
+      var addressVal = await addressResponse.json();
+      setUserAddress(addressVal);
+    }
 
     const subscriptionResult = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/FetchSubscriptionPlan`
@@ -81,12 +82,31 @@ const SubscribeComponent = () => {
 
   const getActionButton = () => {
     const colClassName = `${styles.addressContainer} col`;
-
     if (isAuthenticated) {
       return (
         <div className={styles.container}>
           <p style={{ fontWeight: 700 }}>{t("InvoiceAddressMsg")}:</p>
           <form onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="id"
+              control={control}
+              defaultValue={
+                userAddress
+                  ? userAddress.id
+                  : "00000000-0000-0000-0000-000000000000"
+              }
+              render={({ field }) => <input type="hidden" {...field} />}
+            />
+            <Controller
+              name="userId"
+              control={control}
+              defaultValue={
+                userAddress
+                  ? userAddress.userId
+                  : "00000000-0000-0000-0000-000000000000"
+              }
+              render={({ field }) => <input type="hidden" {...field} />}
+            />
             <div className={styles.container}>
               <div className={styles.row}>
                 <div className={styles.field}>
@@ -329,7 +349,6 @@ const SubscribeComponent = () => {
     };
     // HACK: 1. open spinner window
     openCheckoutSession(requestBody);
-    // HACK: if response is not 200 - then show error message
   };
   const handleClick = async () => {
     const requestBody = {
