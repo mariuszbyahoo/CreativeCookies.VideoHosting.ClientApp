@@ -27,6 +27,7 @@ const SubscribeComponent = () => {
   const [priceList, setPriceList] = useState([]);
   const [selectedPriceId, setSelectedPriceId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
   const [hasDeclinedCoolingOffPeriod, setHasDeclinedCoolingOffPeriod] =
     useState(false); // EU's 14 days cooling off period
   const [
@@ -347,18 +348,11 @@ const SubscribeComponent = () => {
       priceId: selectedPriceId,
       hasDeclinedCoolingOffPeriod: hasDeclinedCoolingOffPeriod,
     };
-    // HACK: 1. open spinner window
-    openCheckoutSession(requestBody);
-  };
-  const handleClick = async () => {
-    const requestBody = {
-      priceId: selectedPriceId,
-      hasDeclinedCoolingOffPeriod: hasDeclinedCoolingOffPeriod,
-    };
     openCheckoutSession(requestBody);
   };
 
   const openCheckoutSession = async (requestBody) => {
+    setRedirecting(true);
     const paymentSessionResult = await fetch(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeCheckout/CreateSession`,
       {
@@ -379,6 +373,7 @@ const SubscribeComponent = () => {
     } else {
       setUnexpectedErrorOccured(true);
     }
+    setRedirecting(false);
   };
 
   const closeUnexpectedErrorOccured = () => {
@@ -496,6 +491,11 @@ const SubscribeComponent = () => {
         <DialogActions>
           <Button onClick={closeUnexpectedErrorOccured}>{t("Close")}</Button>
         </DialogActions>
+      </Dialog>
+      <Dialog open={redirecting}>
+        <DialogContent>
+          <CircularProgress />
+        </DialogContent>
       </Dialog>
     </>
   );
