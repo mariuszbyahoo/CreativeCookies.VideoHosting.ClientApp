@@ -17,6 +17,7 @@ import AboutComponent from "./components/About/AboutComponent";
 import AboutEditorComponent from "./components/About/AboutEditorComponent";
 import RegulationsComponent from "./components/Regulations/RegulationsComponent";
 import PrivacyPolicyComponent from "./components/PrivacyPolicy/PrivacyPolicyComponent";
+import RegulationsEditorComponent from "./components/Regulations/RegulationsEditorComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   return (
@@ -55,6 +56,21 @@ const AppRoutes = [
     ),
   },
   {
+    path: "/regulationsEditor",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <ProtectedComponent accessFor="ADMIN">
+          <RegulationsEditorComponent />
+        </ProtectedComponent>
+      </ErrorBoundary>
+    ),
+  },
+  {
     path: "/privacyPolicy",
     element: (
       <ErrorBoundary
@@ -76,7 +92,9 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <AboutEditorComponent />
+        <ProtectedComponent accessFor="ADMIN">
+          <AboutEditorComponent />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },

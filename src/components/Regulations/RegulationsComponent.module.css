@@ -4,7 +4,7 @@
     right: 0;
     left: 0;
     height: 150px;
-    background: linear-gradient(to top, rgba(255, 255, 255, 1), transparent);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1), transparent);
     transition: all 0.3s ease;
     display: none;
     z-index: 1;
@@ -21,7 +21,7 @@
   
   .editButton {
     position: absolute !important;
-    bottom: 0 !important;
+    top: 0 !important;
     right: 0 !important;
     color: orange !important;
     display: none !important;
