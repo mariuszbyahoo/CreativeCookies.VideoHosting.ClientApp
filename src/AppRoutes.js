@@ -15,9 +15,9 @@ import SuccessComponent from "./components/Stripe/Subscribe/SuccessComponent";
 import CancelComponent from "./components/Stripe/Subscribe/CancelComponent";
 import AboutComponent from "./components/About/AboutComponent";
 import AboutEditorComponent from "./components/About/AboutEditorComponent";
+import RegulationsComponent from "./components/Regulations/RegulationsComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
-  // Call resetErrorBoundary() to reset the error boundary and retry the render.
   return (
     <div role="alert">
       <p>Something went wrong:</p>
@@ -37,6 +37,19 @@ const AppRoutes = [
         }}
       >
         <AboutComponent />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/regulations",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <RegulationsComponent />
       </ErrorBoundary>
     ),
   },
