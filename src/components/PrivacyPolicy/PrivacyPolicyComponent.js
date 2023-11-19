@@ -23,7 +23,7 @@ const PrivacyPolicyComponent = () => {
     );
     if (apiResponse.ok && apiResponse.status === 200) {
       var jsonRes = await apiResponse.json();
-      const sanitizedHTML = DOMPurify.sanitize(jsonRes.HtmlContent);
+      const sanitizedHTML = DOMPurify.sanitize(jsonRes.htmlContent);
       setPrivacyPolicyHtml(sanitizedHTML);
     } else if (apiResponse.status === 204) {
       setPrivacyPolicyHtml(undefined);
