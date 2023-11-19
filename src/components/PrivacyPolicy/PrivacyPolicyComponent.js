@@ -19,7 +19,7 @@ const PrivacyPolicyComponent = () => {
   async function fetchData() {
     setIsLoading(true);
     const apiResponse = await fetch(
-      `https://${process.env.REACT_APP_API_ADDRESS}/regulations/regulations`
+      `https://${process.env.REACT_APP_API_ADDRESS}/regulations/privacyPolicy`
     );
     if (apiResponse.ok && apiResponse.status === 200) {
       var jsonRes = await apiResponse.json();
@@ -46,7 +46,7 @@ const PrivacyPolicyComponent = () => {
           <Button
             className={styles.editButton}
             onClick={() => {
-              navigate("/regulationsEditor");
+              navigate("/privacyPolicyEditor");
             }}
           >
             <BorderColorIcon className={styles.editButtonIcon} />
