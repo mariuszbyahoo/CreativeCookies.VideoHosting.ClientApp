@@ -40,6 +40,7 @@ import {
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
+import { useConsent } from "./ConsentContext/ConsentContext";
 
 const NavMenu = () => {
   const {
@@ -54,6 +55,9 @@ const NavMenu = () => {
     subscriptionEndDateLocal,
     refreshTokens,
   } = useAuth();
+
+  const { showConsentPopup, acceptCookies } = useConsent();
+
   const [collapsed, setCollapsed] = useState(true);
   const [paymentNavContent, setPaymentNavContent] = useState(<></>);
   const [coolingOffPeriodCancelDialogMsg, setConfirmationDialogMsg] =
@@ -369,39 +373,6 @@ const NavMenu = () => {
             MyHub
           </NavbarBrand>
           {paymentNavContent}
-          {/* <NavItem style={{ marginInline: "1em" }}>
-            <FormControl
-              className="language-select"
-              style={{ minWidth: 120, margin: "auto 0" }}
-            >
-              <InputLabel
-                id="language-selector-label"
-                style={{ lineHeight: "1em" }}
-              >
-                {t("Language")}
-              </InputLabel>
-              <Select
-                labelId="language-selector-label"
-                id="language-selector"
-                label={t("Language")}
-                value={language}
-                onChange={changeLanguage}
-                style={{
-                  height: "2em",
-                  paddingTop: "1px",
-                  paddingBottom: "1px",
-                }}
-                MenuProps={{
-                  style: {
-                    maxHeight: 300,
-                  },
-                }}
-              >
-                <MenuItem value="en">English</MenuItem>
-                <MenuItem value="pl">Polski</MenuItem>
-              </Select>
-            </FormControl>
-          </NavItem> */}
           <NavbarToggler onClick={toggleNavbar} className="mr-2" />
           <Collapse
             className="d-sm-inline-flex flex-sm-row-reverse"
@@ -504,6 +475,14 @@ const NavMenu = () => {
           <Button onClick={closeSubscriptionCanceledDialog}>
             {t("Close")}
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={showConsentPopup} autoFocus={true}>
+        <DialogContent>
+          <DialogContentText>{t("CookieConsentTxt")}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={acceptCookies}>{t("Accept")}</Button>
         </DialogActions>
       </Dialog>
     </>

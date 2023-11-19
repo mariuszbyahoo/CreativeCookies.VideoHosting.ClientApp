@@ -206,6 +206,9 @@ const resources = {
       InvalidLastName: "Invalid last name",
       AddressMsg: "Above address will be used to generate valid VAT invoice",
       InvoiceAddressMsg: "Invoice address",
+      Accept: "Accept",
+      CookieConsentTxt:
+        "We respect your privacy and highly value transparent processing of your data. This site uses cookies to ensure a secure login process, remember your preferences, and protect against CSRF attacks. You can block our cookies through your browser settings.",
     },
   },
   pl: {
@@ -407,6 +410,9 @@ const resources = {
       AddressMsg:
         "Powyższy adres zostanie użyty do wygenerowania poprawnej faktury VAT",
       InvoiceAddressMsg: "Adres do faktury",
+      Accept: "Akceptuję",
+      CookieConsentTxt:
+        "Szanujemy Twoją prywatność i przywiązujemy wielką wagę do przejrzystego przetwarzania Twoich danych. Ta strona używa plików cookie w celu zapewnienia bezpiecznego procesu logowania, zapamiętywania Twoich preferencji, oraz ochrony przed atakami CSRF. Możesz zablokować nasze ciasteczka poprzez ustawienia swojej przeglądarki.",
     },
   },
 };
