@@ -16,6 +16,7 @@ import CancelComponent from "./components/Stripe/Subscribe/CancelComponent";
 import AboutComponent from "./components/About/AboutComponent";
 import AboutEditorComponent from "./components/About/AboutEditorComponent";
 import RegulationsComponent from "./components/Regulations/RegulationsComponent";
+import PrivacyPolicyComponent from "./components/PrivacyPolicy/PrivacyPolicyComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
   return (
@@ -50,6 +51,19 @@ const AppRoutes = [
         }}
       >
         <RegulationsComponent />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/privacyPolicy",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <PrivacyPolicyComponent />
       </ErrorBoundary>
     ),
   },

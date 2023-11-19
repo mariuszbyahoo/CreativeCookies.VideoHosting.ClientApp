@@ -5,10 +5,10 @@ import { Button, CircularProgress } from "@mui/material";
 import { Card } from "reactstrap";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import DOMPurify from "dompurify";
-import styles from "./RegulationsComponent.module.css";
+import styles from "./PrivacyPolicyComponent.module.css";
 
-const RegulationsComponent = () => {
-  const [regulationsHtml, setRegulationsHtml] = useState(undefined);
+const PrivacyPolicyComponent = () => {
+  const [privacyPolicyHtml, setPrivacyPolicyHtml] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const { userRole, isAuthenticated } = useAuth();
   useEffect(() => {
@@ -24,9 +24,9 @@ const RegulationsComponent = () => {
     if (apiResponse.ok && apiResponse.status === 200) {
       var jsonRes = await apiResponse.json();
       const sanitizedHTML = DOMPurify.sanitize(jsonRes.HtmlContent);
-      setRegulationsHtml(sanitizedHTML);
+      setPrivacyPolicyHtml(sanitizedHTML);
     } else if (apiResponse.status === 204) {
-      setRegulationsHtml(undefined);
+      setPrivacyPolicyHtml(undefined);
     } else {
       console.error("Unexpected error occured, contact vendor");
     }
@@ -66,18 +66,18 @@ const RegulationsComponent = () => {
           {editButton()}
           <div>
             {overlay()}
-            {regulationsHtml ? (
+            {privacyPolicyHtml ? (
               <div
                 style={{ margin: "1%" }}
-                dangerouslySetInnerHTML={{ __html: regulationsHtml }}
+                dangerouslySetInnerHTML={{ __html: privacyPolicyHtml }}
               />
             ) : (
               <>
                 <div style={{ textAlign: "center" }}>
-                  <h4>Regulamin</h4>
+                  <h4>Polityka prywatności</h4>
                   <p>
                     Zaloguj się przy użyciu konta administratora aby dodać
-                    regulamin portalu.
+                    politykę prywatności portalu.
                   </p>
                 </div>
               </>
@@ -89,4 +89,4 @@ const RegulationsComponent = () => {
   );
 };
 
-export default RegulationsComponent;
+export default PrivacyPolicyComponent;

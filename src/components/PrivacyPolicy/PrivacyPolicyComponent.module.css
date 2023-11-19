@@ -1,0 +1,37 @@
+.overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 150px;
+    background: linear-gradient(to top, rgba(255, 255, 255, 1), transparent);
+    transition: all 0.3s ease;
+    display: none;
+    z-index: 1;
+}
+
+.container {
+  text-align: center;
+  margin-top: 1vmax;
+}
+
+.editButtonIcon {
+    font-size: xx-large !important;
+  }
+  
+  .editButton {
+    position: absolute !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    color: orange !important;
+    display: none !important;
+    z-index: 2 !important; 
+  }
+
+.boxShadowCard:hover .editButton {
+    display: block !important; 
+  }
+
+  .boxShadowCard:hover .overlay {
+    display: block;
+  }
