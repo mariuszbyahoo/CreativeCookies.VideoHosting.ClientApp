@@ -15,9 +15,12 @@ import SuccessComponent from "./components/Stripe/Subscribe/SuccessComponent";
 import CancelComponent from "./components/Stripe/Subscribe/CancelComponent";
 import AboutComponent from "./components/About/AboutComponent";
 import AboutEditorComponent from "./components/About/AboutEditorComponent";
+import RegulationsComponent from "./components/Regulations/RegulationsComponent";
+import PrivacyPolicyComponent from "./components/PrivacyPolicy/PrivacyPolicyComponent";
+import RegulationsEditorComponent from "./components/Regulations/RegulationsEditorComponent";
+import PrivacyPolicyEditorComponent from "./components/PrivacyPolicy/PrivacyPolicyEditorComponent";
 
 function fallbackRender({ error, resetErrorBoundary }) {
-  // Call resetErrorBoundary() to reset the error boundary and retry the render.
   return (
     <div role="alert">
       <p>Something went wrong:</p>
@@ -41,6 +44,62 @@ const AppRoutes = [
     ),
   },
   {
+    path: "/regulations",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <RegulationsComponent />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/regulationsEditor",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <ProtectedComponent accessFor="ADMIN">
+          <RegulationsEditorComponent />
+        </ProtectedComponent>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/privacyPolicy",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <PrivacyPolicyComponent />
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: "/privacyPolicyEditor",
+    element: (
+      <ErrorBoundary
+        fallbackRender={fallbackRender}
+        onReset={(details) => {
+          console.log("ErrorBoundary onReset: ", details);
+        }}
+      >
+        <ProtectedComponent accessFor="ADMIN">
+          <PrivacyPolicyEditorComponent />
+        </ProtectedComponent>
+      </ErrorBoundary>
+    ),
+  },
+  {
     path: "/aboutEditor",
     element: (
       <ErrorBoundary
@@ -49,7 +108,9 @@ const AppRoutes = [
           console.log("ErrorBoundary onReset: ", details);
         }}
       >
-        <AboutEditorComponent />
+        <ProtectedComponent accessFor="ADMIN">
+          <AboutEditorComponent />
+        </ProtectedComponent>
       </ErrorBoundary>
     ),
   },

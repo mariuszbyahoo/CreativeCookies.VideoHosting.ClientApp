@@ -209,6 +209,12 @@ const resources = {
       Accept: "Accept",
       CookieConsentTxt:
         "We respect your privacy and highly value transparent processing of your data. This site uses cookies to ensure a secure login process, remember your preferences, and protect against CSRF attacks. You can block our cookies through your browser settings.",
+      EditRegulations: "Edit regulations",
+      UpdateRegulations: "Update",
+      RegulationsEditedSuccesfully: "Regulations edited succesfully",
+      EditPrivacyPolicy: "Edit privacy policy",
+      UpdatePrivacyPolicy: "Edit",
+      PrivacyPolicyEditedSuccesfully: "Privacy policy edited succesfully",
     },
   },
   pl: {
@@ -413,6 +419,13 @@ const resources = {
       Accept: "Akceptuję",
       CookieConsentTxt:
         "Szanujemy Twoją prywatność i przywiązujemy wielką wagę do przejrzystego przetwarzania Twoich danych. Ta strona używa plików cookie w celu zapewnienia bezpiecznego procesu logowania, zapamiętywania Twoich preferencji, oraz ochrony przed atakami CSRF. Możesz zablokować nasze ciasteczka poprzez ustawienia swojej przeglądarki.",
+      EditRegulations: "Edycja regulaminu",
+      UpdateRegulations: "Zmień",
+      RegulationsEditedSuccesfully: "Poprawnie zmieniono regulamin",
+      EditPrivacyPolicy: "Edycja polityki prywatności",
+      UpdatePrivacyPolicy: "Zmień",
+      PrivacyPolicyEditedSuccesfully:
+        "Poprawnie zmieniono politykę prywatności",
     },
   },
 };
