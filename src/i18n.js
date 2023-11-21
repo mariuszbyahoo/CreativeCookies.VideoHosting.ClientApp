@@ -219,6 +219,9 @@ const resources = {
       PrivacyPolicy: "Privacy policy",
       Regulations: "Regulations",
       YouWantSuchAWebsite: "Would you like to have such a website?",
+      EditAboutPage: "Edit about page",
+      UpdateAboutPage: "Update",
+      AboutPageEditedSuccessfully: "About page edited successfully",
     },
   },
   pl: {
@@ -434,6 +437,10 @@ const resources = {
       PrivacyPolicy: "Polityka Prywatności",
       Regulations: "Regulamin",
       YouWantSuchAWebsite: "Chciałbyś taką stronę",
+      EditAboutPage: "Edytuj stronę o kanale",
+      UpdateAboutPage: "Zmień",
+      AboutPageEditedSuccessfully:
+        "Strona o kanale została poprawnie zmieniona",
     },
   },
 };

@@ -9,6 +9,7 @@ import { ArrowDownward } from "@mui/icons-material";
 import ConfirmationDialog from "../ConfirmationDialog";
 import { useAuth } from "../Account/AuthContext";
 import { quillFormats, quillModules } from "../Helpers/quillHelper";
+import { useTranslation } from "react-i18next";
 
 const AboutEditorComponent = (props) => {
   const [metadata, setMetadata] = useState(undefined);
@@ -17,6 +18,7 @@ const AboutEditorComponent = (props) => {
   const [confirmationDialogOpened, setConfirmationDialogOpened] =
     useState(false);
   const { refreshTokens } = useAuth();
+  const { t } = useTranslation();
 
   const params = useParams();
   const navigate = useNavigate();
@@ -26,12 +28,9 @@ const AboutEditorComponent = (props) => {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
     control,
     watch,
-    reset,
     setValue,
-    clearErrors,
   } = useForm({
     defaultValues: {
       innerHTML: "",
@@ -113,7 +112,7 @@ const AboutEditorComponent = (props) => {
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.container}>
-          <h3>Edit your About page</h3>
+          <h3>{t("EditAboutPage")}</h3>
           {isLoading ? (
             <CircularProgress />
           ) : (
@@ -123,49 +122,21 @@ const AboutEditorComponent = (props) => {
               endIcon={<EditIcon />}
               style={{ marginTop: "1%", width: "25%" }}
             >
-              Edit
+              {t("UpdateAboutPage")}
             </Button>
           )}
           <div className={`row ${styles["row-margin"]}`}>
-            <p>
-              Used description length: {innerHTML ? innerHTML.length : "0"} /
-              5000 characters
-            </p>
-            <div className={`row ${styles["row-margin"]}`}>
-              {errors.innerHTML && (
-                <>
-                  <span style={{ color: "#b71c1c" }}>
-                    Description cannot exceed 5000 characters.
-                  </span>
-                </>
-              )}
-            </div>
-            <p>
-              How is description counted?
-              <IconButton variant="contained" onClick={scrollIntoExplanation}>
-                <ArrowDownward />
-              </IconButton>
-            </p>
             <Controller
               name="innerHTML"
               control={control}
               defaultValue=""
-              rules={{ maxLength: 5000 }}
               render={({ field }) => (
                 <ReactQuill
                   theme="snow"
                   defaultValue=""
                   value={field.value}
                   onChange={(value) => {
-                    if (value.trim().length > 5000) {
-                      setError("innerHTML", {
-                        type: "manual",
-                        message: "About page cannot exceed 5000 characters",
-                      });
-                    } else {
-                      clearErrors("innerHTML");
-                    }
-                    setValue("innerHTML", value, { shouldValidate: true }); // this will trigger validation
+                    setValue("innerHTML", value);
                   }}
                   modules={quillModules}
                   formats={quillFormats}
@@ -174,22 +145,10 @@ const AboutEditorComponent = (props) => {
             />
           </div>
         </div>
-        <div style={{ textAlign: "center", marginTop: "5%" }}>
-          <h4 ref={explanationRef}>Description length's explanation</h4>
-          <p>
-            Description is being translated from the editor above into an HTML
-            code, so any stylings will enlarge the amount of used characters.
-            <br />
-            <strong>Max length of a description is 5000 characters</strong>
-            <br />
-            Generated HTML code of your video's description looks like this:
-          </p>
-          {innerHTML && <p className={styles.code}>{innerHTML}</p>}
-        </div>
       </form>
       <ConfirmationDialog
-        title="Success"
-        message="About page has been updated"
+        title={t("Success")}
+        message={t("AboutPageEditedSuccessfully")}
         open={confirmationDialogOpened}
         hasCancelOption={false}
         onConfirm={() => {
