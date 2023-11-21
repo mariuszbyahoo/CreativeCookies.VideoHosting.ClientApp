@@ -215,6 +215,10 @@ const resources = {
       EditPrivacyPolicy: "Edit privacy policy",
       UpdatePrivacyPolicy: "Edit",
       PrivacyPolicyEditedSuccesfully: "Privacy policy edited succesfully",
+      LinkedinAccount: "Contact the author on LinkedIn",
+      PrivacyPolicy: "Privacy policy",
+      Regulations: "Regulations",
+      YouWantSuchAWebsite: "Would you like to have such a website?",
     },
   },
   pl: {
@@ -426,6 +430,10 @@ const resources = {
       UpdatePrivacyPolicy: "Zmień",
       PrivacyPolicyEditedSuccesfully:
         "Poprawnie zmieniono politykę prywatności",
+      LinkedinAccount: "Skontaktuj się z autorem na LinkedIn",
+      PrivacyPolicy: "Polityka Prywatności",
+      Regulations: "Regulamin",
+      YouWantSuchAWebsite: "Chciałbyś taką stronę",
     },
   },
 };

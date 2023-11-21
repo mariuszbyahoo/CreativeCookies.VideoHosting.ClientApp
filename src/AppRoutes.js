@@ -72,7 +72,7 @@ const AppRoutes = [
     ),
   },
   {
-    path: "/privacyPolicy",
+    path: "/privacy-policy",
     element: (
       <ErrorBoundary
         fallbackRender={fallbackRender}

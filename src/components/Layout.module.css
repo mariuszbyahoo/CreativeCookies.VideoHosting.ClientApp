@@ -1,0 +1,9 @@
+.site-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .content-wrap {
+    flex: 1; /* This will allow the content to expand and push the footer down */
+    /* Ensure there is no padding or margin that could push the footer down unnaturally */
+  }
