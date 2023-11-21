@@ -65,6 +65,7 @@ const SubscribeComponent = () => {
     );
     if (subscriptionResult.ok) {
       const receivedSubscription = await subscriptionResult.json();
+      const prices = pricesList.filter((price) => price.isActive);
       setPriceList(receivedSubscription.prices);
       const plnIndex = receivedSubscription.prices.findIndex(
         (price) => price.currency === "pln"

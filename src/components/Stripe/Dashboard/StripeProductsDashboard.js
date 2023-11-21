@@ -91,6 +91,7 @@ const StripeProductsDashboardComponent = () => {
     const pricesList =
       pricesResponse.status === 200 ? await pricesResponse.json() : undefined;
     if (pricesList) {
+      pricesList = pricesList.filter((price) => price.isActive);
       setStripePrices(pricesList);
     }
     setIsLoadingPrice(false);
