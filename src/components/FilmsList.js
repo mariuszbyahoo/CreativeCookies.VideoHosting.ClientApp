@@ -33,7 +33,7 @@ const FilmsList = () => {
   const { refreshTokens } = useAuth();
 
   const fetchMoviesHandler = async () => {
-    if (!hasMore && pageNumber > 1) return; // Don't fetch if there are no more items and it's not the first page
+    if (!hasMore && pageNumber > 1) return;
 
     setLoading(true);
     setError(null);
@@ -41,7 +41,7 @@ const FilmsList = () => {
     fetchSasToken()
       .then((token) => {
         fetch(
-          `https://${process.env.REACT_APP_API_ADDRESS}/blobs/films?search=${searchTerm}&pageNumber=${pageNumber}&pageSize=24`,
+          `https://${process.env.REACT_APP_API_ADDRESS}/blobs/films?search=${searchTerm}&pageNumber=${pageNumber}&pageSize=5`,
           {
             credentials: "include",
           }
