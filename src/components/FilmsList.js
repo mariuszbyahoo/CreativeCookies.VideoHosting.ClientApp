@@ -60,7 +60,6 @@ const FilmsList = () => {
               `inside of fetchMoviesHandler, data.hasMore: ${data.hasMore}`
             );
             setHasMore(data.hasMore);
-            setPageNumber((prevPage) => prevPage + 1);
             setLoading(false);
           })
           .catch((error) => {
