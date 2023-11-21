@@ -61,12 +61,10 @@ const PrivacyPolicyEditorComponent = (props) => {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     editRegulationsHandler();
   };
 
   const editRegulationsHandler = (e) => {
-    console.log(e);
     const updatedMetadata = {
       ...policyObj,
       htmlContent: watch("htmlContent"),

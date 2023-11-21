@@ -48,17 +48,11 @@ const FilmsList = () => {
         )
           .then((response) => response.json())
           .then((data) => {
-            console.log(
-              `fetch blobs metadata called with searchTerm: ${searchTerm}`
-            );
             setVideoMetadatas((prevVideoMetadatas) => [
               ...prevVideoMetadatas,
               ...data.films,
             ]);
             setTotalPages(data.totalPages);
-            console.log(
-              `inside of fetchMoviesHandler, data.hasMore: ${data.hasMore}`
-            );
             setHasMore(data.hasMore);
             setLoading(false);
           })

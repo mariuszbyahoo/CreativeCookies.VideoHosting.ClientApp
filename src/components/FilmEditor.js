@@ -65,7 +65,6 @@ const FilmEditor = (props) => {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     editVideoHandler();
   };
 
@@ -74,7 +73,6 @@ const FilmEditor = (props) => {
   };
 
   const editVideoHandler = (e) => {
-    console.log(e);
     const updatedMetadata = {
       ...metadata,
       name: watch("videoTitle"),

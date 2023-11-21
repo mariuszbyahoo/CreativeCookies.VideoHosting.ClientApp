@@ -62,12 +62,10 @@ const AboutEditorComponent = (props) => {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     editDescHandler();
   };
 
   const editDescHandler = (e) => {
-    console.log(e);
     const updatedMetadata = {
       ...metadata,
       innerHTML: watch("innerHTML"),

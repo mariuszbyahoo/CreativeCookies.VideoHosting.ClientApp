@@ -61,12 +61,10 @@ const RegulationsEditorComponent = (props) => {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     editRegulationsHandler();
   };
 
   const editRegulationsHandler = (e) => {
-    console.log(e);
     const updatedMetadata = {
       ...regulationsObj,
       htmlContent: watch("htmlContent"),

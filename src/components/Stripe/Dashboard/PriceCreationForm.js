@@ -34,7 +34,6 @@ const PriceCreationForm = ({
 
   const handleSavePrice = async () => {
     try {
-      console.log(JSON.stringify(stripeProduct));
       let requestBody = {
         stripeProductId: stripeProduct.id,
         unitAmount: priceAmount * 100,
