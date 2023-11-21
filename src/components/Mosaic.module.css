@@ -1,7 +1,6 @@
 .mosaic-wrapper {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    grid-gap: 10px;
-    grid-auto-rows: minmax(200px, auto);
-    padding: 10px;
-  }
+  display: grid;
+  grid-template-columns: 1fr; /* Single column layout */
+  grid-gap: 10px;
+  padding: 10px;
+}
