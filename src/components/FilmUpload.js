@@ -192,28 +192,26 @@ const FilmUpload = (props) => {
   }, []);
 
   const videoChangeHandler = (e) => {
-    if (e.target.files) {
-      if (e.target.files && e.target.files[0].name.includes(".mp4")) {
-        setVideo(e.target.files[0]);
-      } else {
-        setVideo(undefined);
-        setConfirmationDialogTitle(t("ValidationError"));
-        setConfirmationDialogMessage(t("OnlyMP4FilesAreAllowed"));
-        setIsConfirmaitonDialogOpened(true);
-      }
+    const selectedFile = e.target.files && e.target.files[0];
+    if (selectedFile && selectedFile.name.includes(".mp4")) {
+      setVideo(selectedFile);
+    } else {
+      setVideo(undefined);
+      setConfirmationDialogTitle(t("ValidationError"));
+      setConfirmationDialogMessage(t("OnlyMP4FilesAreAllowed"));
+      setIsConfirmaitonDialogOpened(true);
     }
   };
 
   const thumbnailChangeHandler = (e) => {
-    if (e.target.files) {
-      if (e.target.files && e.target.files[0].name.includes(".jpg")) {
-        setThumbnail(e.target.files[0]);
-      } else {
-        setThumbnail(undefined);
-        setConfirmationDialogTitle(t("ValidationError"));
-        setConfirmationDialogMessage(t("OnlyJPGFilesAreAllowed"));
-        setIsConfirmaitonDialogOpened(true);
-      }
+    const selectedFile = e.target.files && e.target.files[0];
+    if (selectedFile && selectedFile.name.includes(".jpg")) {
+      setThumbnail(selectedFile);
+    } else {
+      setThumbnail(undefined);
+      setConfirmationDialogTitle(t("ValidationError"));
+      setConfirmationDialogMessage(t("OnlyJPGFilesAreAllowed"));
+      setIsConfirmaitonDialogOpened(true);
     }
   };
 
