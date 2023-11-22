@@ -88,7 +88,7 @@ const StripeProductsDashboardComponent = () => {
     const pricesResponse = await fetchWithCredentials(
       `https://${process.env.REACT_APP_API_ADDRESS}/StripeProducts/GetAllPrices?productId=${productId}`
     );
-    const pricesList =
+    let pricesList =
       pricesResponse.status === 200 ? await pricesResponse.json() : undefined;
     if (pricesList) {
       pricesList = pricesList.filter((price) => price.isActive);
