@@ -29,7 +29,9 @@ export const ConsentProvider = ({ children }) => {
   }, []);
 
   const acceptCookies = () => {
-    document.cookie = "CookieConsent=true; path=/";
+    const expirationDate = new Date();
+    expirationDate.setFullYear(expirationDate.getFullYear() + 10); // Expires in 10 years
+    document.cookie = `CookieConsent=true; expires=${expirationDate.toUTCString()}; path=/`;
     setShowConsentPopup(false);
   };
 
