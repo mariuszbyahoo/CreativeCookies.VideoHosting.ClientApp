@@ -182,10 +182,6 @@ const SubscribeComponent = () => {
                         value: 3,
                         message: t("StreetAtLeast3CharsLong"),
                       },
-                      pattern: {
-                        value: /^[A-Za-z\sążźśćęłóńĄŻŹŚĆĘŁÓŃ]{3,}$/,
-                        message: t("InvalidStreetName"),
-                      },
                     }}
                     render={({ field }) => (
                       <TextField
