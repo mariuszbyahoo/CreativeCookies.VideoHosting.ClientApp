@@ -9,12 +9,12 @@ const Footer = () => {
     <footer className={classNames}>
       {t("YouWantSuchAWebsite")}?
       <a
-        href="https://www.linkedin.com/in/mbudzisz/"
+        href="mailto:your-email@example.com"
         className={styles.linkedin}
         target="_blank"
         rel="noopener noreferrer"
       >
-        {t("LinkedinAccount")}
+        {t("Contact")}
       </a>
       <div className={styles.links}>
         <a href="/privacy-policy">{t("PrivacyPolicy")}</a>
