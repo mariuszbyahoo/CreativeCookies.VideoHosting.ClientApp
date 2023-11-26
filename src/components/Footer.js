@@ -9,7 +9,7 @@ const Footer = () => {
     <footer className={classNames}>
       {t("YouWantSuchAWebsite")}?
       <a
-        href="mailto:your-email@example.com"
+        href="mailto:mariusz@creativecookies.pl"
         className={styles.linkedin}
         target="_blank"
         rel="noopener noreferrer"
